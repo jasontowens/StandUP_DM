@@ -1,4 +1,6 @@
 	
+
+	
 	var canvas = document.getElementById('canvas');
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
@@ -25,15 +27,23 @@
 		
 	};		//starts everything
 
+var timeSpeed = 1000; // 1 means time is correct, .25 means program is running 1/4 speed it should be
 var game = new Object();
  	
 function preloadImagesAndVariables(){
 	game.displayPassFailTime=false;
 	game.originalTimeOfRound=30;
 	game.passNotCorrect=false;
+	
+	
+	
+	game.gameMode = 1; // 1 is head's up, 2 is not in any way legally similar to catchphrase
 
 	game.menu_background = new Image();							//menu background
 	game.menu_background.src = "Menu.png";
+	
+	game.menu_background2 = new Image();
+	game.menu_background2.src = "Menu2.png";
 	
 	
 	game.inGame_background = new Image();						//standard in-game background
@@ -42,9 +52,12 @@ function preloadImagesAndVariables(){
 	game.endGame_background=new Image();
 	game.endGame_background.src= "endGame.png";	
 		
-	game.numOfCategories=2;
-	game.categoriesBoolArray = [1,1];
+	//game.numOfCategories=2;
+	//game.categoriesBoolArray = [1,1];
 	instantiateCategoriesArray();
+	
+	game.buttonsArray = [];
+	instantiateButtonsArray();
 	
 	game.pass_background = new Image();
 	game.pass_background.src="pass.png";
@@ -70,24 +83,34 @@ function preloadImagesAndVariables(){
 	};
 }
 
+function instantiateButtonsArray(){
+	for(i=0; i!=game.categoriesArray.length; ++i){
+		game.buttonsArray.push([game.categoriesArray[i][0], true]);
+	}	
+}
+
 function instantiateCategoriesArray(){
+
+	//VERY IMPORTANT: FIRST ELEMENT IN EACH CATEGORY IS THE NAME OF THE CATEGORY, DO NOT PRINT IT
 	game.categoriesArray= 
 		[
-		/* 0: College Teams*/ ["Florida Gators","LSU Tigers","Tenessee Volunteers","Georgia Bulldogs","Oregon Ducks","Florida State Seminoles","Arkansas Razorbacks",
+		/* 0: College Teams*/ ["College Teams","Florida Gators","LSU Tigers","Tenessee Volunteers","Georgia Bulldogs","Oregon Ducks","Florida State Seminoles","Arkansas Razorbacks",
 		"Alabama Crimson Tide","South Carolina Gamecocks","Ole Miss Rebels","Kentucky Wildcats","Texas A&M Aggies","Michigan Wolverines","Michigan State Spartans",
 		"Texas Longhorns","Ohio State Buckeyes","Notre Dame FIghting Irish","Duke Blue Devils","Nebraska Cornhuskers","TCU Horned Frogs"],
-		/* 1: dances*/["Macarena", "Teach me how to dougie", "Cat Daddy", "Cha Cha Slide", "Cupid Shuffle", "Thriller", "Gangnam Style"],
-		/* 2: ESPN*/["Erin Andrews", "Tim Tebow", "Soccer", "Football", "Baseball", "Softball", "Tennis", "Champion", "Hockey", "Basketball", "College Gameday", "The Gators", "Referee", "Yellow Card", "Red Card", "Goalie", "First Down", "Kicker", "Defense", "Offense", "Punt", "Quarterback", "Michael Jordan", "Sideline", "Cheerleaders", "Halftime Show", "Cleats", "Superbowl", "National Championship", "3 Strikes You’re Out", "Foul Ball", "Heisman", "Overtime", "Sweat", "Tackle", "Wide Receiver", "Striker", "Scoreboard", "Head Coach", "Conditioning", "Two-a-Days", "Gatorade", "Practice Makes Perfect", "Jersey", "Puck", "Kick Off", "Rain Delay", "Fans", "Underdog", "Comeback", "Undefeated Season", "Marching Band", "Umpire", "Nike", "3-pointer", "Dribble", "Homerun", "Pitcher", "Stadium", "Under Armor", "Dazzlers", "Time Out", "Fantasy Football", "Just Do It", "Get Your Head in the Game", "Rivalry", "Sponsor", "Tie", "Semi-Finals"],
+		
+		/* 1: dances*/["Dances","Macarena", "Teach me how to dougie", "Cat Daddy", "Cha Cha Slide", "Cupid Shuffle", "Thriller", "Gangnam Style"],
+		
+		/* 2: ESPN*/["ESPN","Erin Andrews", "Tim Tebow", "Soccer", "Football", "Baseball", "Softball", "Tennis", "Champion", "Hockey", "Basketball", "College Gameday", "The Gators", "Referee", "Yellow Card", "Red Card", "Goalie", "First Down", "Kicker", "Defense", "Offense", "Punt", "Quarterback", "Michael Jordan", "Sideline", "Cheerleaders", "Halftime Show", "Cleats", "Superbowl", "National Championship", "3 Strikes You’re Out", "Foul Ball", "Heisman", "Overtime", "Sweat", "Tackle", "Wide Receiver", "Striker", "Scoreboard", "Head Coach", "Conditioning", "Two-a-Days", "Gatorade", "Practice Makes Perfect", "Jersey", "Puck", "Kick Off", "Rain Delay", "Fans", "Underdog", "Comeback", "Undefeated Season", "Marching Band", "Umpire", "Nike", "3-pointer", "Dribble", "Homerun", "Pitcher", "Stadium", "Under Armor", "Dazzlers", "Time Out", "Fantasy Football", "Just Do It", "Get Your Head in the Game", "Rivalry", "Sponsor", "Tie", "Semi-Finals"],
 
-		/* 3: Medieval*/ ["Chivalry", "Jousting", "Dark Ages", "Sword in the Stone", "Duke", "Knight", "Renaissance", "Melee", "Gauntlet", "Chalice", "Alms", "Prince", "Queen", "King", "Princess", "Jester", "Feast", "Cannon", "Chainmail", "Goblet", "Armor", "Axe", "Bow", "Arrow", "Duel", "Castle", "Helmet"],
+		/* 3: Medieval*/ ["Medieval","Chivalry", "Jousting", "Dark Ages", "Sword in the Stone", "Duke", "Knight", "Renaissance", "Melee", "Gauntlet", "Chalice", "Alms", "Prince", "Queen", "King", "Princess", "Jester", "Feast", "Cannon", "Chainmail", "Goblet", "Armor", "Axe", "Bow", "Arrow", "Duel", "Castle", "Helmet"],
 
-		/* 4: NickeloDM*/ ["Dancing Lobsters", "Orange Soda", "Penelope", "Totally Kyle", "Crazy Courtney", "The Girls Room", "All That", "Tommy Pickles", "Cynthia & Angelica", "Phil & Lil", "Chuckie", "Football Head", "Helga Patnki", "Orange Blimp", "Slime Time Live", "Ren & Shrimpy", "Keenan & Kel", "Are You Afraid of the Dark?", "Ahh Real Monsters", "Spongebob", "The Amanda Show", "The Wild Thornberries", "Rocket Power", "Cat Dog", "Angry Beavers", "Fairly Odd Parents", "Legends of the Hidden Temple"],
+		/* 4: NickeloDM*/ ["NickeloDM","Dancing Lobsters", "Orange Soda", "Penelope", "Totally Kyle", "Crazy Courtney", "The Girls Room", "All That", "Tommy Pickles", "Cynthia & Angelica", "Phil & Lil", "Chuckie", "Football Head", "Helga Patnki", "Orange Blimp", "Slime Time Live", "Ren & Shrimpy", "Keenan & Kel", "Are You Afraid of the Dark?", "Ahh Real Monsters", "Spongebob", "The Amanda Show", "The Wild Thornberries", "Rocket Power", "Cat Dog", "Angry Beavers", "Fairly Odd Parents", "Legends of the Hidden Temple"],
 
-		/* 5: Dr. Seuss*/ ["The Lorax", "Cat in the Hat", "Green Eggs and Ham", "Andy Lou Who", "The Grinch", "Thing 1 and Thing 2", "Truffala Trees", "Fish", "39 and ½ Foot Pole", "Horton", "Theodore Geisel", "Star-bellied Sneetch", "Sam I am", "Max"],
+		/* 5: Dr. Seuss*/ ["Dr. Seuss","The Lorax", "Cat in the Hat", "Green Eggs and Ham", "Andy Lou Who", "The Grinch", "Thing 1 and Thing 2", "Truffala Trees", "Fish", "39 and ½ Foot Pole", "Horton", "Theodore Geisel", "Star-bellied Sneetch", "Sam I am", "Max"],
 
-		/* 6: Morale Royale*/ ["Captain", "Karaoke", "Royal Caribbean", "Carnival", "Buffet", "Casino", "Pool Deck", "Formal Night", "Anchor", "Port", "Dock", "Excursion", "Cabin", "Stateroom", "Putt-Putt Golf", "Life Vest", "Titanic", "Comedy Show", "Beach", "Towel", "Swimsuit", "Sunglasses", "Sunscreen", "Spa", "Massage", "Jacuzzi", "Night Club", "Newlyweds", "Vacation", "Bahamas", "Cazumel", "Hair Braiding", "Kids Club", "Tourists", "Sandals", "Soft Serve Ice Cream"],
+		/* 6: Morale Royale*/ ["Morale Royale","Captain", "Karaoke", "Royal Caribbean", "Carnival", "Buffet", "Casino", "Pool Deck", "Formal Night", "Anchor", "Port", "Dock", "Excursion", "Cabin", "Stateroom", "Putt-Putt Golf", "Life Vest", "Titanic", "Comedy Show", "Beach", "Towel", "Swimsuit", "Sunglasses", "Sunscreen", "Spa", "Massage", "Jacuzzi", "Night Club", "Newlyweds", "Vacation", "Bahamas", "Cazumel", "Hair Braiding", "Kids Club", "Tourists", "Sandals", "Soft Serve Ice Cream"],
 
-		/* 7: Dance ‘Merica*/ ["Statue of Liberty", "Bald Eagle", "American Flag", "Fireworks", "Obama", "Golden Retriever", "Football", "Baseball", "BBQ", "Mount Rushmore", "Hot Dog", "Frat", "Miss America", "Shucking Corn", "McDonalds", "Jorts", "Oprah", "George Washington", "Beyonce", "Thanksgiving", "4th of July", "Black Friday", "Pearl Harbor", "Great Depression", "Civil War", "Prohibition", "Michael Jackson", "Forrest Gump", "United States", "Louis and Clark", "Sacagawea", "White House", "Grand Canyon", "Niagra Falls", "Declaration of Independence", "Martin Luther King Jr", "Secret Service", "The Kennedys", "NYPD", "FBI", "CIA", "Coca Cola", "New York", "Washington D.C."]
+		/* 7: Dance ‘Merica*/ ["Dance 'Merica","Statue of Liberty", "Bald Eagle", "American Flag", "Fireworks", "Obama", "Golden Retriever", "Football", "Baseball", "BBQ", "Mount Rushmore", "Hot Dog", "Frat", "Miss America", "Shucking Corn", "McDonalds", "Jorts", "Oprah", "George Washington", "Beyonce", "Thanksgiving", "4th of July", "Black Friday", "Pearl Harbor", "Great Depression", "Civil War", "Prohibition", "Michael Jackson", "Forrest Gump", "United States", "Louis and Clark", "Sacagawea", "White House", "Grand Canyon", "Niagra Falls", "Declaration of Independence", "Martin Luther King Jr", "Secret Service", "The Kennedys", "NYPD", "FBI", "CIA", "Coca Cola", "New York", "Washington D.C."]
 
 		];
 }	
@@ -125,36 +148,55 @@ function mobileClick(e){
 function menuClick(X,Y){
 	if(Y>(210/667*h) && Y<(505/667*h)){	//first button
 		c.removeEventListener("click", menuClick);
+		
 		if(X<275/320*w){
-			if(Y<285/667*h && Y>200/667*h){	
+			if(Y<285/560*h && Y>200/667*h){	
 				//start game using currently selected categories and  
 				startGame();
-				inMenu = false;
-				
+				inMenu = false;				
 			}
-			else if(Y<360/667*h){
+			else if(Y<350/560*h){
 				//categories
 			}
-			else if(Y<435/667*h){
-				inMenu = false;
-				gameModes();
+			else if(Y<435/560*h){
+				if(game.gameMode == 1){
+					game.gameMode = 2;
+					ctx.drawImage(game.menu_background2, 0,0,w,h);
+				}
+				else{
+					ctx.drawImage(game.menu_background, 0,0,w,h);
+					game.gameMode = 1;
+				}
 				//game modes
 			}
-			else if(Y<505/667*h){
+			else if(Y<505/560*h){
 				//how to play
 			}
 		}
 	}
  }
  
- function gameModes
+ function gameModes(){
+	ctx.drawImage(game.gameMode_background, 0,0,w,h);
+	
+ }
 
 function gameClick(mobileClickX, mobileClickY){
 	
 }
 
+function fixTime(firstTime){
+	var d = new Date();
+	var s = d.getTime();
+	
+	if(firstTime == 0)
+		setTimeout(function(){ fixTime(s); } ,1000);
+	else
+		timeSpeed = 1000/(s - firstTime);
+}
 
 function loadMenu(){
+	fixTime(0);
     Menu();     
     //updateScore();
 }
@@ -195,8 +237,7 @@ function Menu(){
 	if(game.displayPassFail)//if device isn't oriented properly (i.e. on forehead)
 		setTimeout(function(){startGame();}, 100);
 	else{	
-		changeWord(); //initializes first word	
-		
+		changeWord(); //initializes first word			
 		countdown(4000);
 	}
 	
@@ -223,12 +264,12 @@ function Menu(){
 			wrapText(ctx, numString, h/4, w/1.55, h, 89);
 		}
 		ctx.restore();	
-		var f = function(){countdown(timeToGame-10);};
-		setTimeout(f, 10);
+		var f = function(){countdown(timeToGame-100);};
+		setTimeout(f, 100/timeSpeed);
 	}
 	else{
 		ctx.restore();	//for rotateContext();	
-		gameLoop(10);
+		gameLoop(10); //takes number of seconds in game
 	}
  }
   
@@ -287,7 +328,7 @@ function Menu(){
  
  function randomWordInCategory(currentCategory){	//returns a random word in give category (parameter is int)
 	var sizeOfCategory = game.categoriesArray[currentCategory].length;
-	game.currentWordLocation = Math.floor((Math.random() * sizeOfCategory));//location in select category of used word
+	game.currentWordLocation = Math.floor((Math.random() * sizeOfCategory-1))+1;//location in select category of used word, should not be 0 because of category name
 	
 	return game.categoriesArray[currentCategory][game.currentWordLocation];
  }
@@ -296,7 +337,9 @@ function Menu(){
 	game.playedWords.push([game.currentWord, passNotCorrect]);
  }
  
- function gameLoop(timeOfRound){		//this 
+ function gameLoop(timeOfRound,lastTime){			
+	
+	
 	if(timeOfRound<=0){
 		inGame=false;
 		gameOver();
@@ -310,11 +353,9 @@ function Menu(){
 			ctx.drawImage(game.inGame_background, 0,0,w,h);
 			printWord();		
 			printTime(timeOfRound);
-			var f = function(){gameLoop(timeOfRound-.01);};
-			setTimeout(f, 10);
-		}
-		
-		
+			var f = function(){gameLoop(timeOfRound-.1);};
+			setTimeout(f, 100 / timeSpeed);
+		}		
 		//gameLoop();
 	}
  }
@@ -326,12 +367,10 @@ function Menu(){
  }
  
  
- 
  function gameOver(){
 	ctx.font         = "bold 40px AG Book Rounded";	
 	c.addEventListener("click", endClick); 
-	printPlayedWords(0,0);	
-	
+	printPlayedWords(0,0);		
 }
 
 function endClick(X,Y){
