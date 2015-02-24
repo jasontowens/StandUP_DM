@@ -13,53 +13,23 @@
 	var w = canvas.width;
 	var h = canvas.height;
 	var inMenu = true;
-	var inGame = false;
 
 	//global categories arrays
 	var usedArrays = [1];
 	var arrays;
 	
-	var timeSpeed = 1000; // 1 means time is correct, .25 means program is running 1/4 speed it should be
-	var game = new Object();
-	game.gameMode;
-	game.category;
-	
-	/*
-	var game = function(){
-		this.gameMode = new gameMode;
-		this.category = new category;
-		this.gameState = new gameState;
-
-	}
-	
-	game.startGame.prototype = function(){
-		kdjfkasjf;
-	}
-	
-	var gameMode = function(){
-		this.currentGameMode;
-	}
-	var category = function(){
-		this.currentCategory;
-	}
-	
-	*/
-	 var isMobile = false; //boolean for whether or not the device is mobile
-	 var mobileClickX = 0; 
-	 var mobileClickY = 0;
-	 var touchobj;
 	
 
-window.onload = function(){
-		//var button1 = new Button("hellobitch",4,4,1);
+	window.onload = function(){
 		preloadImagesAndVariables();
 		//loadMenu();
 		//listenForFingers();
 		
 	};		//starts everything
 
-
-
+var timeSpeed = 1000; // 1 means time is correct, .25 means program is running 1/4 speed it should be
+var game = new Object();
+ 	
 function preloadImagesAndVariables(){
 	game.displayPassFailTime=false;
 	game.originalTimeOfRound=30;
@@ -183,18 +153,14 @@ function menuClick(X,Y){
 			if(Y<285/560*h && Y>200/667*h){	
 				//start game using currently selected categories and  
 				startGame();
-				inGame = true;
 				inMenu = false;				
 			}
 			else if(Y<350/560*h){
 				//categories
-				//display categories
-				//tell the game which categorie is chosen
-				//game.category 
 			}
 			else if(Y<435/560*h){
 				if(game.gameMode == 1){
-					game.gameMode = 2;//game Mode is being created here. 
+					game.gameMode = 2;
 					ctx.drawImage(game.menu_background2, 0,0,w,h);
 				}
 				else{
@@ -235,6 +201,8 @@ function loadMenu(){
     //updateScore();
 }
 
+
+
 function Menu(){ 
   //clearCanvas();
   inMenu = true;
@@ -242,12 +210,22 @@ function Menu(){
   c.addEventListener("click", menuClick); 
 }
 
+
+
+
+ var isMobile = false; //boolean for whether or not the device is mobile
+ var mobileClickX = 0; 
+ var mobileClickY = 0;
+ var touchobj;
+ 
+ 
  function resetGameVariables(){ //for stuff that needs to be reset every game
 	delete game.playedWords;
 	game.playedWords = [];
  }
  
  function startGame(){
+	inGame=true;
 	var originalTimeOfRound = 30;//in seconds
 	
 	resetGameVariables();
@@ -388,6 +366,7 @@ function Menu(){
 	ctx.rotate(-Math.PI / 2); //rotate counter-clockwise
  }
  
+ 
  function gameOver(){
 	ctx.font         = "bold 40px AG Book Rounded";	
 	c.addEventListener("click", endClick); 
@@ -443,6 +422,7 @@ function endClick(X,Y){
   
  }
  
+  
  window.ondeviceorientation = function(event) {
   //game.alpha = Math.round(event.alpha);
   //game.beta = Math.round(event.beta);
@@ -557,43 +537,7 @@ function endClick(X,Y){
         }
 		return isMultipleLines;
 }
-
-function createButtons(){
-}
  
-var Button = function(text,width,height,buttonNumber){
-	this.text = text;
-	this.width = width;
-	this.height = height;
-	this.buttonNumber = buttonNumber
-	this.makePretty();
-	
-};
-
-Button.prototype.makePretty = function(){
-	var baseFont = "px Arial";
-	var i = 20;
-	var iString = i.toString();
-	var fontSize = iString.concat(baseFont);
-	ctx.font = fontSize;
-	ctx.fillText(this.text,10,10);
-}
  
-function loadScript(url, callback)
-{
-    // Adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-
-    // Then bind the event to the callback function.
-    // There are several events for cross browser compatibility.
-    script.onreadystatechange = callback;
-    script.onload = callback;
-
-    // Fire the loading
-    head.appendChild(script);
-}
  
 
