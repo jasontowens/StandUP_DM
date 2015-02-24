@@ -51,6 +51,7 @@
 	
 
 window.onload = function(){
+		//var cs1 = new CategoryScreen();
 		var cs = new CategoryScreenController(game);
 		//var button1 = new Button("hellobitch",4,4,1);
 		preloadImagesAndVariables();
@@ -668,12 +669,10 @@ function endClick(X,Y){
 function createButtons(){
 }
  
-var Button = function(text,width,height,buttonNumber){
+var Button = function(text,buttonNumber){
 	this.text = text;
-	this.width = width;
-	this.height = height;
 	this.buttonNumber = buttonNumber
-	this.makePretty();
+	//this.makePretty();
 	
 };
 
@@ -685,15 +684,46 @@ Button.prototype.makePretty = function(){
 	ctx.font = fontSize;
 	ctx.fillText(this.text,10,10);
 }
+Button.prototype.drawButton = function(number,x,y){
+	ctx.fillStyle = "blue";
+	if(number%2 == 1){
+		ctx.fillStyle = "orange";
+	}
+	var actualHeight = ((142)/(568) * h);
+	var actualWidth = ((320)/(320) * w);
+	ctx.fillRect(x, y, actualWidth, actualHeight);//fix this
+}
 
-var CategoryScreen = function(){
-
+var CategoryScreen = function(buttons){
+	this.buttons = buttons;
+	//this.startingHeight = 0;
+	this.renderCat();
 
 }
 
-CategoryScreen.prototype.displayButtons = function(){
-
-
+var startingHeight = 0;
+var startingButton1 = 0;
+CategoryScreen.prototype.renderCat = function(){
+	var actualHeight = ((142)/(568) * h);
+	var modulus = startingHeight%actualHeight;
+	var numberOfButtonsRendered = 4;
+	if(modulus != 0) ++numberOfButtonsRendered;
+	console.log("dsf" + startingHeight);
+	var startingButtonfloat = startingHeight/actualHeight;
+	var startingButton = Math.floor( startingButtonfloat );
+	var tempstartingHeight = (-1*startingHeight)%actualHeight;
+	startingButton1 = startingButton;
+	console.log(startingHeight);
+	console.log("canvas_y" + numberOfButtonsRendered);
+	for(i = startingButton; i!= (numberOfButtonsRendered + startingButton); ++i){
+		//console.log(this.buttons[i].text);
+		//console.log("hey" + i);	
+		if(i < this.buttons.length){
+			//console.log(i);	
+			this.buttons[i].drawButton(i,0,tempstartingHeight)
+			tempstartingHeight += actualHeight;
+		}
+	}
 }
 /*
 function hello(){
@@ -703,22 +733,77 @@ function goodbye(){
 	console.log("goodbye");
 }
 */
+
+var b1 = new Button("hi",1);
+var b2 = new Button("hi1",2);
+var b3 = new Button("hi2",3);
+var b4 = new Button("hi3",4);
+var b5 = new Button("hi4",5);
+var b6 = new Button("hi5",6);
+var b7 = new Button("hi5",7);
+var b8 = new Button("hi5",8);
+var b9 = new Button("hi5",9);
+var b10 = new Button("hi5",10);
+
+var butt = [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10];
+screenl = new CategoryScreen(butt);
+var oldY = 0;
+var fingerLifted = true;
 var CategoryScreenController = function(game){
 	this.game = game;
-	ctx.font = "100px Arial";
-	ctx.fillText("hi",10,10);
-	c.addEventListener("touchstart",this.Scrolling);
-	c.addEventListener("touchend",this.takeInputAndUpdate);
+	this.screen = screen;
+	//this.oldY = 0;
+	
+	this.setOldY = function(o) {this.oldY = o}
+  	this.getOldY = function() {return this.oldY}
+  	
+	this.fingerLifted;
+	//ctx.font = "100px Arial";
+	//ctx.fillText("hi",10,10);
+	c.addEventListener("touchmove",this.Scrolling);
+	c.addEventListener("touchend",this.endScrolling);
+	c.addEventListener("click",this.updateGame);
 }
 
 
-CategoryScreenController.prototype.Scrolling = function(){
-	console.log("hello");
+CategoryScreenController.prototype.Scrolling = function(event){
+	event.preventDefault();
+	canvas_y = event.targetTouches[0].pageY;
+	var actualHeight = ((142)/(568) * h);
+	if(!fingerLifted){
+		var difference = oldY - canvas_y;
+		var newStartingHeight = startingHeight+difference;
+		if(newStartingHeight < 0){
+			startingHeight = 0;
+		}else if(newStartingHeight + h > (actualHeight*butt.length)){
+			startingHeight = startingHeight;
+		}else{
+			startingHeight = newStartingHeight;
+		}
+		
+		
+		console.log("startingheight" + (startingHeight));
+		console.log("newstartingheight" + actualHeight*butt.length);
+		console.log("diff" + newStartingHeight);
+		console.log("oldY" + oldY);
+		console.log("canvas_y" + canvas_y);
+		screenl.renderCat();
+	}
+	
+	oldY = canvas_y;
+	fingerLifted = false;
+	//console.log(canvas_y + " " );
+	//screenl.renderCat(canvas_y);
 }
-CategoryScreenController.prototype.takeInputAndUpdate = function(){
-	console.log("goodbye");
+CategoryScreenController.prototype.endScrolling = function(){
+	fingerLifted = true;
 }
+CategoryScreenController.prototype.updateGame = function(){
+	var actualHeight = ((142)/(568) * h);
+	var startingButton = startingHeight/actualHeight;
+	canvas_y = event.targetTouches[0].pageY;
 
+}
 
  
 function loadScript(url, callback)
