@@ -1,7 +1,7 @@
 	
 
 	
-	var canvas = document.getElementById('canvas');
+	//var canvas = document.getElementById('canvas');
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	
@@ -51,8 +51,9 @@
 	
 
 window.onload = function(){
+		var cs = new CategoryScreenController(game);
 		//var button1 = new Button("hellobitch",4,4,1);
-		preloadImagesAndVariables();
+		//preloadImagesAndVariables();
 		//loadMenu();
 		//listenForFingers();
 		
@@ -578,6 +579,41 @@ Button.prototype.makePretty = function(){
 	ctx.font = fontSize;
 	ctx.fillText(this.text,10,10);
 }
+
+var CategoryScreen = function(){
+
+
+}
+
+CategoryScreen.prototype.displayButtons = function(){
+
+
+}
+/*
+function hello(){
+	console.log("hello");
+}
+function goodbye(){
+	console.log("goodbye");
+}
+*/
+var CategoryScreenController = function(game){
+	this.game = game;
+	ctx.font = "100px Arial";
+	ctx.fillText("hi",10,10);
+	c.addEventListener("touchstart",this.Scrolling);
+	c.addEventListener("touchend",this.takeInputAndUpdate);
+}
+
+
+CategoryScreenController.prototype.Scrolling = function(){
+	console.log("hello");
+}
+CategoryScreenController.prototype.takeInputAndUpdate = function(){
+	console.log("goodbye");
+}
+
+
  
 function loadScript(url, callback)
 {
