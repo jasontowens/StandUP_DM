@@ -197,6 +197,7 @@ function categories(){
 }
 
 function categoriesClick(X,Y){
+/*
 	if(Y>505/667*h){
 		c.removeEventListener("touchmove",cs.Scrolling);
 		c.removeEventListener("touchend",cs.endScrolling);
@@ -204,6 +205,7 @@ function categoriesClick(X,Y){
 		//c.removeEventListener();
 		Menu();
 	}
+	*/
 		
 }
 
@@ -802,8 +804,13 @@ var CategoryScreenController = function(game){
 
 CategoryScreenController.prototype.Scrolling = function(event){
 	event.preventDefault();
-	canvas_y = event.targetTouches[0].pageY;
 	var actualHeight = ((142)/(568) * h);
+	canvas_x = event.targetTouches[0].pageX;
+	canvas_y = event.targetTouches[0].pageY;
+	if(fingerLifted){
+		startX = canvas_x;
+		startY = canvas_y;
+	}
 	if(!fingerLifted){
 		var difference = oldY - canvas_y;
 		var newStartingHeight = startingHeight+difference;
@@ -825,12 +832,37 @@ CategoryScreenController.prototype.Scrolling = function(event){
 	}
 	
 	oldY = canvas_y;
+	endY = canvas_y;
+	endX = canvas_x;
+
 	fingerLifted = false;
 	//console.log(canvas_y + " " );
 	//screenl.renderCat(canvas_y);
 }
+var startX = 0;
+var startY = 0
+var endX = 0;
+var endY = 0;
 CategoryScreenController.prototype.endScrolling = function(){
 	fingerLifted = true;
+		if(Math.abs(startY-endY) < 60){
+			if(Math.abs(startX-endX)>200){
+				startY = 0;
+				endY = 0;
+				startX = 0;
+				endX = 0;
+				goToMenu();
+			}
+		}
+
+}
+
+function goToMenu(){
+	c.removeEventListener("touchmove",cs.Scrolling);
+	c.removeEventListener("touchend",cs.endScrolling);
+	c.removeEventListener("click",cs.updateGame);
+	Menu();
+
 }
 CategoryScreenController.prototype.updateGame = function(event){
 	var actualHeight = ((142)/(568) * h);
