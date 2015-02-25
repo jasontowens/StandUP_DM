@@ -1,6 +1,6 @@
 	
 	
-
+	
 	
 	//var canvas = document.getElementById('canvas');
 	canvas.width = window.innerWidth;
@@ -15,6 +15,7 @@
 	var h = canvas.height;
 	var inMenu = true;
 	var inGame = false;
+	var inCat = false;
 
 	//global categories arrays
 	var usedArrays = [1];
@@ -24,6 +25,8 @@
 	var game = new Object();
 	game.gameMode;
 	game.category;
+	
+	var screenl;
 	
 	/*
 	var game = function(){
@@ -52,7 +55,7 @@
 	
 
 window.onload = function(){
-		var cs = new CategoryScreenController(game);
+		
 		//var button1 = new Button("hellobitch",4,4,1);
 		preloadImagesAndVariables();
 		
@@ -179,11 +182,25 @@ function mobileClick(e){
   else if(inGame){
 	gameClick(mobileClickX, mobileClickY);
   }
+  else if(inCat){
+	categoriesClick(mobileClickX, mobileClickY);
+  }
   else{
 	endClick(mobileClickX, mobileClickY);
   }
   
   
+}
+function categories(){
+	screenl = new CategoryScreen(butt);
+	var cs = new CategoryScreenController(game);
+}
+
+function categoriesClick(X,Y){
+	if(Y>505/667*h){
+		Menu();
+	}
+		
 }
 
 function menuClick(X,Y){
@@ -198,6 +215,9 @@ function menuClick(X,Y){
 				inMenu = false;				
 			}
 			else if(Y<350/560*h){
+				inMenu = false;
+				inCat=true;
+				categories();
 				//categories
 				//display categories
 				//tell the game which categorie is chosen
@@ -692,6 +712,8 @@ Button.prototype.drawButton = function(number,x,y){
 	var actualHeight = ((142)/(568) * h);
 	var actualWidth = ((320)/(320) * w);
 	ctx.fillRect(x, y, actualWidth, actualHeight);//fix this
+	console.log(number);
+	ctx.fillText(game.categoriesArray[number][0], x + w/2,y + actualWidth/2);
 }
 
 var CategoryScreen = function(buttons){
@@ -742,17 +764,14 @@ var b4 = new Button("hi3",4);
 var b5 = new Button("hi4",5);
 var b6 = new Button("hi5",6);
 var b7 = new Button("hi5",7);
-var b8 = new Button("hi5",8);
-var b9 = new Button("hi5",9);
-var b10 = new Button("hi5",10);
 
-var butt = [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10];
+var butt = [b1,b2,b3,b4,b5,b6,b7];
 
 
 
 //var butt = [];
 
-screenl = new CategoryScreen(butt);
+
 var oldY = 0;
 var fingerLifted = true;
 
