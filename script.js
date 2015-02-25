@@ -1,4 +1,5 @@
 	
+	
 
 	
 	//var canvas = document.getElementById('canvas');
@@ -51,10 +52,10 @@
 	
 
 window.onload = function(){
-		//var cs1 = new CategoryScreen();
 		var cs = new CategoryScreenController(game);
 		//var button1 = new Button("hellobitch",4,4,1);
-		//preloadImagesAndVariables();
+		preloadImagesAndVariables();
+		
 		//loadMenu();
 		//listenForFingers();
 		
@@ -67,10 +68,16 @@ function preloadImagesAndVariables(){
 	game.originalTimeOfRound=30;
 	game.passNotCorrect=false;
 	
-	
+	game.playedWords = [];
 	
 	game.gameMode = 1; // 1 is head's up, 2 is not in any way legally similar to catchphrase
-
+	game.team1Score = 0;
+	game.team2Score = 0;
+	game.activeTeam = 1; //is 1 or 2, denotes which team is currently playing
+	game.team1Time = 0;
+	game.team2Time = 0;
+	
+	
 	game.menu_background = new Image();							//menu background
 	game.menu_background.src = "Menu.png";
 	
@@ -80,6 +87,8 @@ function preloadImagesAndVariables(){
 	
 	game.inGame_background = new Image();						//standard in-game background
 	game.inGame_background.src = "InGame.png";
+	game.inGame_background2 = new Image();						//mode2 in-game background
+	game.inGame_background2.src = "InGame2.png";
 		
 	game.endGame_background=new Image();
 	game.endGame_background.src= "endGame.png";	
@@ -196,7 +205,7 @@ function menuClick(X,Y){
 			}
 			else if(Y<435/560*h){
 				if(game.gameMode == 1){
-					game.gameMode = 2;//game Mode is being created here. 
+					game.gameMode = 2;
 					ctx.drawImage(game.menu_background2, 0,0,w,h);
 				}
 				else{
@@ -218,7 +227,24 @@ function menuClick(X,Y){
  }
 
 function gameClick(mobileClickX, mobileClickY){
-	
+	if(game.gameMode == 2){
+		if(mobileClickX > 250/320 * w && mobileClickX < 300/320*w){ //Clicking pass or correct buttons
+			if(mobileClickY > 290/580*h){
+				game.displayPassFail = true;
+				game.passNotCorrect= true;
+			}
+			else if(mobileClickY < 290/580*h){
+				game.displayPassFail = true;
+				game.passNotCorrect= false;
+			}
+			else{
+				game.displayPassFail =false;
+			}
+		}
+		else{
+			game.displayPassFail =false;
+		}
+	}
 }
 
 function fixTime(firstTime){
@@ -252,11 +278,19 @@ function Menu(){
  function startGame(){
 	var originalTimeOfRound = 30;//in seconds
 	
+	game.team1Score = 0;
+	game.team2Score = 0;	
+	game.team1Time = 0;
+	game.team2Time = 0;
+	
 	resetGameVariables();
 	
 	
 	clearCanvas();
 	ctx.drawImage(game.forehead_background, 0,0,w,h);
+	
+	if(game.gameRound == 2)
+		game.displayPassFail = false;
 	
 	if(game.displayPassFail)//if device isn't oriented properly (i.e. on forehead)
 		setTimeout(function(){startGame();}, 100);
@@ -293,7 +327,7 @@ function Menu(){
 	}
 	else{
 		ctx.restore();	//for rotateContext();	
-		gameLoop(10); //takes number of seconds in game
+		gameLoop(60); //takes number of seconds in game
 	}
  }
   
@@ -313,10 +347,19 @@ function Menu(){
 	}
 	
 	game.displayPassFailTime -= 10;		//decrementing time left for displaying pass/fail
+	
+	if(game.gameMode == 2){				//in game mode 2, we don't need the delay
+		game.displayPassFailTime = 0;
+		game.displayPassFail = false;
+	}
 	if(game.displayPassFailTime <= 0 && game.displayPassFail == false){
 		//game.displayPassFail = false;//stops this method from being called again		
 		saveCurrentWord(game.passNotCorrect); //for displaying at end of game.In this if statement so it only calls once.		
 		changeWord();	//when pass/fail screen disappears, there should be a new word
+		if(game.gameMode == 2 ){
+			if(!game.passNotCorrect)
+				changeActiveTeam();
+		}
 		gameLoop(timeOfRound);
 	}
 	else{
@@ -324,10 +367,26 @@ function Menu(){
 	}
  }
  
+ function changeActiveTeam(){
+	game.activeTeam = ((game.activeTeam) % 2) + 1;
+ }
+ 
  function changeWord(){
 	var currentCategory = randomUsableCategory();
 	game.currentWordCategory = currentCategory;
 	game.currentWord = randomWordInCategory(currentCategory);//category, phrase in category
+	
+	for(i=0; i != game.playedWords.length; ++i){
+		if(game.playedWords[i]){
+			if(game.currentWord == game.playedWords[i][0]){
+				changeWord();
+				break;
+			}
+		}
+		else{
+			console.log("game.playedWords[i] not found");
+		}
+	}
  }
  
  function randomUsableCategory(){	//returns an int
@@ -363,7 +422,6 @@ function Menu(){
  
  function gameLoop(timeOfRound,lastTime){			
 	
-	
 	if(timeOfRound<=0){
 		inGame=false;
 		gameOver();
@@ -374,16 +432,57 @@ function Menu(){
 		}
 		else{
 			clearCanvas();
-			ctx.drawImage(game.inGame_background, 0,0,w,h);
+			if(game.gameMode == 1)
+				ctx.drawImage(game.inGame_background, 0,0,w,h);
+			else
+				ctx.drawImage(game.inGame_background2,0,0,w,h);
 			printWord();		
-			printTime(timeOfRound);
+			if(game.gameMode == 1) //in game mode 2, time is shown additively
+				printTime(timeOfRound);
+			if(game.gameMode == 2){
+				Mode2();
+			}
+			
 			var f = function(){gameLoop(timeOfRound-.1);};
 			setTimeout(f, 100 / timeSpeed);
 		}		
-		//gameLoop();
 	}
  }
  
+ function Mode2(){ //only gets called in game mode 2
+	if(game.activeTeam == 1){
+		game.team1Time += .1;
+	}
+	else{
+		game.team2Time += .1;
+	}
+	printTeamTimes();
+ }
+ 
+ function printTeamTimes(){
+	  ctx.font         = "bold 30px Arial";
+	  ctx.textBaseline = 'bottom';
+	  ctx.textAlign = 'center';
+		
+	  ctx.save();
+	  ctx.translate(0,h*3/4); //new origin
+	  ctx.rotate(-Math.PI / 2);  
+	  
+	  if(game.activeTeam == 1){
+		ctx.fillStyle = "white";
+		ctx.fillText( 'TEAM 1 TIME: ' + Math.floor(game.team1Time*10)/10, 0, w*3/16); 
+		ctx.fillStyle = "blue";
+		ctx.fillText( 'TEAM 2 TIME: ' +  Math.floor(game.team2Time*10)/10, 2*h/4, w*3/16); 
+	  }
+	  else{
+		  ctx.fillStyle = "blue";
+		  ctx.fillText( 'TEAM 1 TIME: ' +  Math.floor(game.team1Time*10)/10, 0, w*3/16); 
+		  ctx.fillStyle = "white";
+		  ctx.fillText( 'TEAM 2 TIME: ' +  Math.floor(game.team2Time*10)/10, 2*h/4, w*3/16); 
+	  }
+	  ctx.restore();
+ }
+  
  function rotateContext(){ //essentially rotates context so that you can write text sideways.
 	ctx.save();
 	ctx.translate(0,h*3/4); //new origin
@@ -394,6 +493,8 @@ function Menu(){
 	ctx.font         = "bold 40px AG Book Rounded";	
 	c.addEventListener("click", endClick); 
 	printPlayedWords(0,0);		
+	if(gameMode==2)
+		printTeamScores();
 }
 
 function endClick(X,Y){
@@ -401,11 +502,14 @@ function endClick(X,Y){
 		Menu();
 }
  
- function printPlayedWords(i, ii){//remember playedWords stores location and passNotCorrect Bool
+ function printPlayedWords(i){//remember playedWords stores location and passNotCorrect Bool
 		if(!inMenu){	//because you can press leave button before printing is finished (don't want text printing on top of menu screen)
 			ctx.drawImage(game.endGame_background, 0,0,w,h);
 			
-			var numCorrect =0;
+			var numCorrect = 0;
+			var shiftUp = 0;
+			if(i>14)
+				shiftUp = i - 14;
 			for( ii = 0; ii <= i; ++ii){ 	
 				if(game.playedWords[ii][1]){	//if word was passed
 					ctx.fillStyle = "red";		
@@ -415,13 +519,13 @@ function endClick(X,Y){
 					ctx.fillStyle = "green";
 				}
 				ctx.font = "bold 20px AG Book Rounded";
-				ctx.fillText(game.playedWords[ii][0], w/2, h*1/4+ii*23);
+				ctx.fillText(game.playedWords[ii][0], w/2, h*1/4+ii*23 - shiftUp *23);
 			}
 			ctx.font = "bold 40px AG Book Rounded";
 			ctx.fillStyle = "white";
-			ctx.fillText((i+1).toString(), w/2, h*1/8);
+			ctx.fillText((numCorrect).toString(), w/2, h*1/8);
 			if(i<game.playedWords.length-1)
-				setTimeout(function(){printPlayedWords(i+1,ii);	}, 1000);		
+				setTimeout(function(){printPlayedWords(i+1);	}, 1000);		
 				
 		}
 }
@@ -450,16 +554,18 @@ function endClick(X,Y){
   //game.beta = Math.round(event.beta);
   game.gamma = Math.round(event.gamma);
   
-  if (game.gamma > 125){
-	game.displayPassFail = true;
-	game.passNotCorrect= false;
-  }
-  else if(game.gamma< 55){
-	game.displayPassFail = true;
-	game.passNotCorrect= true;
-  }
-  else{
-	game.displayPassFail = false;
+  if(game.gameMode == 1){
+	  if (game.gamma > 125){
+		game.displayPassFail = true;
+		game.passNotCorrect= false;
+	  }
+	  else if(game.gamma< 55){
+		game.displayPassFail = true;
+		game.passNotCorrect= true;
+	  }
+	  else{
+		game.displayPassFail = false;
+	  }
   }
 }
  
@@ -628,6 +734,7 @@ function goodbye(){
 }
 */
 
+
 var b1 = new Button("hi",1);
 var b2 = new Button("hi1",2);
 var b3 = new Button("hi2",3);
@@ -640,9 +747,15 @@ var b9 = new Button("hi5",9);
 var b10 = new Button("hi5",10);
 
 var butt = [b1,b2,b3,b4,b5,b6,b7,b8,b9,b10];
+
+
+
+//var butt = [];
+
 screenl = new CategoryScreen(butt);
 var oldY = 0;
 var fingerLifted = true;
+
 var CategoryScreenController = function(game){
 	this.game = game;
 	this.screen = screen;
@@ -692,30 +805,16 @@ CategoryScreenController.prototype.Scrolling = function(event){
 CategoryScreenController.prototype.endScrolling = function(){
 	fingerLifted = true;
 }
-CategoryScreenController.prototype.updateGame = function(){
+CategoryScreenController.prototype.updateGame = function(event){
 	var actualHeight = ((142)/(568) * h);
 	var startingButton = startingHeight/actualHeight;
-	canvas_y = event.targetTouches[0].pageY;
-	if(canvas_y)
-
+	var canvas_y = event.y;
+	canvas_y -= c.offsetLeft;
+	//canvas_y = e.clientY;//event.targetTouches[0].pageY;
+	
+	var i = Math.floor((startingHeight + canvas_y) / actualHeight); // i
+	console.log("i: " + i);
 }
 
- 
-function loadScript(url, callback)
-{
-    // Adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = url;
-
-    // Then bind the event to the callback function.
-    // There are several events for cross browser compatibility.
-    script.onreadystatechange = callback;
-    script.onload = callback;
-
-    // Fire the loading
-    head.appendChild(script);
-}
  
 
