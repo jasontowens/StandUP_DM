@@ -193,11 +193,15 @@ function mobileClick(e){
 }
 function categories(){
 	screenl = new CategoryScreen(butt);
-	var cs = new CategoryScreenController(game);
+	cs = new CategoryScreenController(game);
 }
 
 function categoriesClick(X,Y){
 	if(Y>505/667*h){
+		c.removeEventListener("touchmove",cs.Scrolling);
+		c.removeEventListener("touchend",cs.endScrolling);
+		c.removeEventListener("click",cs.updateGame);
+		//c.removeEventListener();
 		Menu();
 	}
 		
@@ -347,7 +351,7 @@ function Menu(){
 	}
 	else{
 		ctx.restore();	//for rotateContext();	
-		gameLoop(60); //takes number of seconds in game
+		gameLoop(30); //takes number of seconds in game
 	}
  }
   
@@ -713,7 +717,11 @@ Button.prototype.drawButton = function(number,x,y){
 	var actualWidth = ((320)/(320) * w);
 	ctx.fillRect(x, y, actualWidth, actualHeight);//fix this
 	console.log(number);
-	ctx.fillText(game.categoriesArray[number][0], x + w/2,y + actualWidth/2);
+	ctx.fillStyle = "white";
+	ctx.font = "20px Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(game.categoriesArray[number][0], x + w/2,y + actualHeight/2);
 }
 
 var CategoryScreen = function(buttons){
