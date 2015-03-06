@@ -28,12 +28,12 @@ module Game{
 			this.height = height;
 			this.model = new GameOne();
 			this.controller = new Game.MenuController(this,canvas,width,height);//add model
-			this.view = new MenuView(context,width,height);//add model
-		
+			this.view = new MenuView(context,width,height);//add model		
 		}
 		runGame(){
 			this.controller.takeInput();
 			this.view.render();
+			console.log("imadeit");
 		}
 		
 		switchGameModes(){

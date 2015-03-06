@@ -3,9 +3,6 @@ module Game{
 	
 		teamOneScore: number;
 		teamTwoScore: number;
-		chosenCategories:boolean[];
-		Categories:string[];
-		currentItem:string;
 		
 		
 		constructor(){

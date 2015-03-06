@@ -3,22 +3,23 @@ module Game{
 	export class GameOne extends Model{
 	
 		recentPassOrFail:boolean;
-		timeLastAnswerGiven:number;
 		heldSideways:boolean;
 		newItem:boolean;
 		gameStarted:boolean;
 		gameView;
-
+		
+		wordsGuessed:String[];
+		wordsGuessedCorrect:Boolean[];
+		
 		
 		
 		
 		
 		constructor(){
 			super();
-			this.timeLastAnswerGiven = 0;
 			this.currentItemNumber = 0;
-			this.currentItem = this.Items[this.currentItemNumber];
 			this.gameStarted = false;
+			this.changeWord();
 		}
 		setGameView(gv){
 			this.gameView = gv
@@ -43,8 +44,7 @@ module Game{
 				clearTimeout(timeout);
 			}
 			if(this.newItem){
-				this.currentItemNumber = ++this.currentItemNumber%this.size;
-				this.currentItem = this.Items[this.currentItemNumber];
+				this.changeWord();
 				this.newItem = false;
 				
 			}
