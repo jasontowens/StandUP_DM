@@ -81,14 +81,14 @@ module Game{
 			var buttonHeight = screenHeight/7;
 			var gap = 10;
     		var startingGap = this.height/9 + 10;
-    		var menuButton = ((this.height/7) * 6) - 10;
+    		var menuButton = (550/667)*this.height;
     		var click = this.startingHeight + canvas_y;
-    		if(click > startingGap && click < menuButton){
+    		if(click > startingGap){
 				var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
 				this.model.changeChosenCat(i);
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)
 			}
-			if(click > menuButton){	
+			if(canvas_y > menuButton){	
 				console.log("menu");
 			}
 		}

@@ -65,7 +65,8 @@ module Game{
 		}
 		
 		click(X,Y){
-			if(Y>h/3){
+		var menuButton = (550/667)*this.height;
+			if(Y>menuButton){
 				console.log("badddd");
 				this.switchToMenuState()
 			}
