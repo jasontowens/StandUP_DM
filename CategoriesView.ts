@@ -1,27 +1,33 @@
 module Game{
 	export class CategoriesView{
 	
-		game_background = new Image();
+		category_background = new Image();
 		context;
 		width;
 		height;
 		model;
+		categories;
+		boolCategories:boolean[];
 	
 		constructor(context,width,height){
-			this.game_background.src = "inGame.png";
+			this.category_background.src = "categories_foreground.png";
 			this.context = context;
 			this.width = width;
 			this.height = height;
 		}
+		setCategories(categories,boolcat){
+			this.categories = categories;
+			this.boolCategories = boolcat;
+		}
+		
 		render(){
 			var self = this;
-			this.game_background.onload = function(){
-				self.context.drawImage(self.game_background, 0, 0, self.width, self.height); 
-				self.fillRoundedRect(50,50,100,100,20);
+			this.category_background.onload = function(){ 
+				self.renderCategories(0,self.boolCategories);
 			}
-		
 		}
-		fillRoundedRect(x, y, w, h, r){
+		fillRoundedRect(x, y,w,h){
+			var r = 20;
 			this.context.beginPath();
 			this.context.moveTo(x+r, y);
 			this.context.lineTo(x+w-r, y);
@@ -29,12 +35,63 @@ module Game{
 			this.context.lineTo(x+w, y+h-r);
 			this.context.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
 			this.context.lineTo(x+r, y+h);
-			this.context.quadraticCurveTo(x, y+h, x, y+h-r);
+			//this.context.quadraticCurveTo(x, y+h, x, y+h-r);
 			this.context.lineTo(x, y+r);
-			this.context.quadraticCurveTo(x, y, x+r, y);
-			this.context.fillStyle="red";
-			this.context.fill();        
-    }
-		
+			//this.context.quadraticCurveTo(x, y, x+r, y);
+			this.context.closePath();
+			this.context.strokeStyle = "black";
+    		this.context.lineWidth   = 5;
+			this.context.fill();
+			this.context.stroke();     
+    	}
+    	drawText(rectX,rectY,width,height,i){
+    		var fontSize = 30;
+    		var fontSizeString = fontSize.toString();
+    		var font = "pt Calibri"
+    		this.context.font = fontSizeString + font;
+      		this.context.textAlign="center"; 
+			this.context.textBaseline = "middle";
+      		this.context.fillStyle = "black";
+      		var metrics = this.context.measureText(this.categories[i][0]);
+      		var metricsWidth = metrics.width;
+      		while(metricsWidth >= width){
+      			--fontSize;
+      			var fontSizeString = fontSize.toString();
+      			this.context.font = fontSizeString + font;
+      			metrics = this.context.measureText(this.categories[i][0]);
+      			metricsWidth = metrics.width;
+      			
+      		}
+      		
+      		this.context.fillText(this.categories[i][0],rectX+(width/2),rectY+(height/2));
+    	}
+    	renderCategories(startingHeight,boolCategories){
+    		this.clearCanvas()
+    		var screenHeight = this.height - (this.height/4);
+    		var tempStartingHeight = startingHeight;
+    		var h = screenHeight/7;
+    		var gap = 10;
+    		var startingGap = this.height/9 + 10;
+			//console.log(startingHeight);
+			//console.log("canvas_y" + numberOfButtonsRendered);
+			for(var i = 0; i != this.categories.length;++i){
+				var width = this.width/1.2;
+				var height = h;
+				var rectX = this.width / 20;
+				var rectY = startingGap-tempStartingHeight;
+				if(boolCategories[i]){
+					this.context.fillStyle = "#00FF00";
+				}else{
+					this.context.fillStyle = "#FF3300";
+				}
+				this.fillRoundedRect(rectX,rectY,width,height);
+				this.drawText(rectX,rectY,width,height,i);   
+				tempStartingHeight -= (h+gap);
+			}
+			this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+    	}
+    	clearCanvas(){
+			this.context.clearRect(0, 0, this.width, this.height);
+		}
 	}
 }
