@@ -9,6 +9,7 @@ module Game{
 		
 		playedWords:string[];
 		correctPlayedWords:boolean[];
+		gameOver:boolean;
 		
 		currentWordCategory:number;
 		
@@ -17,6 +18,7 @@ module Game{
 			this.playedWords = [];
 			this.correctPlayedWords = [];
 			this.generateItems();
+			this.gameOver = false;
 			
 		}
 		generateItems(){

@@ -18,9 +18,12 @@ module Game{
 			this.categoriesView = categoriesView;
 		}
 		takeInput(){
-			this.canvas.addEventListener("touchmove",this.Scrolling.bind(this));
-			this.canvas.addEventListener("touchend",this.endScrolling.bind(this));
-			this.canvas.addEventListener("click",this.updateGame.bind(this)); 
+			this.Scrolling = <any>this.mobileClick.bind(this);
+			this.endScrolling = <any>this.mobileClick.bind(this);
+			this.updateGame = <any>this.mobileClick.bind(this);
+			this.canvas.addEventListener("touchmove",this.Scrolling);
+			this.canvas.addEventListener("touchend",this.endScrolling);
+			this.canvas.addEventListener("click",this.updateGame); 
 		}
 		Scrolling(e){
 			
@@ -35,9 +38,9 @@ module Game{
 		 
 		 
 		switchStates(){
-			this.canvas.removeEventListener("touchmove",this.Scrolling.bind(this));
-			this.canvas.removeEventListener("touchend",this.endScrolling.bind(this));
-			this.canvas.removeEventListener("click",this.updateGame.bind(this)); 
+			this.canvas.removeEventListener("touchmove",this.Scrolling);
+			this.canvas.removeEventListener("touchend",this.endScrolling);
+			this.canvas.removeEventListener("click",this.updateGame); 
 		}
 	
 		switchToGameState(){

@@ -13,7 +13,8 @@ module Game{
 			this.canvas = canvas;
 		}
 		takeInput(){
-			this.canvas.addEventListener('touchstart', this.mobileClick.bind(this));   
+			this.mobileClick = <any>this.mobileClick.bind(this);
+			this.canvas.addEventListener('touchstart', this.mobileClick);   
 		}
 		mobileClick(e){
 			var touchobj = e.changedTouches[0] // reference first touch point (ie: first finger)
@@ -45,7 +46,8 @@ module Game{
 		 
 		 
 		switchStates(){
-			this.canvas.removeEventListener('touchstart', this.mobileClick.bind(this)); 
+			this.canvas.removeEventListener('touchstart', this.mobileClick); 
+				console.log("switching states");
 		}
 	
 		switchToGameState(){

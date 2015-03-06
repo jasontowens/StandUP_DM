@@ -69,13 +69,16 @@ module Game{
 		}
 		
 		switchToMenuState(){
+		
+			var newView = new MenuView(this.context,this.width,this.height);//add model
+			this.view = newView;
+			this.view.render();
+			
 			var newController = new MenuController(this,this.canvas,this.width,this.height);//add model
 			this.controller = newController;
 			this.controller.takeInput();
 			
-			var newView = new MenuView(this.context,this.width,this.height);//add model
-			this.view = newView;
-			this.view.render();
+			
 		}
 		
 		

@@ -8,6 +8,7 @@ module Game{
 		forehead = new Image();
 		pass = new Image();
 		correct = new Image();
+		endGame_background = new Image();
 		context;
 		width;
 		height;
@@ -19,6 +20,7 @@ module Game{
 			this.forehead.src = "forehead.png";
 			this.pass.src = "pass.png";
 			this.correct.src = "correct.png";
+			this.endGame_background.src = "endGame.png";
 			this.context = context;
 			this.width = width;
 			this.height = height;
@@ -49,6 +51,29 @@ module Game{
 			this.printTime(currTime);
 		
 		}
+		renderGameOver(numItems:number,playedWords:string[],correct:boolean){
+			this.clearCanvas();
+			this.context.drawImage(this.endGame_background, 0,0,w,h);
+			var numCorrect = 0;
+			var shiftUp = 0;
+
+				
+			for(var i = 0; i < numItems; ++i){ 	
+				if(!correct[i]){	//if word was passed
+					this.context.fillStyle = "red";		
+				}
+				else{
+					numCorrect++;
+					this.context.fillStyle = "green";
+				}
+				this.context.font = "bold 20px AG Book Rounded";
+				this.context.fillText(playedWords[i], this.width/2, this.height*1/4+i*23 - shiftUp *23);
+			}
+			this.context.font = "bold 40px AG Book Rounded";
+			this.context.fillStyle = "white";
+			this.context.fillText((numCorrect).toString(), w/2, h*1/8);		
+		}
+		
 		
 		clearCanvas(){
 			this.context.clearRect(0, 0, this.width, this.height);

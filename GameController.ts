@@ -31,6 +31,8 @@ module Game{
 		gameOneTakeInput(){
 			var self = this;
 			this.model.beginGame();
+			this.mobileClick = <any>this.mobileClick.bind(this);
+			this.canvas.addEventListener("touchstart",this.mobileClick); 
 			 window.ondeviceorientation = function(event) {
 				  var gamma = Math.round(event.gamma);
 				  if (gamma > 125){
@@ -44,26 +46,47 @@ module Game{
 				  }else{
 				  	if(!self.model.gameStarted){
 				  		self.model.countdown();
-				  		self.model.startGame(30);
+				  		self.model.startGame(5);
 				  	}
 				  	self.model.heldSideways = false;
 				  }
 				}
 		}
 		
+		mobileClick(e){
+		if(this.model.gameOver){
+			var touchobj = e.changedTouches[0] // reference first touch point (ie: first finger)
+ 			var mobileClickX = parseInt(touchobj.clientX); // get x position of touch point relative to left edge of browser
+ 			mobileClickX = mobileClickX - (window.innerWidth-this.gameloop.width)/2;
+ 			var mobileClickY = parseInt(touchobj.clientY);
+ 			mobileClickY = mobileClickY - 25;	
+ 			this.click(mobileClickX,mobileClickY);
+ 		}
+		}
+		
+		click(X,Y){
+			if(Y>h/3){
+				console.log("badddd");
+				this.switchToMenuState()
+			}
+		}
+		
 		gameTwoTakeInput(){
 		
 		}
-		
 	
-		mobileClick(e){
-			console.log("hi");
+		
+		switchToMenuState(){
+			this.switchStates();
+			this.gameloop.switchToMenuState();
 		}
-		
-		switchController(newController){
-			this.gameloop.switchController(newController);
-			this.gameloop.switchView(newController);
-		
+		switchStates(){
+			this.canvas.removeEventListener("click",this.mobileClick); 
+			this.clearVariables();
+		}
+		clearVariables(){
+			this.model.gameOver = false;
+			this.model.gameStarted = false;
 		}
 	
 	}

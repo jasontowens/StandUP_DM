@@ -8,8 +8,7 @@ module Game{
 		gameStarted:boolean;
 		gameView;
 		
-		wordsGuessed:String[];
-		wordsGuessedCorrect:Boolean[];
+	
 		
 		
 		
@@ -42,8 +41,12 @@ module Game{
 			var timeout = setTimeout(f, 100);
 			if(timeOfRound <= 0){
 				clearTimeout(timeout);
+				this.gameOver = true;
+				this.gameView.renderGameOver(this.playedWords.length,this.playedWords,this.correctPlayedWords);
 			}
 			if(this.newItem){
+				this.playedWords.push(this.currentItem);
+				this.correctPlayedWords.push(this.recentPassOrFail);
 				this.changeWord();
 				this.newItem = false;
 				
