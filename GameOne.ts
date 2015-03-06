@@ -16,7 +16,6 @@ module Game{
 		
 		constructor(){
 			super();
-			this.currentItemNumber = 0;
 			this.gameStarted = false;
 			this.changeWord();
 		}
