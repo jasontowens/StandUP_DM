@@ -18,9 +18,9 @@ module Game{
 			this.categoriesView = categoriesView;
 		}
 		takeInput(){
-			this.Scrolling = <any>this.mobileClick.bind(this);
-			this.endScrolling = <any>this.mobileClick.bind(this);
-			this.updateGame = <any>this.mobileClick.bind(this);
+			this.Scrolling = <any>this.Scrolling.bind(this);
+			this.endScrolling = <any>this.endScrolling.bind(this);
+			this.updateGame = <any>this.updateGame.bind(this);
 			this.canvas.addEventListener("touchmove",this.Scrolling);
 			this.canvas.addEventListener("touchend",this.endScrolling);
 			this.canvas.addEventListener("click",this.updateGame); 

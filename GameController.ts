@@ -87,6 +87,12 @@ module Game{
 		clearVariables(){
 			this.model.gameOver = false;
 			this.model.gameStarted = false;
+			
+			delete this.model.playedWords;
+			this.model.playedWords = [];
+			
+			delete this.model.correctPlayedWords;
+			this.model.correctPlayedWords = [];
 		}
 	
 	}
