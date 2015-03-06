@@ -87,7 +87,14 @@ module Game{
 				return categoryToUse; //is an int
 			}
 		 }
+		 changeChosenCat(i:number){
+		 	if(this.chosenCategories[i]){
+		 		this.chosenCategories[i] = false;
+		 	}else{
+		 		this.chosenCategories[i] = true;
+		 	}
 		 
+		 }
 		 randomWordInCategory(currentCategory){	//returns a random word in give category (parameter is int)
 			var sizeOfCategory = this.Categories[currentCategory].length;
 			this.currentItemNumber = Math.floor((Math.random() * sizeOfCategory-1))+1;//location in select category of used word, should not be 0 because of category name

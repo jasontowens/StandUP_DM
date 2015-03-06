@@ -11,35 +11,34 @@ var Game;
             this.canvas.addEventListener('touchstart', this.mobileClick);
         };
         MenuController.prototype.mobileClick = function (e) {
-            var touchobj = e.changedTouches[0];
-            var mobileClickX = parseInt(touchobj.clientX);
+            var touchobj = e.changedTouches[0]; // reference first touch point (ie: first finger)
+            var mobileClickX = parseInt(touchobj.clientX); // get x position of touch point relative to left edge of browser
             mobileClickX = mobileClickX - (window.innerWidth - this.gameloop.width) / 2;
             var mobileClickY = parseInt(touchobj.clientY);
             mobileClickY = mobileClickY - 25;
             this.click(mobileClickX, mobileClickY);
         };
-
         MenuController.prototype.click = function (X, Y) {
             if (Y > (210 / 667 * h) && Y < (505 / 667 * h)) {
                 if (X < 275 / 320 * w) {
                     if (Y < 285 / 560 * h && Y > 200 / 667 * h) {
                         this.switchToGameState();
-                    } else if (Y < 350 / 560 * h) {
+                    }
+                    else if (Y < 350 / 560 * h) {
                         this.switchToCategoriesState();
-                    } else if (Y < 435 / 560 * h) {
+                    }
+                    else if (Y < 435 / 560 * h) {
                         this.gameloop.switchGameModes();
-                    } else if (Y < 505 / 560 * h) {
-                        //how to play
+                    }
+                    else if (Y < 505 / 560 * h) {
                     }
                 }
             }
         };
-
         MenuController.prototype.switchStates = function () {
             this.canvas.removeEventListener('touchstart', this.mobileClick);
             console.log("switching states");
         };
-
         MenuController.prototype.switchToGameState = function () {
             this.switchStates();
             this.gameloop.switchToGameState();
@@ -85,10 +84,7 @@ var Game;
         Model.prototype.generateItems = function () {
             //VERY IMPORTANT: FIRST ELEMENT IN EACH CATEGORY IS THE NAME OF THE CATEGORY, DO NOT PRINT IT
             this.Categories = [
-                [
-                    "College Teams", "Florida Gators", "LSU Tigers", "Tenessee Volunteers", "Georgia Bulldogs", "Oregon Ducks", "Florida State Seminoles", "Arkansas Razorbacks",
-                    "Alabama Crimson Tide", "South Carolina Gamecocks", "Ole Miss Rebels", "Kentucky Wildcats", "Texas A&M Aggies", "Michigan Wolverines", "Michigan State Spartans",
-                    "Texas Longhorns", "Ohio State Buckeyes", "Notre Dame FIghting Irish", "Duke Blue Devils", "Nebraska Cornhuskers", "TCU Horned Frogs"],
+                ["College Teams", "Florida Gators", "LSU Tigers", "Tenessee Volunteers", "Georgia Bulldogs", "Oregon Ducks", "Florida State Seminoles", "Arkansas Razorbacks", "Alabama Crimson Tide", "South Carolina Gamecocks", "Ole Miss Rebels", "Kentucky Wildcats", "Texas A&M Aggies", "Michigan Wolverines", "Michigan State Spartans", "Texas Longhorns", "Ohio State Buckeyes", "Notre Dame FIghting Irish", "Duke Blue Devils", "Nebraska Cornhuskers", "TCU Horned Frogs"],
                 ["Dances", "Macarena", "Teach me how to dougie", "Cat Daddy", "Cha Cha Slide", "Cupid Shuffle", "Thriller", "Gangnam Style"],
                 ["ESPN", "Erin Andrews", "Tim Tebow", "Soccer", "Football", "Baseball", "Softball", "Tennis", "Champion", "Hockey", "Basketball", "College Gameday", "The Gators", "Referee", "Yellow Card", "Red Card", "Goalie", "First Down", "Kicker", "Defense", "Offense", "Punt", "Quarterback", "Michael Jordan", "Sideline", "Cheerleaders", "Halftime Show", "Cleats", "Superbowl", "National Championship", "3 Strikes You’re Out", "Foul Ball", "Heisman", "Overtime", "Sweat", "Tackle", "Wide Receiver", "Striker", "Scoreboard", "Head Coach", "Conditioning", "Two-a-Days", "Gatorade", "Practice Makes Perfect", "Jersey", "Puck", "Kick Off", "Rain Delay", "Fans", "Underdog", "Comeback", "Undefeated Season", "Marching Band", "Umpire", "Nike", "3-pointer", "Dribble", "Homerun", "Pitcher", "Stadium", "Under Armor", "Dazzlers", "Time Out", "Fantasy Football", "Just Do It", "Get Your Head in the Game", "Rivalry", "Sponsor", "Tie", "Semi-Finals"],
                 ["Medieval", "Chivalry", "Jousting", "Dark Ages", "Sword in the Stone", "Duke", "Knight", "Renaissance", "Melee", "Gauntlet", "Chalice", "Alms", "Prince", "Queen", "King", "Princess", "Jester", "Feast", "Cannon", "Chainmail", "Goblet", "Armor", "Axe", "Bow", "Arrow", "Duel", "Castle", "Helmet"],
@@ -100,7 +96,6 @@ var Game;
             for (var i = 0; i != this.Categories.length; ++i) {
                 this.chosenCategories[i] = true;
             }
-
             //this.Items = ["hidjnfoda fnoiqwebfo sada" ,"bye", "yo"];
             this.size = this.Categories.length;
         };
@@ -108,19 +103,18 @@ var Game;
             var currentCategory = this.randomUsableCategory();
             this.currentWordCategory = currentCategory;
             this.currentItem = this.randomWordInCategory(currentCategory); //category, phrase in category
-
             for (var i = 0; i != this.playedWords.length; ++i) {
                 if (this.playedWords[i]) {
                     if (this.currentItem == this.playedWords[i]) {
                         this.changeWord();
                         break;
                     }
-                } else {
+                }
+                else {
                     console.log("game.playedWords[i] not found");
                 }
             }
         };
-
         Model.prototype.randomUsableCategory = function () {
             var usableCategories = 0;
             for (var i = 0; i != this.chosenCategories.length; ++i) {
@@ -128,24 +122,29 @@ var Game;
                     ++usableCategories;
                 }
             }
-
             //generate random number from 0 to usableCategories -1
             if (usableCategories > 0) {
                 var returnCategory = 0;
-                var categoryToUse = Math.floor((Math.random() * usableCategories));
+                var categoryToUse = Math.floor((Math.random() * usableCategories)); //note: this is OF the usable categories, still need to skip unusable categories
                 for (var i = 0; i != categoryToUse; ++i) {
                     if (this.chosenCategories[i] == false) {
                         ++categoryToUse; // increments forloop check as it encounters an unused category
                     }
                 }
-                return categoryToUse;
+                return categoryToUse; //is an int
             }
         };
-
+        Model.prototype.changeChosenCat = function (i) {
+            if (this.chosenCategories[i]) {
+                this.chosenCategories[i] = false;
+            }
+            else {
+                this.chosenCategories[i] = true;
+            }
+        };
         Model.prototype.randomWordInCategory = function (currentCategory) {
             var sizeOfCategory = this.Categories[currentCategory].length;
             this.currentItemNumber = Math.floor((Math.random() * sizeOfCategory - 1)) + 1; //location in select category of used word, should not be 0 because of category name
-
             return this.Categories[currentCategory][this.currentItemNumber];
         };
         return Model;
@@ -202,11 +201,9 @@ var Game;
         GameView.prototype.renderPass = function () {
             this.context.drawImage(this.pass, 0, 0, this.width, this.height);
         };
-
         GameView.prototype.renderCorrect = function () {
             this.context.drawImage(this.correct, 0, 0, this.width, this.height);
         };
-
         GameView.prototype.renderCurrentWordOne = function (currword, currTime) {
             this.clearCanvas();
             currTime = Math.floor(currTime);
@@ -219,11 +216,11 @@ var Game;
             this.context.drawImage(this.endGame_background, 0, 0, w, h);
             var numCorrect = 0;
             var shiftUp = 0;
-
             for (var i = 0; i < numItems; ++i) {
                 if (!correct[i]) {
                     this.context.fillStyle = "red";
-                } else {
+                }
+                else {
                     numCorrect++;
                     this.context.fillStyle = "green";
                 }
@@ -234,11 +231,9 @@ var Game;
             this.context.fillStyle = "white";
             this.context.fillText((numCorrect).toString(), w / 2, h * 1 / 8);
         };
-
         GameView.prototype.clearCanvas = function () {
             this.context.clearRect(0, 0, this.width, this.height);
         };
-
         GameView.prototype.printWord = function (currword) {
             this.context.font = "bold 80px AG Book Rounded";
             this.context.textBaseline = 'bottom';
@@ -249,13 +244,11 @@ var Game;
             this.wrapText(this.context, currword, this.height / 4, this.width / 1.55, this.height, 89, "bold 60px AG Book Rounded");
             this.context.restore();
         };
-
         GameView.prototype.rotateContext = function () {
             this.context.save();
             this.context.translate(0, h * 3 / 4); //new origin
             this.context.rotate(-Math.PI / 2); //rotate counter-clockwise
         };
-
         GameView.prototype.wrapText = function (context, text, x, y, maxWidth, lineHeight, font) {
             var cars = text.split("\n");
             var lengthgr = false;
@@ -264,7 +257,6 @@ var Game;
                 context.font = font;
                 lineHeight = 60;
             }
-
             for (var ii = 0; ii < cars.length; ii++) {
                 var line = "";
                 var words = cars[ii].split(" ");
@@ -274,14 +266,14 @@ var Game;
                     var testLine = line + words[n] + " ";
                     var metrics = context.measureText(testLine);
                     var testWidth = metrics.width;
-
                     if (testWidth > maxWidth) {
                         isMultipleLines = true;
                         y = y / 1.25;
                         context.fillText(line, x, y);
                         line = words[n] + " ";
                         y += lineHeight;
-                    } else {
+                    }
+                    else {
                         line = testLine;
                     }
                 }
@@ -299,7 +291,6 @@ var Game;
             this.context.fillText('TIME REMAINING: ' + Math.floor(timeLeft), h / 4, w * 15 / 16);
             this.context.restore();
         };
-
         GameView.prototype.gameTwoRender = function () {
         };
         return GameView;
@@ -352,13 +343,15 @@ var Game;
             if (this.heldSideways) {
                 if (this.recentPassOrFail) {
                     this.gameView.renderCorrect();
-                } else {
+                }
+                else {
                     this.gameView.renderPass();
                 }
-            } else {
+            }
+            else {
                 timeOfRound = timeOfRound - 0.1;
             }
-            //TODO figure out how to hold scores.
+            //TODO figure out how to hold scores.			
         };
         return GameOne;
     })(Game.Model);
@@ -386,7 +379,6 @@ var Game;
                 this.gameTwoTakeInput();
             }
         };
-
         GameController.prototype.gameOneTakeInput = function () {
             var self = this;
             this.model.beginGame();
@@ -398,11 +390,13 @@ var Game;
                     self.model.setRecentPassOrFail(true); //they got the answer right
                     var seconds = new Date().getTime() / 1000;
                     self.model.heldSideways = true;
-                } else if (gamma < 55) {
+                }
+                else if (gamma < 55) {
                     self.model.setRecentPassOrFail(false); //they got the answer wrong
                     var seconds = new Date().getTime() / 1000;
                     self.model.heldSideways = true;
-                } else {
+                }
+                else {
                     if (!self.model.gameStarted) {
                         self.model.countdown();
                         self.model.startGame(5);
@@ -411,28 +405,24 @@ var Game;
                 }
             };
         };
-
         GameController.prototype.mobileClick = function (e) {
             if (this.model.gameOver) {
-                var touchobj = e.changedTouches[0];
-                var mobileClickX = parseInt(touchobj.clientX);
+                var touchobj = e.changedTouches[0]; // reference first touch point (ie: first finger)
+                var mobileClickX = parseInt(touchobj.clientX); // get x position of touch point relative to left edge of browser
                 mobileClickX = mobileClickX - (window.innerWidth - this.gameloop.width) / 2;
                 var mobileClickY = parseInt(touchobj.clientY);
                 mobileClickY = mobileClickY - 25;
                 this.click(mobileClickX, mobileClickY);
             }
         };
-
         GameController.prototype.click = function (X, Y) {
             if (Y > h / 3) {
                 console.log("badddd");
                 this.switchToMenuState();
             }
         };
-
         GameController.prototype.gameTwoTakeInput = function () {
         };
-
         GameController.prototype.switchToMenuState = function () {
             this.switchStates();
             this.gameloop.switchToMenuState();
@@ -444,10 +434,8 @@ var Game;
         GameController.prototype.clearVariables = function () {
             this.model.gameOver = false;
             this.model.gameStarted = false;
-
             delete this.model.playedWords;
             this.model.playedWords = [];
-
             delete this.model.correctPlayedWords;
             this.model.correctPlayedWords = [];
         };
@@ -464,8 +452,10 @@ var Game;
             this.canvas = canvas;
             this.width = width;
             this.height = height;
+            this.startingHeight = 0;
             this.model = model;
             this.categoriesView = categoriesView;
+            this.categoriesView.setCategories(this.model.Categories, this.model.chosenCategories);
         }
         CategoriesController.prototype.takeInput = function () {
             this.Scrolling = this.Scrolling.bind(this);
@@ -475,21 +465,63 @@ var Game;
             this.canvas.addEventListener("touchend", this.endScrolling);
             this.canvas.addEventListener("click", this.updateGame);
         };
-        CategoriesController.prototype.Scrolling = function (e) {
+        CategoriesController.prototype.Scrolling = function (event) {
+            event.preventDefault();
+            var screenHeight = this.height - (this.height / 4);
+            var numCatPages = Math.ceil(this.model.Categories.length / 6);
+            var maxHeight = screenHeight * numCatPages; //fix this once there is new categories
+            var canvas_x = event.targetTouches[0].pageX;
+            var canvas_y = event.targetTouches[0].pageY;
+            var startingHeight;
+            if (this.fingerLifted) {
+                this.startX = canvas_x;
+                this.startY = canvas_y;
+            }
+            if (!this.fingerLifted) {
+                var difference = this.oldY - canvas_y;
+                var newStartingHeight = this.startingHeight + difference;
+                if (newStartingHeight < 0) {
+                    this.startingHeight = 0;
+                }
+                else if (newStartingHeight + this.height > (maxHeight)) {
+                    this.startingHeight = this.startingHeight;
+                }
+                else {
+                    this.startingHeight = newStartingHeight;
+                }
+                this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
+            }
+            this.oldY = canvas_y;
+            this.endY = canvas_y;
+            this.endX = canvas_x;
+            this.fingerLifted = false;
         };
-
-        CategoriesController.prototype.endScrolling = function (e) {
+        CategoriesController.prototype.endScrolling = function (event) {
+            this.fingerLifted = true;
         };
-
-        CategoriesController.prototype.updateGame = function (e) {
+        CategoriesController.prototype.updateGame = function (event) {
+            var canvas_y = event.y;
+            canvas_y -= c.offsetLeft;
+            var screenHeight = this.height - (this.height / 4);
+            var buttonHeight = screenHeight / 7;
+            var gap = 10;
+            var startingGap = this.height / 9 + 10;
+            var menuButton = ((this.height / 7) * 6) - 10;
+            var click = this.startingHeight + canvas_y;
+            if (click > startingGap && click < menuButton) {
+                var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
+                this.model.changeChosenCat(i);
+                this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
+            }
+            if (click > menuButton) {
+                console.log("menu");
+            }
         };
-
         CategoriesController.prototype.switchStates = function () {
             this.canvas.removeEventListener("touchmove", this.Scrolling);
             this.canvas.removeEventListener("touchend", this.endScrolling);
             this.canvas.removeEventListener("click", this.updateGame);
         };
-
         CategoriesController.prototype.switchToGameState = function () {
             this.switchStates();
             this.gameloop.switchToGameState();
@@ -506,20 +538,24 @@ var Game;
 (function (Game) {
     var CategoriesView = (function () {
         function CategoriesView(context, width, height) {
-            this.game_background = new Image();
-            this.game_background.src = "inGame.png";
+            this.category_background = new Image();
+            this.category_background.src = "categories_foreground.png";
             this.context = context;
             this.width = width;
             this.height = height;
         }
+        CategoriesView.prototype.setCategories = function (categories, boolcat) {
+            this.categories = categories;
+            this.boolCategories = boolcat;
+        };
         CategoriesView.prototype.render = function () {
             var self = this;
-            this.game_background.onload = function () {
-                self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
-                self.fillRoundedRect(50, 50, 100, 100, 20);
+            this.category_background.onload = function () {
+                self.renderCategories(0, self.boolCategories);
             };
         };
-        CategoriesView.prototype.fillRoundedRect = function (x, y, w, h, r) {
+        CategoriesView.prototype.fillRoundedRect = function (x, y, w, h) {
+            var r = 20;
             this.context.beginPath();
             this.context.moveTo(x + r, y);
             this.context.lineTo(x + w - r, y);
@@ -527,11 +563,60 @@ var Game;
             this.context.lineTo(x + w, y + h - r);
             this.context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
             this.context.lineTo(x + r, y + h);
-            this.context.quadraticCurveTo(x, y + h, x, y + h - r);
+            //this.context.quadraticCurveTo(x, y+h, x, y+h-r);
             this.context.lineTo(x, y + r);
-            this.context.quadraticCurveTo(x, y, x + r, y);
-            this.context.fillStyle = "red";
+            //this.context.quadraticCurveTo(x, y, x+r, y);
+            this.context.closePath();
+            this.context.strokeStyle = "black";
+            this.context.lineWidth = 5;
             this.context.fill();
+            this.context.stroke();
+        };
+        CategoriesView.prototype.drawText = function (rectX, rectY, width, height, i) {
+            var fontSize = 30;
+            var fontSizeString = fontSize.toString();
+            var font = "pt Calibri";
+            this.context.font = fontSizeString + font;
+            this.context.textAlign = "center";
+            this.context.textBaseline = "middle";
+            this.context.fillStyle = "black";
+            var metrics = this.context.measureText(this.categories[i][0]);
+            var metricsWidth = metrics.width;
+            while (metricsWidth >= width) {
+                --fontSize;
+                var fontSizeString = fontSize.toString();
+                this.context.font = fontSizeString + font;
+                metrics = this.context.measureText(this.categories[i][0]);
+                metricsWidth = metrics.width;
+            }
+            this.context.fillText(this.categories[i][0], rectX + (width / 2), rectY + (height / 2));
+        };
+        CategoriesView.prototype.renderCategories = function (startingHeight, boolCategories) {
+            this.clearCanvas();
+            var screenHeight = this.height - (this.height / 4);
+            var tempStartingHeight = startingHeight;
+            var h = screenHeight / 7;
+            var gap = 10;
+            var startingGap = this.height / 9 + 10;
+            for (var i = 0; i != this.categories.length; ++i) {
+                var width = this.width / 1.2;
+                var height = h;
+                var rectX = this.width / 20;
+                var rectY = startingGap - tempStartingHeight;
+                if (boolCategories[i]) {
+                    this.context.fillStyle = "#00FF00";
+                }
+                else {
+                    this.context.fillStyle = "#FF3300";
+                }
+                this.fillRoundedRect(rectX, rectY, width, height);
+                this.drawText(rectX, rectY, width, height, i);
+                tempStartingHeight -= (h + gap);
+            }
+            this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+        };
+        CategoriesView.prototype.clearCanvas = function () {
+            this.context.clearRect(0, 0, this.width, this.height);
         };
         return CategoriesView;
     })();
@@ -556,48 +641,42 @@ var Game;
             this.height = height;
             this.model = new Game.GameOne();
             this.controller = new Game.MenuController(this, canvas, width, height); //add model
-            this.view = new Game.MenuView(context, width, height); //add model
+            this.view = new Game.MenuView(context, width, height); //add model		
         }
         GameLoop.prototype.runGame = function () {
             this.controller.takeInput();
             this.view.render();
             console.log("imadeit");
         };
-
         GameLoop.prototype.switchGameModes = function () {
             if (this.model instanceof Game.GameOne) {
                 this.model = new Game.GameTwo();
-            } else if (this.model instanceof Game.GameTwo) {
+            }
+            else if (this.model instanceof Game.GameTwo) {
                 this.model = new Game.GameOne();
             }
         };
-
         GameLoop.prototype.switchToGameState = function () {
             var newView = new Game.GameView(this.context, this.width, this.height, this.model);
             this.view = newView;
             this.model.setGameView(newView);
-
             var newController = new Game.GameController(this, this.canvas, this.width, this.height, this.model);
             this.controller = newController;
             this.controller.takeInput();
         };
-
         GameLoop.prototype.switchToCategoriesState = function () {
-            var newView = new Game.CategoriesView(this.context, this.width, this.height);
+            var newView = new Game.CategoriesView(this.context, this.width, this.height); //add model
             this.view = newView;
-            this.view.render();
-
             var newController = new Game.CategoriesController(this, this.canvas, this.width, this.height, this.model, newView);
             this.controller = newController;
             this.controller.takeInput();
+            this.view.render();
         };
-
         GameLoop.prototype.switchToMenuState = function () {
-            var newView = new Game.MenuView(this.context, this.width, this.height);
+            var newView = new Game.MenuView(this.context, this.width, this.height); //add model
             this.view = newView;
             this.view.render();
-
-            var newController = new Game.MenuController(this, this.canvas, this.width, this.height);
+            var newController = new Game.MenuController(this, this.canvas, this.width, this.height); //add model
             this.controller = newController;
             this.controller.takeInput();
         };
@@ -612,6 +691,5 @@ c.height = window.innerHeight;
 var w = window.innerWidth;
 var h = window.innerHeight;
 var ctx = c.getContext('2d');
-
 var game = new Game.GameLoop(c, ctx, w, h);
 game.runGame();
