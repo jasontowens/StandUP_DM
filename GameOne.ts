@@ -5,12 +5,14 @@ module Game{
 		recentPassOrFail:boolean;
 		heldSideways:boolean;
 		gameView;
-		
+		gameCount;
+		canChange;
 		
 		constructor(){
 			super();
 			this.gameStarted = false;
 			this.changeWord();
+			this.gameCount = 0;
 		}
 		setGameView(gv){
 			this.gameView = gv
@@ -23,7 +25,10 @@ module Game{
 			this.gameView.renderForehead();
 		}
 		countdown(){
-			this.gameView.renderCountdown();
+			if(this.gameCount == 0){
+				this.gameView.renderCountdown(3);
+			}
+			++this.gameCount;
 		}
 		 notEnoughCategories(){
 		 	this.gameView.renderNotEnoughCategories
