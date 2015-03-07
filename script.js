@@ -323,7 +323,31 @@ var Game;
                 self.context.drawImage(self.forehead, 0, 0, self.width, self.height);
             };
         };
-        GameView.prototype.renderCountdown = function () {
+        GameView.prototype.renderCountdown = function (timeLeft) {
+            this.clearCanvas();
+            this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+            this.drawNumber(timeLeft);
+            var self = this;
+            var timeout;
+            if (timeLeft < 0) {
+                clearTimeout(timeout);
+                this.model.canChange = true;
+            }
+            else {
+                var f = function () {
+                    self.renderCountdown(timeLeft - 1);
+                };
+                timeout = setTimeout(f, 1000);
+            }
+        };
+        GameView.prototype.drawNumber = function (timeLeft) {
+            this.rotateContext();
+            this.context.font = "bold 80px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            this.context.fillStyle = 'white';
+            this.context.fillText(timeLeft, this.width / 2, this.height / 2);
+            this.context.restore();
         };
         GameView.prototype.renderPass = function () {
             this.context.drawImage(this.pass, 0, 0, this.width, this.height);
@@ -553,6 +577,7 @@ var Game;
             _super.call(this);
             this.gameStarted = false;
             this.changeWord();
+            this.gameCount = 0;
         }
         GameOne.prototype.setGameView = function (gv) {
             this.gameView = gv;
@@ -565,7 +590,10 @@ var Game;
             this.gameView.renderForehead();
         };
         GameOne.prototype.countdown = function () {
-            this.gameView.renderCountdown();
+            if (this.gameCount == 0) {
+                this.gameView.renderCountdown(3);
+            }
+            ++this.gameCount;
         };
         GameOne.prototype.notEnoughCategories = function () {
             this.gameView.renderNotEnoughCategories;
@@ -649,7 +677,6 @@ var Game;
             var mostRecentState = 100;
             var mostRecentTimeItWasBeingHeldSideways;
             window.ondeviceorientation = function (event) {
-                console.log(self.gamma);
                 self.gamma = Math.round(event.gamma);
                 if (self.gamma > 125 || self.gamma < 55) {
                     mostRecentTimeItWasBeingHeldSideways = new Date().getTime();
@@ -675,15 +702,29 @@ var Game;
         GameController.prototype.startDaGame = function () {
             this.clearVariablesOne();
             var self = this;
-            console.log(!this.model.gameStarted + " " + this.gameShallStart);
-            var f = function () {
-                self.startDaGame();
-            };
-            var t = setTimeout(f, 100);
+            var t;
             if (!this.model.gameStarted && this.gameShallStart) {
-                self.model.countdown();
-                self.model.startGame(5);
-                clearTimeout(t);
+                console.log(this.model.gameCount);
+                this.model.countdown();
+                this.startAnothaGame();
+            }
+            else {
+                var f = function () {
+                    self.startDaGame();
+                };
+                t = setTimeout(f, 100);
+            }
+        };
+        GameController.prototype.startAnothaGame = function () {
+            if (this.model.canChange) {
+                this.model.startGame(5);
+            }
+            else {
+                var self = this;
+                var f = function () {
+                    self.startAnothaGame();
+                };
+                var t = setTimeout(f, 100);
             }
         };
         GameController.prototype.gameCanStart = function () {
@@ -816,7 +857,9 @@ var Game;
             this.model.gameOver = false;
             this.model.gameStarted = false;
             this.model.newItem = false;
+            this.model.canChange = false;
             this.model.heldSideways = false;
+            this.model.gameCount = 0;
             while (this.model.playedWords.length > 0) {
                 this.model.playedWords.pop();
                 this.model.correctPlayedWords.pop();

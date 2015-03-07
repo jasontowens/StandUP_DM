@@ -50,7 +50,6 @@ module Game{
 			var mostRecentState = 100;
 			var mostRecentTimeItWasBeingHeldSideways;
 			window.ondeviceorientation = function(event) {
-				console.log(self.gamma);
 				  self.gamma = Math.round(event.gamma);
 				  if(self.gamma>125 || self.gamma < 55){
 				  	mostRecentTimeItWasBeingHeldSideways  = new Date().getTime();
@@ -78,14 +77,26 @@ module Game{
 		startDaGame(){
 			this.clearVariablesOne();
 			var self = this;
-			console.log(!this.model.gameStarted + " " + this.gameShallStart);
-			var f = function(){self.startDaGame();};
-			var t = setTimeout(f,100);
+			var t;
 			if(!this.model.gameStarted && this.gameShallStart){
-				self.model.countdown();
-				self.model.startGame(5);
-				clearTimeout(t);
+				console.log(this.model.gameCount);
+				this.model.countdown();
+				this.startAnothaGame();
 			}
+			else{
+				var f = function(){self.startDaGame();};
+				t = setTimeout(f,100);
+			}
+		}
+		startAnothaGame(){
+			if(this.model.canChange){
+				this.model.startGame(5);
+			}else{
+				var self = this;
+				var f = function(){self.startAnothaGame();};
+				var t = setTimeout(f,100);
+			}
+		
 		}
 		gameCanStart():boolean{
 			for(var i = 0; i != this.model.chosenCategories.length; ++i){
@@ -218,8 +229,9 @@ module Game{
 			this.model.gameOver = false;
 			this.model.gameStarted = false;
 			this.model.newItem = false;
+			this.model.canChange = false;
 			this.model.heldSideways = false;
-			
+			this.model.gameCount = 0;
 			while(this.model.playedWords.length > 0) {
    				 this.model.playedWords.pop();
    				 this.model.correctPlayedWords.pop();

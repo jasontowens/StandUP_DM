@@ -39,8 +39,28 @@ module Game{
 					self.context.drawImage(self.forehead, 0, 0, self.width, self.height);
 			}
 		}
-		renderCountdown(){
-		
+		renderCountdown(timeLeft){
+			this.clearCanvas();
+			this.context.drawImage(this.game_background, 0,0,this.width,this.height);
+			this.drawNumber(timeLeft);
+			var self = this;
+			var timeout;
+			if(timeLeft < 0){
+				clearTimeout(timeout);
+				this.model.canChange = true;
+			}else{
+				var f = function(){self.renderCountdown(timeLeft-1)};
+				timeout = setTimeout(f, 1000);
+			}
+		}
+		drawNumber(timeLeft){
+			this.rotateContext();
+			this.context.font = "bold 80px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			this.context.fillStyle = 'white';
+			this.context.fillText(timeLeft, this.width/2, this.height/2);
+			this.context.restore();
 		}
 		renderPass(){
 			this.context.drawImage(this.pass, 0, 0, this.width, this.height);
