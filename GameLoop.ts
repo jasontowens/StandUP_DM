@@ -46,8 +46,6 @@ module Game{
 				var f = function(){self.runGame()};
 				var t = setTimeout(f,100);
 			}
-			
-
 		}
 		
 		switchGameModes(){
@@ -86,7 +84,6 @@ module Game{
 			
 			
 		}
-		
 		switchToMenuState(){
 		
 			var newView = new MenuView(this.context,this.width,this.height,this.currentGame,this.model);
@@ -96,7 +93,6 @@ module Game{
 			var newController = new MenuController(this,this.canvas,this.width,this.height,this.model);
 			this.controller = newController;
 			this.controller.takeInput();
-			
 			
 		}
 		
