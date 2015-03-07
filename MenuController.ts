@@ -8,9 +8,10 @@ module Game{
 		height;
 		model;
 
-		constructor(gameloop,canvas,width,height){
+		constructor(gameloop,canvas,width,height,model){
 			this.gameloop = gameloop;
 			this.canvas = canvas;
+			this.model = model
 		}
 		takeInput(){
 			this.mobileClick = <any>this.mobileClick.bind(this);

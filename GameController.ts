@@ -212,6 +212,8 @@ module Game{
 			this.model.teamOneScore = 0;
 			this.model.teamTwoScore = 0;
 			this.model.totalRoundsOptionNumber = 0;
+			this.model.teamOneTotalTime = 0;
+			this.model.teamTwoTotalTime = 0;
 		
 		}
 	

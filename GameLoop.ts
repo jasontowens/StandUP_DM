@@ -27,7 +27,7 @@ module Game{
 			this.width = width;
 			this.height = height;
 			this.model = new GameOne();
-			this.controller = new Game.MenuController(this,canvas,width,height);//add model
+			this.controller = new Game.MenuController(this,canvas,width,height,this.model);//add model
 			this.view = new MenuView(context,width,height,1);//add model		
 		}
 		runGame(){
@@ -65,7 +65,7 @@ module Game{
 			var newController = new CategoriesController(this,this.canvas,this.width,this.height,this.model,newView);
 			this.controller = newController;
 			this.controller.takeInput();
-			this.view.render();
+			//this.view.render();
 			
 			
 		}
@@ -80,7 +80,7 @@ module Game{
 			var newView = new MenuView(this.context,this.width,this.height,gm);//add model
 			this.view = newView;
 			
-			var newController = new MenuController(this,this.canvas,this.width,this.height);//add model
+			var newController = new MenuController(this,this.canvas,this.width,this.height,this.model);//add model
 			this.controller = newController;
 			this.controller.takeInput();
 			

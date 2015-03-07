@@ -7,6 +7,8 @@ module Game{
 		teamTwoScore;
 		teamOneTime;
 		teamTwoTime;
+		teamOneTotalTime;
+		teamTwoTotalTime;
 		activeTeam;
 		inBetweenRounds;
 		currentRound;
@@ -28,6 +30,7 @@ module Game{
 			this.teamOneScore = 0;
 			this.teamTwoScore = 0;
 			this.currentRound = 0;
+		
 			this.totalRoundsOption = [1,3,7,9,11];
 			this.totalRoundsOptionNumber = 0;
 			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
@@ -47,7 +50,7 @@ module Game{
 			this.newItem = true;
 		}
 		setTotalRounds(){
-			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
+			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber%5];
 		}
 		beginGame(height){
 			this.gameView.renderRoundNumber(height/2,this.totalRounds,true);
@@ -75,8 +78,8 @@ module Game{
 			this.gameStarted = true;
 			this.teamOneTime = 2;
 			this.teamTwoTime = 2;
-			this.teamOneScore = 0;
-			this.teamTwoScore = 0;
+			this.teamOneTotalTime = 0;
+			this.teamTwoTotalTime = 0;
 			this.currentRound++;
 			this.startGame1();
 		}
@@ -93,11 +96,21 @@ module Game{
 			var timeout = setTimeout(f, 100);
 			if(this.teamOneTime < 0 || this.teamTwoTime < 0){
 				if(this.currentRound == this.totalRounds){
+					if(this.teamOneTotalTime>this.teamTwoTotalTime){
+						++this.teamTwoScore;
+					}else{
+						++this.teamOneScore;
+					}
 					this.playingGame = false;
 					this.gameOver = true;
 					this.gameView.renderGameOverTwo(this.teamOneScore,this.teamTwoScore);
 				}
 				else{
+					if(this.teamOneTotalTime>this.teamTwoTotalTime){
+						++this.teamTwoScore;
+					}else{
+						++this.teamOneScore;
+					}
 					this.playingGame = false;
 					this.inBetweenRounds = true;
 					this.gameView.renderInBetweenRounds(this.teamOneScore,this.teamTwoScore,this.currentRound,this.totalRounds);
@@ -112,8 +125,10 @@ module Game{
 				
 			}
 			if(this.activeTeam == 1){
+				this.teamOneTotalTime += .1;
 				this.teamOneTime -= .1;
 			}else{	
+				this.teamTwoTotalTime += .1;
 				this.teamTwoTime -= .1;
 			}		
 		}

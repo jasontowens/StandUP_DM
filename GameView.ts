@@ -109,7 +109,7 @@ module Game{
 			width2-=5;
 			clearTimeout(this.bouncingAnimation);
 			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
-			this.slideLeftAnimation = setTimeout(f, .01);
+			this.slideLeftAnimation = setTimeout(f, 5);
 			if(width2 <= Math.floor(this.width/2)){
 				clearTimeout(this.slideLeftAnimation);
 				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
@@ -130,7 +130,7 @@ module Game{
 			width2+=5;
 			clearTimeout(this.bouncingAnimation);
 			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
-			this.slideLeftAnimation = setTimeout(f, .01);
+			this.slideLeftAnimation = setTimeout(f, 5);
 			if(width2 >= Math.floor(this.width/2)){
 				clearTimeout(this.slideLeftAnimation);
 				this.renderRoundNumber(this.bouncingHeight,rounds2,true);

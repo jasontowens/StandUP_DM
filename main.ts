@@ -6,6 +6,7 @@ c.height = window.innerHeight;
 var w = window.innerWidth;
 var h = window.innerHeight;
 var ctx = c.getContext('2d');
+ctx.font = "50px AG Book Rounded";
 
 
 

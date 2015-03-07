@@ -8,12 +8,14 @@ module Game{
 		model;
 		categories;
 		boolCategories:boolean[];
+		font;
 	
 		constructor(context,width,height){
 			this.category_background.src = "categories_foreground.png";
 			this.context = context;
 			this.width = width;
 			this.height = height;
+			this.font = "pt AG Book Rounded"
 		}
 		setCategories(categories,boolcat){
 			this.categories = categories;
@@ -25,6 +27,7 @@ module Game{
 			this.category_background.onload = function(){ 
 				self.renderCategories(0,self.boolCategories);
 			}
+			
 		}
 		fillRoundedRect(x, y,w,h){
 			var r = 20;
@@ -35,9 +38,7 @@ module Game{
 			this.context.lineTo(x+w, y+h-r);
 			this.context.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
 			this.context.lineTo(x, y+h);
-			//this.context.quadraticCurveTo(x, y+h, x, y+h-r);
 			this.context.lineTo(x, y);
-			//this.context.quadraticCurveTo(x, y, x+r, y);
 			this.context.closePath();
 			this.context.strokeStyle = "black";
     		this.context.lineWidth   = 5;
@@ -47,8 +48,7 @@ module Game{
     	drawText(rectX,rectY,width,height,i){
     		var fontSize = 30;
     		var fontSizeString = fontSize.toString();
-    		var font = "pt AG Book Rounded"
-    		this.context.font = fontSizeString + font;
+    		this.context.font = fontSizeString + this.font;
       		this.context.textAlign="center"; 
 			this.context.textBaseline = "middle";
       		this.context.fillStyle = "black";
@@ -57,7 +57,7 @@ module Game{
       		while(metricsWidth >= width){
       			--fontSize;
       			var fontSizeString = fontSize.toString();
-      			this.context.font = fontSizeString + font;
+      			this.context.font = fontSizeString + this.font;
       			metrics = this.context.measureText(this.categories[i][0]);
       			metricsWidth = metrics.width;
       			
@@ -89,6 +89,16 @@ module Game{
 				tempStartingHeight -= (h+gap);
 			}
 			this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+    	}
+    	fontLoaded():boolean{
+    		var what = "kajdshfluakhfasn";
+    		var metrics = this.context.measureText(what);
+      		var metricsWidth = metrics.width;
+      		if(Math.floor(metricsWidth) == 304){
+      			return true;
+      		}else{
+      			return false;
+      		}
     	}
     	clearCanvas(){
 			this.context.clearRect(0, 0, this.width, this.height);

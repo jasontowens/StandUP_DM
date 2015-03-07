@@ -2,9 +2,10 @@
 var Game;
 (function (Game) {
     var MenuController = (function () {
-        function MenuController(gameloop, canvas, width, height) {
+        function MenuController(gameloop, canvas, width, height, model) {
             this.gameloop = gameloop;
             this.canvas = canvas;
+            this.model = model;
         }
         MenuController.prototype.takeInput = function () {
             this.mobileClick = this.mobileClick.bind(this);
@@ -200,7 +201,7 @@ var Game;
             this.newItem = true;
         };
         GameTwo.prototype.setTotalRounds = function () {
-            this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
+            this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber % 5];
         };
         GameTwo.prototype.beginGame = function (height) {
             this.gameView.renderRoundNumber(height / 2, this.totalRounds, true);
@@ -226,8 +227,8 @@ var Game;
             this.gameStarted = true;
             this.teamOneTime = 2;
             this.teamTwoTime = 2;
-            this.teamOneScore = 0;
-            this.teamTwoScore = 0;
+            this.teamOneTotalTime = 0;
+            this.teamTwoTotalTime = 0;
             this.currentRound++;
             this.startGame1();
         };
@@ -247,11 +248,23 @@ var Game;
             var timeout = setTimeout(f, 100);
             if (this.teamOneTime < 0 || this.teamTwoTime < 0) {
                 if (this.currentRound == this.totalRounds) {
+                    if (this.teamOneTotalTime > this.teamTwoTotalTime) {
+                        ++this.teamTwoScore;
+                    }
+                    else {
+                        ++this.teamOneScore;
+                    }
                     this.playingGame = false;
                     this.gameOver = true;
                     this.gameView.renderGameOverTwo(this.teamOneScore, this.teamTwoScore);
                 }
                 else {
+                    if (this.teamOneTotalTime > this.teamTwoTotalTime) {
+                        ++this.teamTwoScore;
+                    }
+                    else {
+                        ++this.teamOneScore;
+                    }
                     this.playingGame = false;
                     this.inBetweenRounds = true;
                     this.gameView.renderInBetweenRounds(this.teamOneScore, this.teamTwoScore, this.currentRound, this.totalRounds);
@@ -264,9 +277,11 @@ var Game;
                 this.newItem = false;
             }
             if (this.activeTeam == 1) {
+                this.teamOneTotalTime += .1;
                 this.teamOneTime -= .1;
             }
             else {
+                this.teamTwoTotalTime += .1;
                 this.teamTwoTime -= .1;
             }
         };
@@ -374,7 +389,7 @@ var Game;
             var f = function () {
                 self.slideLeft(rounds1, rounds2, width1, width2);
             };
-            this.slideLeftAnimation = setTimeout(f, .01);
+            this.slideLeftAnimation = setTimeout(f, 5);
             if (width2 <= Math.floor(this.width / 2)) {
                 clearTimeout(this.slideLeftAnimation);
                 this.renderRoundNumber(this.bouncingHeight, rounds2, true);
@@ -395,7 +410,7 @@ var Game;
             var f = function () {
                 self.slideLeft(rounds1, rounds2, width1, width2);
             };
-            this.slideLeftAnimation = setTimeout(f, .01);
+            this.slideLeftAnimation = setTimeout(f, 5);
             if (width2 >= Math.floor(this.width / 2)) {
                 clearTimeout(this.slideLeftAnimation);
                 this.renderRoundNumber(this.bouncingHeight, rounds2, true);
@@ -785,6 +800,8 @@ var Game;
             this.model.teamOneScore = 0;
             this.model.teamTwoScore = 0;
             this.model.totalRoundsOptionNumber = 0;
+            this.model.teamOneTotalTime = 0;
+            this.model.teamTwoTotalTime = 0;
         };
         return GameController;
     })();
@@ -804,6 +821,7 @@ var Game;
             this.model = model;
             this.categoriesView = categoriesView;
             this.categoriesView.setCategories(this.model.Categories, this.model.chosenCategories);
+            this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
         }
         CategoriesController.prototype.takeInput = function () {
             this.Scrolling = this.Scrolling.bind(this);
@@ -837,7 +855,7 @@ var Game;
                     this.startingHeight = newStartingHeight;
                 }
                 console.log("hi" + canvas_y);
-                this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
+                this.categoriesView.renderCategories(Math.round(this.startingHeight), this.model.chosenCategories);
             }
             this.oldY = canvas_y;
             this.endY = canvas_y;
@@ -887,6 +905,7 @@ var Game;
             this.context = context;
             this.width = width;
             this.height = height;
+            this.font = "pt AG Book Rounded";
         }
         CategoriesView.prototype.setCategories = function (categories, boolcat) {
             this.categories = categories;
@@ -907,9 +926,7 @@ var Game;
             this.context.lineTo(x + w, y + h - r);
             this.context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
             this.context.lineTo(x, y + h);
-            //this.context.quadraticCurveTo(x, y+h, x, y+h-r);
             this.context.lineTo(x, y);
-            //this.context.quadraticCurveTo(x, y, x+r, y);
             this.context.closePath();
             this.context.strokeStyle = "black";
             this.context.lineWidth = 5;
@@ -919,8 +936,7 @@ var Game;
         CategoriesView.prototype.drawText = function (rectX, rectY, width, height, i) {
             var fontSize = 30;
             var fontSizeString = fontSize.toString();
-            var font = "pt AG Book Rounded";
-            this.context.font = fontSizeString + font;
+            this.context.font = fontSizeString + this.font;
             this.context.textAlign = "center";
             this.context.textBaseline = "middle";
             this.context.fillStyle = "black";
@@ -929,7 +945,7 @@ var Game;
             while (metricsWidth >= width) {
                 --fontSize;
                 var fontSizeString = fontSize.toString();
-                this.context.font = fontSizeString + font;
+                this.context.font = fontSizeString + this.font;
                 metrics = this.context.measureText(this.categories[i][0]);
                 metricsWidth = metrics.width;
             }
@@ -959,6 +975,17 @@ var Game;
             }
             this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
         };
+        CategoriesView.prototype.fontLoaded = function () {
+            var what = "kajdshfluakhfasn";
+            var metrics = this.context.measureText(what);
+            var metricsWidth = metrics.width;
+            if (Math.floor(metricsWidth) == 304) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
         CategoriesView.prototype.clearCanvas = function () {
             this.context.clearRect(0, 0, this.width, this.height);
         };
@@ -984,7 +1011,7 @@ var Game;
             this.width = width;
             this.height = height;
             this.model = new Game.GameOne();
-            this.controller = new Game.MenuController(this, canvas, width, height); //add model
+            this.controller = new Game.MenuController(this, canvas, width, height, this.model); //add model
             this.view = new Game.MenuView(context, width, height, 1); //add model		
         }
         GameLoop.prototype.runGame = function () {
@@ -1014,7 +1041,7 @@ var Game;
             var newController = new Game.CategoriesController(this, this.canvas, this.width, this.height, this.model, newView);
             this.controller = newController;
             this.controller.takeInput();
-            this.view.render();
+            //this.view.render();
         };
         GameLoop.prototype.switchToMenuState = function () {
             var gm;
@@ -1026,7 +1053,7 @@ var Game;
             }
             var newView = new Game.MenuView(this.context, this.width, this.height, gm); //add model
             this.view = newView;
-            var newController = new Game.MenuController(this, this.canvas, this.width, this.height); //add model
+            var newController = new Game.MenuController(this, this.canvas, this.width, this.height, this.model); //add model
             this.controller = newController;
             this.controller.takeInput();
         };
@@ -1041,5 +1068,6 @@ c.height = window.innerHeight;
 var w = window.innerWidth;
 var h = window.innerHeight;
 var ctx = c.getContext('2d');
+ctx.font = "50px AG Book Rounded";
 var game = new Game.GameLoop(c, ctx, w, h);
 game.runGame();
