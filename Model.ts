@@ -21,6 +21,16 @@ module Game{
 			this.gameOver = false;
 			
 		}
+		clearVariables(){
+			this.changeWord();
+			this.gameOver = false;
+			this.newItem = false;
+			this.gameStarted = false;
+			while(this.playedWords.length > 0) {
+   				 this.playedWords.pop();
+   				 this.correctPlayedWords.pop();
+			}
+		}
 		generateItems(){
 			//VERY IMPORTANT: FIRST ELEMENT IN EACH CATEGORY IS THE NAME OF THE CATEGORY, DO NOT PRINT IT
 			this.Categories= 

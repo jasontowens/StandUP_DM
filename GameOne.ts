@@ -8,6 +8,12 @@ module Game{
 		gameCount;
 		canChange;
 		
+		clearVariables(){
+			super.clearVariables();
+			this.heldSideways = false;
+			this.gameCount = 0;
+			this.canChange = false;
+		}
 		constructor(){
 			super();
 			this.gameStarted = false;

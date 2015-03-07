@@ -8,16 +8,17 @@ module Game{
 		height;
 		model;
 	
-		constructor(context,width,height,gameMode){
+		constructor(context,width,height,gameMode,model){
 			this.menu_background1.src = "Menu.png";
 			this.menu_background2.src = "Menu2.png";
 			this.context = context;
 			this.width = width;
 			var self = this;
 			this.height = height;
-			this.menu_background1.onload = function(){
-					self.render(gameMode);
-			}
+			this.model = model;
+		}
+		checkIfImageLoaded():boolean{
+			return this.menu_background1.complete;
 		}
 		render(gameMode){
 			var self = this;

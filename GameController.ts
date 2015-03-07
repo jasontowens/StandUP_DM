@@ -34,10 +34,8 @@ module Game{
 		
 		gameOneTakeInput(){
 			if(this.gameCanStart()){
-				//console.log("start");
 			 	this.startGameOne();
 			}else{
-				//console.log("nostart");
 				this.model.notEnoughCategories();
 			}
 		}
@@ -72,10 +70,9 @@ module Game{
 				mostRecentState  = self.gamma;
 			}
 			this.startDaGame();
-			
 		}
 		startDaGame(){
-			this.clearVariablesOne();
+			this.model.newItem = false;
 			var self = this;
 			var t;
 			if(!this.model.gameStarted && this.gameShallStart){
@@ -98,6 +95,7 @@ module Game{
 			}
 		
 		}
+		
 		gameCanStart():boolean{
 			for(var i = 0; i != this.model.chosenCategories.length; ++i){
 				if(this.model.chosenCategories[i] == true){
@@ -218,39 +216,10 @@ module Game{
 		switchStates(){
 			if(this.model instanceof GameOne){
 				this.canvas.removeEventListener("click",this.mobileClick); 
-				this.clearVariablesOne();
 			}
 			else{
 				this.canvas.removeEventListener("click",this.mobileClickTwo); 
-				this.clearVariablesTwo();
 			}
-		}
-		clearVariablesOne(){
-			this.model.gameOver = false;
-			this.model.gameStarted = false;
-			this.model.newItem = false;
-			this.model.canChange = false;
-			this.model.heldSideways = false;
-			this.model.gameCount = 0;
-			while(this.model.playedWords.length > 0) {
-   				 this.model.playedWords.pop();
-   				 this.model.correctPlayedWords.pop();
-			}
-		}
-		clearVariablesTwo(){
-			this.model.gameOver = false;
-			this.model.playingGame = false;
-			this.model.newItem = false;
-			this.model.activeTeam = 1;
-			this.model.currentRound = 0;
-			this.model.teamOneTime = 30;
-			this.model.teamTwoTime = 30;
-			this.model.teamOneScore = 0;
-			this.model.teamTwoScore = 0;
-			this.model.totalRoundsOptionNumber = 0;
-			this.model.teamOneTotalTime = 0;
-			this.model.teamTwoTotalTime = 0;
-		
 		}
 	
 	}
