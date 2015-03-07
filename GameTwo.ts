@@ -59,7 +59,9 @@ module Game{
 			this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(++this.totalRoundsOptionNumber)%5],width/2,width+5);
 		}
 		slideRight(width){
-			this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,width+5);
+			if(this.totalRoundsOptionNumber-1 >= 0){
+				this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,0);
+			}
 		}
 		selectedRoundNumber(){
 			this.gameView.renderSelectedRoundNumber();

@@ -210,7 +210,9 @@ var Game;
             this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 5);
         };
         GameTwo.prototype.slideRight = function (width) {
-            this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, width + 5);
+            if (this.totalRoundsOptionNumber - 1 >= 0) {
+                this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, 0);
+            }
         };
         GameTwo.prototype.selectedRoundNumber = function () {
             this.gameView.renderSelectedRoundNumber();
@@ -300,10 +302,12 @@ var Game;
             this.game_background2 = new Image();
             this.forehead = new Image();
             this.pass = new Image();
+            this.roundPicking = new Image();
             this.correct = new Image();
             this.endGame_background = new Image();
             this.game_background.src = "InGame.png";
             this.game_background2.src = "InGame2.png";
+            this.roundPicking.src = "RoundPickingBackground.png";
             this.forehead.src = "forehead.png";
             this.pass.src = "pass.png";
             this.correct.src = "correct.png";
@@ -354,6 +358,13 @@ var Game;
             this.context.fillText(teamTwoScore, 3 * this.width / 4, 3 * this.height / 4);
         };
         GameView.prototype.renderRoundNumber = function (height, rounds, up) {
+            var self = this;
+            /*
+            this.roundPicking.onload = function(){
+                    self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+            }
+            */
+            this.clearCanvas();
             this.bouncingHeight = height;
             var self = this;
             if (up) {
@@ -372,8 +383,7 @@ var Game;
                 self.renderRoundNumber(height, rounds, up);
             };
             this.bouncingAnimation = setTimeout(f, 20);
-            this.clearCanvas();
-            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
             this.context.font = "150px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
@@ -382,7 +392,7 @@ var Game;
         GameView.prototype.slideLeft = function (rounds1, rounds2, width1, width2) {
             this.clearCanvas();
             var self = this;
-            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
             width1 -= 5;
             width2 -= 5;
             clearTimeout(this.bouncingAnimation);
@@ -403,16 +413,16 @@ var Game;
         GameView.prototype.slideRight = function (rounds1, rounds2, width1, width2) {
             this.clearCanvas();
             var self = this;
-            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
             width1 += 5;
             width2 += 5;
             clearTimeout(this.bouncingAnimation);
             var f = function () {
-                self.slideLeft(rounds1, rounds2, width1, width2);
+                self.slideRight(rounds1, rounds2, width1, width2);
             };
-            this.slideLeftAnimation = setTimeout(f, 5);
+            this.slideRightAnimation = setTimeout(f, 5);
             if (width2 >= Math.floor(this.width / 2)) {
-                clearTimeout(this.slideLeftAnimation);
+                clearTimeout(this.slideRightAnimation);
                 this.renderRoundNumber(this.bouncingHeight, rounds2, true);
             }
             this.context.font = "150px AG Book Rounded";
@@ -447,7 +457,7 @@ var Game;
             this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
             var numCorrect = 0;
             var shiftUp = 0;
-            for (var i = 1; i < numItems; ++i) {
+            for (var i = 0; i < numItems; ++i) {
                 if (!correct[i]) {
                     this.context.fillStyle = "red";
                 }
@@ -562,12 +572,12 @@ var Game;
         };
         GameOne.prototype.startGame = function (timeOfRound) {
             this.gameStarted = true;
-            this.gameView.renderCurrentWordOne(this.currentItem, timeOfRound);
             var self = this;
             var f = function () {
                 self.startGame(timeOfRound);
             };
             var timeout = setTimeout(f, 100);
+            this.gameView.renderCurrentWordOne(this.currentItem, timeOfRound);
             if (timeOfRound <= 0) {
                 clearTimeout(timeout);
                 this.gameOver = true;
@@ -610,6 +620,8 @@ var Game;
             this.width = width;
             this.height = height;
             this.model = model;
+            this.gameShallStart = false;
+            this.gamma = 0;
         }
         GameController.prototype.takeInput = function () {
             if (this.model instanceof Game.GameOne) {
@@ -621,11 +633,11 @@ var Game;
         };
         GameController.prototype.gameOneTakeInput = function () {
             if (this.gameCanStart()) {
-                console.log("start");
+                //console.log("start");
                 this.startGameOne();
             }
             else {
-                console.log("nostart");
+                //console.log("nostart");
                 this.model.notEnoughCategories();
             }
         };
@@ -637,29 +649,43 @@ var Game;
             var mostRecentState = 100;
             var mostRecentTimeItWasBeingHeldSideways;
             window.ondeviceorientation = function (event) {
-                var gamma = Math.round(event.gamma);
-                if (gamma > 125 || gamma < 55) {
+                console.log(self.gamma);
+                self.gamma = Math.round(event.gamma);
+                if (self.gamma > 125 || self.gamma < 55) {
                     mostRecentTimeItWasBeingHeldSideways = new Date().getTime();
                 }
-                if (gamma > 125 && mostRecentState <= 125) {
+                if (self.gamma > 125 && mostRecentState <= 125) {
                     self.model.setRecentPassOrFail(true); //they got the answer right
                     self.model.heldSideways = true;
                 }
-                else if (gamma < 55 && mostRecentState >= 55) {
+                else if (self.gamma < 55 && mostRecentState >= 55) {
                     self.model.setRecentPassOrFail(false); //they got the answer wrong
                     self.model.heldSideways = true;
                 }
-                else if (gamma >= 55 && gamma <= 125) {
-                    if (!self.model.gameStarted) {
-                        self.model.countdown();
-                        self.model.startGame(5);
-                    }
-                    while ((new Date().getTime()) - mostRecentTimeItWasBeingHeldSideways < 2000) {
+                else if (self.gamma >= 55 && self.gamma <= 125) {
+                    self.gameShallStart = true;
+                    while ((new Date().getTime()) - mostRecentTimeItWasBeingHeldSideways < 1000) {
                     }
                     self.model.heldSideways = false;
                 }
-                mostRecentState = gamma;
+                mostRecentState = self.gamma;
             };
+            this.startDaGame();
+        };
+        GameController.prototype.startDaGame = function () {
+            this.clearVariablesOne();
+            this.model.newItem = false;
+            var self = this;
+            console.log(!this.model.gameStarted + " " + this.gameShallStart);
+            var f = function () {
+                self.startDaGame();
+            };
+            var t = setTimeout(f, 100);
+            if (!this.model.gameStarted && this.gameShallStart) {
+                self.model.countdown();
+                self.model.startGame(5);
+                clearTimeout(t);
+            }
         };
         GameController.prototype.gameCanStart = function () {
             for (var i = 0; i != this.model.chosenCategories.length; ++i) {
@@ -736,14 +762,21 @@ var Game;
             }
         };
         GameController.prototype.clickSelectTotalRounds = function (X, Y) {
-            var leftArrowStartingX = 260 / 375 * this.width;
-            var leftArrowStartingY = 250 / 667 * this.height;
-            var leftArrowEndingY = 290 / 667 * this.height;
+            var leftArrowStartingX = (260 / 375) * this.width;
+            var leftArrowStartingY = (250 / 667) * this.height;
+            var leftArrowEndingY = (320 / 667) * this.height;
             if (X > leftArrowStartingX && X < this.width) {
                 if (Y > leftArrowStartingY && Y < leftArrowEndingY) {
                     this.model.slideLeft(this.width);
                 }
-                else if (Y > 550 / 667 * this.height) {
+            }
+            else if (X > 0 && X < (50 / 375) * this.width) {
+                if (Y > leftArrowStartingY && Y < leftArrowEndingY) {
+                    this.model.slideRight(this.width);
+                }
+            }
+            else {
+                if (Y > 550 / 667 * this.height) {
                     this.model.setTotalRounds();
                     this.model.selectedRoundNumber();
                     this.model.startGame();
@@ -949,6 +982,7 @@ var Game;
                 metrics = this.context.measureText(this.categories[i][0]);
                 metricsWidth = metrics.width;
             }
+            this.context.fillText(this.categories[i][0], rectX + (width / 2), rectY + (height / 2));
             this.context.fillText(this.categories[i][0], rectX + (width / 2), rectY + (height / 2));
         };
         CategoriesView.prototype.renderCategories = function (startingHeight, boolCategories) {

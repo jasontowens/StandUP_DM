@@ -30,10 +30,10 @@ module Game{
 		 }
 		startGame(timeOfRound:number){
 			this.gameStarted = true;
-			this.gameView.renderCurrentWordOne(this.currentItem,timeOfRound);
 			var self = this;
 			var f = function(){self.startGame(timeOfRound)};
 			var timeout = setTimeout(f, 100);
+			this.gameView.renderCurrentWordOne(this.currentItem,timeOfRound);
 			if(timeOfRound <= 0){
 				clearTimeout(timeout);
 				this.gameOver = true;
@@ -56,7 +56,8 @@ module Game{
 				}
 			}else{
 				timeOfRound = timeOfRound - 0.1;
-			}		
+			}	
+			
 		}
 	}
 }

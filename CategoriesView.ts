@@ -64,6 +64,7 @@ module Game{
       		}
       		
       		this.context.fillText(this.categories[i][0],rectX+(width/2),rectY+(height/2));
+      		this.context.fillText(this.categories[i][0],rectX+(width/2),rectY+(height/2));
     	}
     	renderCategories(startingHeight,boolCategories){
     		this.clearCanvas()

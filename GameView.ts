@@ -8,6 +8,7 @@ module Game{
 		game_background2 = new Image();
 		forehead = new Image();
 		pass = new Image();
+		roundPicking = new Image();
 		correct = new Image();
 		endGame_background = new Image();
 		context;
@@ -22,7 +23,7 @@ module Game{
 		constructor(context,width,height,model){
 			this.game_background.src = "InGame.png";
 			this.game_background2.src = "InGame2.png";
-
+			this.roundPicking.src = "RoundPickingBackground.png";
 			this.forehead.src = "forehead.png";
 			this.pass.src = "pass.png";
 			this.correct.src = "correct.png";
@@ -80,6 +81,13 @@ module Game{
 		
 		}
 		renderRoundNumber(height,rounds,up){
+			var self = this;
+			/*
+			this.roundPicking.onload = function(){
+					self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+			}
+			*/
+			this.clearCanvas();
 			this.bouncingHeight = height;
 			var self = this;
 			if(up){	
@@ -94,8 +102,7 @@ module Game{
 			}
 			var f = function(){self.renderRoundNumber(height,rounds,up)};
 			this.bouncingAnimation = setTimeout(f, 20);
-			this.clearCanvas();
-			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
@@ -104,7 +111,7 @@ module Game{
 		slideLeft(rounds1,rounds2,width1,width2){
 			this.clearCanvas();
 			var self = this;
-			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			width1-=5;
 			width2-=5;
 			clearTimeout(this.bouncingAnimation);
@@ -125,14 +132,14 @@ module Game{
 		slideRight(rounds1,rounds2,width1,width2){
 			this.clearCanvas();
 			var self = this;
-			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			width1+=5;
 			width2+=5;
 			clearTimeout(this.bouncingAnimation);
-			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
-			this.slideLeftAnimation = setTimeout(f, 5);
+			var f = function(){self.slideRight(rounds1,rounds2,width1,width2)};
+			this.slideRightAnimation = setTimeout(f, 5);
 			if(width2 >= Math.floor(this.width/2)){
-				clearTimeout(this.slideLeftAnimation);
+				clearTimeout(this.slideRightAnimation);
 				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
@@ -169,7 +176,7 @@ module Game{
 			var shiftUp = 0;
 
 				
-			for(var i = 1; i < numItems; ++i){ 	
+			for(var i = 0; i < numItems; ++i){ 	
 				if(!correct[i]){	//if word was passed
 					this.context.fillStyle = "red";		
 				}
