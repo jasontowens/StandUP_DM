@@ -5,8 +5,8 @@ module Game{
 		gameView;
 		teamOneScore;
 		teamTwoScore;
-		teamOneTime;
-		teamTwoTime;
+		teamOneTimeLeft;
+		teamTwoTimeLeft;
 		teamOneTotalTime;
 		teamTwoTotalTime;
 		activeTeam;
@@ -18,6 +18,20 @@ module Game{
 		totalRoundsOptionNumber;
 		
 		
+		clearVariables(){
+			super.clearVariables();
+			this.playingGame = false;
+			this.activeTeam = 1;
+			this.currentRound = 0;
+			this.teamOneTimeLeft = 30;
+			this.teamTwoTimeLeft = 30;
+			this.teamOneScore = 0;
+			this.teamTwoScore = 0;
+			this.totalRoundsOptionNumber = 0;
+			this.teamOneTotalTime = 0;
+			this.teamTwoTotalTime = 0;
+		}
+		
 		
 	
 		constructor(){
@@ -25,8 +39,8 @@ module Game{
 			this.gameStarted = false;
 			this.changeWord();
 			this.activeTeam = 1;
-			this.teamOneTime = 2;
-			this.teamTwoTime = 2;
+			this.teamOneTimeLeft = 2;
+			this.teamTwoTimeLeft = 2;
 			this.teamOneScore = 0;
 			this.teamTwoScore = 0;
 			this.currentRound = 0;
@@ -78,25 +92,25 @@ module Game{
 			this.inBetweenRounds = false;
 			this.playingGame = true;
 			this.gameStarted = true;
-			this.teamOneTime = 2;
-			this.teamTwoTime = 2;
+			this.teamOneTimeLeft = 2;
+			this.teamTwoTimeLeft = 2;
 			this.teamOneTotalTime = 0;
 			this.teamTwoTotalTime = 0;
 			this.currentRound++;
-			this.startGame1();
+			this.startGameForEachRound();
 		}
-		startGame1(){
+		startGameForEachRound(){
 			var act
 			if(this.activeTeam == 1){
-				act = this.teamOneTime;
+				act = this.teamOneTimeLeft;
 			}else{	
-				act = this.teamTwoTime;
+				act = this.teamTwoTimeLeft;
 			}
 			this.gameView.renderCurrentWordTwo(this.currentItem,act,this.activeTeam);
 			var self = this;
-			var f = function(){self.startGame1()};
+			var f = function(){self.startGameForEachRound()};
 			var timeout = setTimeout(f, 100);
-			if(this.teamOneTime < 0 || this.teamTwoTime < 0){
+			if(this.teamOneTimeLeft < 0 || this.teamTwoTimeLeft < 0){
 				if(this.currentRound == this.totalRounds){
 					if(this.teamOneTotalTime>this.teamTwoTotalTime){
 						++this.teamTwoScore;
@@ -130,10 +144,10 @@ module Game{
 			}
 			if(this.activeTeam == 1){
 				this.teamOneTotalTime += .1;
-				this.teamOneTime -= .1;
+				this.teamOneTimeLeft -= .1;
 			}else{	
 				this.teamTwoTotalTime += .1;
-				this.teamTwoTime -= .1;
+				this.teamTwoTimeLeft -= .1;
 			}		
 		}
 	}

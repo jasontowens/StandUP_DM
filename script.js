@@ -54,7 +54,7 @@ var Game;
 var Game;
 (function (Game) {
     var MenuView = (function () {
-        function MenuView(context, width, height, gameMode) {
+        function MenuView(context, width, height, gameMode, model) {
             this.menu_background1 = new Image();
             this.menu_background2 = new Image();
             this.menu_background1.src = "Menu.png";
@@ -63,10 +63,11 @@ var Game;
             this.width = width;
             var self = this;
             this.height = height;
-            this.menu_background1.onload = function () {
-                self.render(gameMode);
-            };
+            this.model = model;
         }
+        MenuView.prototype.checkIfImageLoaded = function () {
+            return this.menu_background1.complete;
+        };
         MenuView.prototype.render = function (gameMode) {
             var self = this;
             if (gameMode == 1) {
@@ -90,6 +91,16 @@ var Game;
             this.generateItems();
             this.gameOver = false;
         }
+        Model.prototype.clearVariables = function () {
+            this.changeWord();
+            this.gameOver = false;
+            this.newItem = false;
+            this.gameStarted = false;
+            while (this.playedWords.length > 0) {
+                this.playedWords.pop();
+                this.correctPlayedWords.pop();
+            }
+        };
         Model.prototype.generateItems = function () {
             //VERY IMPORTANT: FIRST ELEMENT IN EACH CATEGORY IS THE NAME OF THE CATEGORY, DO NOT PRINT IT
             this.Categories = [
@@ -176,8 +187,8 @@ var Game;
             this.gameStarted = false;
             this.changeWord();
             this.activeTeam = 1;
-            this.teamOneTime = 2;
-            this.teamTwoTime = 2;
+            this.teamOneTimeLeft = 2;
+            this.teamTwoTimeLeft = 2;
             this.teamOneScore = 0;
             this.teamTwoScore = 0;
             this.currentRound = 0;
@@ -185,6 +196,19 @@ var Game;
             this.totalRoundsOptionNumber = 0;
             this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
         }
+        GameTwo.prototype.clearVariables = function () {
+            _super.prototype.clearVariables.call(this);
+            this.playingGame = false;
+            this.activeTeam = 1;
+            this.currentRound = 0;
+            this.teamOneTimeLeft = 30;
+            this.teamTwoTimeLeft = 30;
+            this.teamOneScore = 0;
+            this.teamTwoScore = 0;
+            this.totalRoundsOptionNumber = 0;
+            this.teamOneTotalTime = 0;
+            this.teamTwoTotalTime = 0;
+        };
         GameTwo.prototype.setGameView = function (gv) {
             this.gameView = gv;
         };
@@ -227,28 +251,28 @@ var Game;
             this.inBetweenRounds = false;
             this.playingGame = true;
             this.gameStarted = true;
-            this.teamOneTime = 2;
-            this.teamTwoTime = 2;
+            this.teamOneTimeLeft = 2;
+            this.teamTwoTimeLeft = 2;
             this.teamOneTotalTime = 0;
             this.teamTwoTotalTime = 0;
             this.currentRound++;
-            this.startGame1();
+            this.startGameForEachRound();
         };
-        GameTwo.prototype.startGame1 = function () {
+        GameTwo.prototype.startGameForEachRound = function () {
             var act;
             if (this.activeTeam == 1) {
-                act = this.teamOneTime;
+                act = this.teamOneTimeLeft;
             }
             else {
-                act = this.teamTwoTime;
+                act = this.teamTwoTimeLeft;
             }
             this.gameView.renderCurrentWordTwo(this.currentItem, act, this.activeTeam);
             var self = this;
             var f = function () {
-                self.startGame1();
+                self.startGameForEachRound();
             };
             var timeout = setTimeout(f, 100);
-            if (this.teamOneTime < 0 || this.teamTwoTime < 0) {
+            if (this.teamOneTimeLeft < 0 || this.teamTwoTimeLeft < 0) {
                 if (this.currentRound == this.totalRounds) {
                     if (this.teamOneTotalTime > this.teamTwoTotalTime) {
                         ++this.teamTwoScore;
@@ -282,11 +306,11 @@ var Game;
             }
             if (this.activeTeam == 1) {
                 this.teamOneTotalTime += .1;
-                this.teamOneTime -= .1;
+                this.teamOneTimeLeft -= .1;
             }
             else {
                 this.teamTwoTotalTime += .1;
-                this.teamTwoTime -= .1;
+                this.teamTwoTimeLeft -= .1;
             }
         };
         return GameTwo;
@@ -583,6 +607,12 @@ var Game;
             this.changeWord();
             this.gameCount = 0;
         }
+        GameOne.prototype.clearVariables = function () {
+            _super.prototype.clearVariables.call(this);
+            this.heldSideways = false;
+            this.gameCount = 0;
+            this.canChange = false;
+        };
         GameOne.prototype.setGameView = function (gv) {
             this.gameView = gv;
         };
@@ -665,11 +695,9 @@ var Game;
         };
         GameController.prototype.gameOneTakeInput = function () {
             if (this.gameCanStart()) {
-                //console.log("start");
                 this.startGameOne();
             }
             else {
-                //console.log("nostart");
                 this.model.notEnoughCategories();
             }
         };
@@ -704,7 +732,7 @@ var Game;
             this.startDaGame();
         };
         GameController.prototype.startDaGame = function () {
-            this.clearVariablesOne();
+            this.model.newItem = false;
             var self = this;
             var t;
             if (!this.model.gameStarted && this.gameShallStart) {
@@ -850,38 +878,10 @@ var Game;
         GameController.prototype.switchStates = function () {
             if (this.model instanceof Game.GameOne) {
                 this.canvas.removeEventListener("click", this.mobileClick);
-                this.clearVariablesOne();
             }
             else {
                 this.canvas.removeEventListener("click", this.mobileClickTwo);
-                this.clearVariablesTwo();
             }
-        };
-        GameController.prototype.clearVariablesOne = function () {
-            this.model.gameOver = false;
-            this.model.gameStarted = false;
-            this.model.newItem = false;
-            this.model.canChange = false;
-            this.model.heldSideways = false;
-            this.model.gameCount = 0;
-            while (this.model.playedWords.length > 0) {
-                this.model.playedWords.pop();
-                this.model.correctPlayedWords.pop();
-            }
-        };
-        GameController.prototype.clearVariablesTwo = function () {
-            this.model.gameOver = false;
-            this.model.playingGame = false;
-            this.model.newItem = false;
-            this.model.activeTeam = 1;
-            this.model.currentRound = 0;
-            this.model.teamOneTime = 30;
-            this.model.teamTwoTime = 30;
-            this.model.teamOneScore = 0;
-            this.model.teamTwoScore = 0;
-            this.model.totalRoundsOptionNumber = 0;
-            this.model.teamOneTotalTime = 0;
-            this.model.teamTwoTotalTime = 0;
         };
         return GameController;
     })();
@@ -1093,23 +1093,39 @@ var Game;
             this.width = width;
             this.height = height;
             this.model = new Game.GameOne();
-            this.controller = new Game.MenuController(this, canvas, width, height, this.model); //add model
-            this.view = new Game.MenuView(context, width, height, 1); //add model		
+            this.controller = new Game.MenuController(this, canvas, width, height, this.model);
+            this.view = new Game.MenuView(context, width, height, 1, this.model);
+            this.gameOne = new Game.GameOne();
+            this.gameTwo = new Game.GameTwo();
+            this.currentGame = 1;
         }
         GameLoop.prototype.runGame = function () {
-            this.controller.takeInput();
+            if (this.view.checkIfImageLoaded()) {
+                this.controller.takeInput();
+                this.view.render(this.currentGame);
+            }
+            else {
+                var self = this;
+                var f = function () {
+                    self.runGame();
+                };
+                var t = setTimeout(f, 100);
+            }
         };
         GameLoop.prototype.switchGameModes = function () {
             if (this.model instanceof Game.GameOne) {
-                this.model = new Game.GameTwo();
+                this.model = this.gameTwo;
+                this.currentGame = 2;
                 this.view.render(2);
             }
             else if (this.model instanceof Game.GameTwo) {
-                this.model = new Game.GameOne();
+                this.model = this.gameOne;
+                this.currentGame = 1;
                 this.view.render(1);
             }
         };
         GameLoop.prototype.switchToGameState = function () {
+            this.model.clearVariables();
             var newView = new Game.GameView(this.context, this.width, this.height, this.model);
             this.view = newView;
             this.model.setGameView(newView);
@@ -1120,22 +1136,16 @@ var Game;
         GameLoop.prototype.switchToCategoriesState = function () {
             var newView = new Game.CategoriesView(this.context, this.width, this.height); //add model
             this.view = newView;
-            this.view.render();
             var newController = new Game.CategoriesController(this, this.canvas, this.width, this.height, this.model, newView);
             this.controller = newController;
             this.controller.takeInput();
+            this.view.render();
         };
         GameLoop.prototype.switchToMenuState = function () {
-            var gm;
-            if (this.model instanceof Game.GameOne) {
-                gm = 1;
-            }
-            else if (this.model instanceof Game.GameTwo) {
-                gm = 2;
-            }
-            var newView = new Game.MenuView(this.context, this.width, this.height, gm); //add model
+            var newView = new Game.MenuView(this.context, this.width, this.height, this.currentGame, this.model);
             this.view = newView;
-            var newController = new Game.MenuController(this, this.canvas, this.width, this.height, this.model); //add model
+            this.view.render(this.currentGame);
+            var newController = new Game.MenuController(this, this.canvas, this.width, this.height, this.model);
             this.controller = newController;
             this.controller.takeInput();
         };
