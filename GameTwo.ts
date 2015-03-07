@@ -56,11 +56,11 @@ module Game{
 			this.gameView.renderRoundNumber(height/2,this.totalRounds,true);
 		}
 		slideLeft(width){
-			this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(++this.totalRoundsOptionNumber)%5],width/2,width+5);
+			this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(++this.totalRoundsOptionNumber)%5],width/2,width+70);
 		}
 		slideRight(width){
 			if(this.totalRoundsOptionNumber-1 >= 0){
-				this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,0);
+				this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,-70);
 			}
 		}
 		selectedRoundNumber(){
@@ -113,6 +113,8 @@ module Game{
 					}else{
 						++this.teamOneScore;
 					}
+					this.playedWords.push(this.currentItem);
+					this.changeWord();
 					this.playingGame = false;
 					this.inBetweenRounds = true;
 					this.gameView.renderInBetweenRounds(this.teamOneScore,this.teamTwoScore,this.currentRound,this.totalRounds);

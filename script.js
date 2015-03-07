@@ -207,11 +207,11 @@ var Game;
             this.gameView.renderRoundNumber(height / 2, this.totalRounds, true);
         };
         GameTwo.prototype.slideLeft = function (width) {
-            this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 5);
+            this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 70);
         };
         GameTwo.prototype.slideRight = function (width) {
             if (this.totalRoundsOptionNumber - 1 >= 0) {
-                this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, 0);
+                this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, -70);
             }
         };
         GameTwo.prototype.selectedRoundNumber = function () {
@@ -267,6 +267,8 @@ var Game;
                     else {
                         ++this.teamOneScore;
                     }
+                    this.playedWords.push(this.currentItem);
+                    this.changeWord();
                     this.playingGame = false;
                     this.inBetweenRounds = true;
                     this.gameView.renderInBetweenRounds(this.teamOneScore, this.teamTwoScore, this.currentRound, this.totalRounds);
@@ -383,11 +385,13 @@ var Game;
         };
         GameView.prototype.renderRoundNumber = function (height, rounds, up) {
             var self = this;
-            /*
-            this.roundPicking.onload = function(){
-                    self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
-            }
-            */
+            this.roundPicking.onload = function () {
+                self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+                self.renderRoundNumber1(height, rounds, up);
+            };
+        };
+        GameView.prototype.renderRoundNumber1 = function (height, rounds, up) {
+            var self = this;
             this.clearCanvas();
             this.bouncingHeight = height;
             var self = this;
@@ -404,7 +408,7 @@ var Game;
                 up = false;
             }
             var f = function () {
-                self.renderRoundNumber(height, rounds, up);
+                self.renderRoundNumber1(height, rounds, up);
             };
             this.bouncingAnimation = setTimeout(f, 20);
             self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
@@ -416,7 +420,7 @@ var Game;
         GameView.prototype.slideLeft = function (rounds1, rounds2, width1, width2) {
             this.clearCanvas();
             var self = this;
-            self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+            this.context.drawImage(self.roundPicking, 0, 0, this.width, this.height);
             width1 -= 5;
             width2 -= 5;
             clearTimeout(this.bouncingAnimation);
@@ -424,9 +428,9 @@ var Game;
                 self.slideLeft(rounds1, rounds2, width1, width2);
             };
             this.slideLeftAnimation = setTimeout(f, 5);
-            if (width2 <= Math.floor(this.width / 2)) {
+            if (width2 <= Math.round(this.width / 2)) {
                 clearTimeout(this.slideLeftAnimation);
-                this.renderRoundNumber(this.bouncingHeight, rounds2, true);
+                this.renderRoundNumber1(this.bouncingHeight, rounds2, true);
             }
             this.context.font = "150px AG Book Rounded";
             this.context.textBaseline = 'center';
@@ -445,9 +449,9 @@ var Game;
                 self.slideRight(rounds1, rounds2, width1, width2);
             };
             this.slideRightAnimation = setTimeout(f, 5);
-            if (width2 >= Math.floor(this.width / 2)) {
+            if (width2 >= Math.round(this.width / 2)) {
                 clearTimeout(this.slideRightAnimation);
-                this.renderRoundNumber(this.bouncingHeight, rounds2, true);
+                this.renderRoundNumber1(this.bouncingHeight, rounds2, true);
             }
             this.context.font = "150px AG Book Rounded";
             this.context.textBaseline = 'center';
@@ -950,7 +954,7 @@ var Game;
             var startingGap = this.height / 9 + 10;
             var menuButton = (550 / 667) * this.height;
             var click = this.startingHeight + canvas_y;
-            if (click > startingGap) {
+            if (click > startingGap && canvas_y <= menuButton) {
                 var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
                 this.model.changeChosenCat(i);
                 this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
