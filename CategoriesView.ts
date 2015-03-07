@@ -24,20 +24,9 @@ module Game{
 		
 		render(){
 			var self = this;
-			
-			if(self.fontLoaded()){
-				this.category_background.onload = function(){ 
-					self.renderCategories(0,self.boolCategories);
-				}
+			this.category_background.onload = function(){ 
+				self.renderCategories(0,self.boolCategories);
 			}
-			else{			
-				setTimeout(function(){
-					self.render();
-				}, 100
-				
-				);
-			}
-			
 		}
 		fillRoundedRect(x, y,w,h){
 			var r = 20;

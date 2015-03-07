@@ -45,7 +45,7 @@ module Game{
 			this.drawNumber(timeLeft);
 			var self = this;
 			var timeout;
-			if(timeLeft < 0){
+			if(timeLeft <= 0){
 				clearTimeout(timeout);
 				this.model.canChange = true;
 			}else{
