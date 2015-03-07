@@ -26,7 +26,7 @@ module Game{
 			this.model = model;
 			this.categoriesView = categoriesView;
 			this.categoriesView.setCategories(this.model.Categories,this.model.chosenCategories);
-			this.categoriesView.renderCategories(Math.round(1),this.model.chosenCategories)
+			//this.categoriesView.renderCategories(Math.round(1),this.model.chosenCategories)
 		}
 		takeInput(){
 			this.Scrolling = <any>this.Scrolling.bind(this);
@@ -85,7 +85,7 @@ module Game{
     		var startingGap = this.height/9 + 10;
     		var menuButton = (550/667)*this.height;
     		var click = this.startingHeight + canvas_y;
-    		if(click > startingGap){
+    		if(click > startingGap && canvas_y <= menuButton){
 				var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
 				this.model.changeChosenCat(i);
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)

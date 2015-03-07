@@ -45,7 +45,7 @@ module Game{
 			this.drawNumber(timeLeft);
 			var self = this;
 			var timeout;
-			if(timeLeft < 0){
+			if(timeLeft <= 0){
 				clearTimeout(timeout);
 				this.model.canChange = true;
 			}else{
@@ -101,12 +101,15 @@ module Game{
 		
 		}
 		renderRoundNumber(height,rounds,up){
-			var self = this;
-			/*
+		var self = this;
 			this.roundPicking.onload = function(){
 					self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+					self.renderRoundNumber1(height,rounds,up);
 			}
-			*/
+		}
+		renderRoundNumber1(height,rounds,up){
+			var self = this;
+			
 			this.clearCanvas();
 			this.bouncingHeight = height;
 			var self = this;
@@ -120,7 +123,7 @@ module Game{
 			}else if(height < this.height/2 - 20){
 				up = false;
 			}
-			var f = function(){self.renderRoundNumber(height,rounds,up)};
+			var f = function(){self.renderRoundNumber1(height,rounds,up)};
 			this.bouncingAnimation = setTimeout(f, 20);
 			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			this.context.font = "150px AG Book Rounded";
@@ -131,15 +134,15 @@ module Game{
 		slideLeft(rounds1,rounds2,width1,width2){
 			this.clearCanvas();
 			var self = this;
-			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+			this.context.drawImage(self.roundPicking, 0, 0, this.width, this.height);
 			width1-=5;
 			width2-=5;
 			clearTimeout(this.bouncingAnimation);
 			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
 			this.slideLeftAnimation = setTimeout(f, 5);
-			if(width2 <= Math.floor(this.width/2)){
+			if(width2 <= Math.round(this.width/2)){
 				clearTimeout(this.slideLeftAnimation);
-				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
+				this.renderRoundNumber1(this.bouncingHeight,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
@@ -158,9 +161,9 @@ module Game{
 			clearTimeout(this.bouncingAnimation);
 			var f = function(){self.slideRight(rounds1,rounds2,width1,width2)};
 			this.slideRightAnimation = setTimeout(f, 5);
-			if(width2 >= Math.floor(this.width/2)){
+			if(width2 >= Math.round(this.width/2)){
 				clearTimeout(this.slideRightAnimation);
-				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
+				this.renderRoundNumber1(this.bouncingHeight,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
