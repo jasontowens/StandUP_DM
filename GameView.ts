@@ -11,6 +11,10 @@ module Game{
 		roundPicking = new Image();
 		correct = new Image();
 		endGame_background = new Image();
+		rightArrow = new Image();
+		leftArrow = new Image();
+		rightArrowPressed = new Image();
+		leftArrowPressed = new Image();
 		context;
 		width;
 		height;
@@ -28,6 +32,10 @@ module Game{
 			this.pass.src = "pass.png";
 			this.correct.src = "correct.png";
 			this.endGame_background.src = "endGame.png";
+			this.rightArrow.src ="rightArrow.png";
+			this.leftArrow.src = "leftArrow.png";
+			this.rightArrowPressed.src = "rightArrowClicked.png";
+			this.leftArrowPressed.src = "leftArrowClicked.png";
 			this.context = context;
 			this.width = width;
 			this.height = height;
@@ -125,11 +133,20 @@ module Game{
 			}
 			var f = function(){self.renderRoundNumber1(height,rounds,up)};
 			this.bouncingAnimation = setTimeout(f, 20);
-			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+			this.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
+			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds, this.width/2, height);	
+		}
+		clickLeftArrow(currTime){
+		
+		}
+		clickRightArrow(){
+			//this.context.drawImage(this.rightArrowPressed, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			//this.context.drawImage(this.rightArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 		}
 		slideLeft(rounds1,rounds2,width1,width2){
 			this.clearCanvas();
@@ -149,6 +166,8 @@ module Game{
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
+			self.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			self.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			
 			
 		}
@@ -170,6 +189,8 @@ module Game{
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
+			self.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			self.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 		}
 		renderSelectedRoundNumber(){
 			clearTimeout(this.bouncingAnimation);

@@ -174,13 +174,15 @@ module Game{
 		clickSelectTotalRounds(X,Y){
 			var leftArrowStartingX	= (260/375) * this.width;
 			var leftArrowStartingY =  (250/667) * this.height;
-			var leftArrowEndingY = (320/667)* this.height;
+			var leftArrowEndingY = (340/667)* this.height;
 			if(X > leftArrowStartingX && X  < this.width ){
 				if(Y > leftArrowStartingY && Y < leftArrowEndingY){
+					this.model.clickRightArrow();
 					this.model.slideLeft(this.width);
 				}
-			}else if(X > 0 && X  < (50/375)*this.width ){
+			}else if(X > 0 && X  < (150/375)*this.width ){
 				if(Y > leftArrowStartingY && Y < leftArrowEndingY){
+					this.model.clickLeftArrow();
 					this.model.slideRight(this.width);
 				}
 			}else{

@@ -63,6 +63,12 @@ module Game{
 		changeItem(){
 			this.newItem = true;
 		}
+		clickLeftArrow(){
+			this.gameView.clickLeftArrow();
+		}
+		clickRightArrow(){
+			this.gameView.clickRightArrow();
+		}
 		setTotalRounds(){
 			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber%5];
 		}
