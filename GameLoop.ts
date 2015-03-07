@@ -20,6 +20,7 @@ module Game{
 		controller;
 		view;
 		model;
+		categoriesView;
 		
 		constructor(canvas,context,width,height){
 			this.canvas = canvas;
@@ -28,7 +29,8 @@ module Game{
 			this.height = height;
 			this.model = new GameOne();
 			this.controller = new Game.MenuController(this,canvas,width,height,this.model);//add model
-			this.view = new MenuView(context,width,height,1);//add model		
+			this.view = new MenuView(context,width,height,1);//add model	
+			this.categoriesView = new CategoriesView(this.context,this.width,this.height);//add model			
 		}
 		runGame(){
 			this.controller.takeInput();
@@ -58,11 +60,11 @@ module Game{
 		}
 		
 		switchToCategoriesState(){
-			var newView = new CategoriesView(this.context,this.width,this.height);//add model
-			this.view = newView;
+			
+			this.view = this.categoriesView;
 	
 			
-			var newController = new CategoriesController(this,this.canvas,this.width,this.height,this.model,newView);
+			var newController = new CategoriesController(this,this.canvas,this.width,this.height,this.model,this.view);
 			this.controller = newController;
 			this.controller.takeInput();
 			//this.view.render();

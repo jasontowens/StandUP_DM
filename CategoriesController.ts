@@ -26,7 +26,7 @@ module Game{
 			this.model = model;
 			this.categoriesView = categoriesView;
 			this.categoriesView.setCategories(this.model.Categories,this.model.chosenCategories);
-			this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)
+			this.categoriesView.renderCategories(Math.round(1),this.model.chosenCategories)
 		}
 		takeInput(){
 			this.Scrolling = <any>this.Scrolling.bind(this);

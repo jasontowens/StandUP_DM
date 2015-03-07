@@ -15,7 +15,7 @@ module Game{
 			this.context = context;
 			this.width = width;
 			this.height = height;
-			this.font = "pt AG Book Rounded"
+			this.font = "pt AG Book Rounded";
 		}
 		setCategories(categories,boolcat){
 			this.categories = categories;
@@ -24,8 +24,18 @@ module Game{
 		
 		render(){
 			var self = this;
-			this.category_background.onload = function(){ 
-				self.renderCategories(0,self.boolCategories);
+			
+			if(self.fontLoaded()){
+				this.category_background.onload = function(){ 
+					self.renderCategories(0,self.boolCategories);
+				}
+			}
+			else{			
+				setTimeout(function(){
+					self.render();
+				}, 100
+				
+				);
 			}
 			
 		}
@@ -67,6 +77,9 @@ module Game{
       		this.context.fillText(this.categories[i][0],rectX+(width/2),rectY+(height/2));
     	}
     	renderCategories(startingHeight,boolCategories){
+			var self = this;
+				
+		
     		this.clearCanvas()
     		var screenHeight = this.height - (this.height/4);
     		var tempStartingHeight = startingHeight;

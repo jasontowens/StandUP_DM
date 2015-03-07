@@ -12,6 +12,7 @@ ctx.font = "50px AG Book Rounded";
 
 
 
-
-var game = new Game.GameLoop(c,ctx,w,h);
-game.runGame();
+window.onload = function(){
+	var game = new Game.GameLoop(c,ctx,w,h);
+	game.runGame();
+};
