@@ -8,14 +8,13 @@ var Game;
         }
         MenuController.prototype.takeInput = function () {
             this.mobileClick = this.mobileClick.bind(this);
-            this.canvas.addEventListener('touchstart', this.mobileClick);
+            this.canvas.addEventListener('click', this.mobileClick);
         };
         MenuController.prototype.mobileClick = function (e) {
-            var touchobj = e.changedTouches[0]; // reference first touch point (ie: first finger)
-            var mobileClickX = parseInt(touchobj.clientX); // get x position of touch point relative to left edge of browser
-            mobileClickX = mobileClickX - (window.innerWidth - this.gameloop.width) / 2;
-            var mobileClickY = parseInt(touchobj.clientY);
-            mobileClickY = mobileClickY - 25;
+            var mobileClickY = event.y;
+            mobileClickY -= this.canvas.offsetTop;
+            var mobileClickX = event.x;
+            mobileClickX -= this.canvas.offsetLeft;
             this.click(mobileClickX, mobileClickY);
         };
         MenuController.prototype.click = function (X, Y) {
@@ -36,7 +35,7 @@ var Game;
             }
         };
         MenuController.prototype.switchStates = function () {
-            this.canvas.removeEventListener('touchstart', this.mobileClick);
+            this.canvas.removeEventListener('click', this.mobileClick);
             console.log("switching states");
         };
         MenuController.prototype.switchToGameState = function () {
@@ -54,18 +53,27 @@ var Game;
 var Game;
 (function (Game) {
     var MenuView = (function () {
-        function MenuView(context, width, height) {
-            this.menu_background = new Image();
-            this.menu_background.src = "Menu.png";
+        function MenuView(context, width, height, gameMode) {
+            this.menu_background1 = new Image();
+            this.menu_background2 = new Image();
+            this.menu_background1.src = "Menu.png";
+            this.menu_background2.src = "Menu2.png";
             this.context = context;
             this.width = width;
-            this.height = height;
-        }
-        MenuView.prototype.render = function () {
             var self = this;
-            this.menu_background.onload = function () {
-                self.context.drawImage(self.menu_background, 0, 0, self.width, self.height);
+            this.height = height;
+            this.menu_background1.onload = function () {
+                self.render(gameMode);
             };
+        }
+        MenuView.prototype.render = function (gameMode) {
+            var self = this;
+            if (gameMode == 1) {
+                self.context.drawImage(self.menu_background1, 0, 0, self.width, self.height);
+            }
+            else {
+                self.context.drawImage(self.menu_background2, 0, 0, self.width, self.height);
+            }
         };
         return MenuView;
     })();
@@ -96,8 +104,6 @@ var Game;
             for (var i = 0; i != this.Categories.length; ++i) {
                 this.chosenCategories[i] = true;
             }
-            //this.Items = ["hidjnfoda fnoiqwebfo sada" ,"bye", "yo"];
-            this.size = this.Categories.length;
         };
         Model.prototype.changeWord = function () {
             var currentCategory = this.randomUsableCategory();
@@ -135,11 +141,13 @@ var Game;
             }
         };
         Model.prototype.changeChosenCat = function (i) {
-            if (this.chosenCategories[i]) {
-                this.chosenCategories[i] = false;
-            }
-            else {
-                this.chosenCategories[i] = true;
+            if (i < this.chosenCategories.length) {
+                if (this.chosenCategories[i]) {
+                    this.chosenCategories[i] = false;
+                }
+                else {
+                    this.chosenCategories[i] = true;
+                }
             }
         };
         Model.prototype.randomWordInCategory = function (currentCategory) {
@@ -157,13 +165,111 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+/// <reference path="GameView.ts" />
 var Game;
 (function (Game) {
     var GameTwo = (function (_super) {
         __extends(GameTwo, _super);
         function GameTwo() {
             _super.call(this);
+            this.gameStarted = false;
+            this.changeWord();
+            this.activeTeam = 1;
+            this.teamOneTime = 2;
+            this.teamTwoTime = 2;
+            this.teamOneScore = 0;
+            this.teamTwoScore = 0;
+            this.currentRound = 0;
+            this.totalRoundsOption = [1, 3, 7, 9, 11];
+            this.totalRoundsOptionNumber = 0;
+            this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
         }
+        GameTwo.prototype.setGameView = function (gv) {
+            this.gameView = gv;
+        };
+        GameTwo.prototype.changeActiveTeam = function () {
+            if (this.activeTeam == 1) {
+                this.activeTeam = 2;
+            }
+            else {
+                this.activeTeam = 1;
+            }
+            this.newItem = true;
+        };
+        GameTwo.prototype.changeItem = function () {
+            this.newItem = true;
+        };
+        GameTwo.prototype.setTotalRounds = function () {
+            this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
+        };
+        GameTwo.prototype.beginGame = function (height) {
+            this.gameView.renderRoundNumber(height / 2, this.totalRounds, true);
+        };
+        GameTwo.prototype.slideLeft = function (width) {
+            this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 5);
+        };
+        GameTwo.prototype.slideRight = function (width) {
+            this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, width + 5);
+        };
+        GameTwo.prototype.selectedRoundNumber = function () {
+            this.gameView.renderSelectedRoundNumber();
+        };
+        GameTwo.prototype.countdown = function () {
+            this.gameView.renderCountdown();
+        };
+        GameTwo.prototype.notEnoughCategories = function () {
+            this.gameView.renderNotEnoughCategories;
+        };
+        GameTwo.prototype.startGame = function () {
+            this.inBetweenRounds = false;
+            this.playingGame = true;
+            this.gameStarted = true;
+            this.teamOneTime = 2;
+            this.teamTwoTime = 2;
+            this.teamOneScore = 0;
+            this.teamTwoScore = 0;
+            this.currentRound++;
+            this.startGame1();
+        };
+        GameTwo.prototype.startGame1 = function () {
+            var act;
+            if (this.activeTeam == 1) {
+                act = this.teamOneTime;
+            }
+            else {
+                act = this.teamTwoTime;
+            }
+            this.gameView.renderCurrentWordTwo(this.currentItem, act, this.activeTeam);
+            var self = this;
+            var f = function () {
+                self.startGame1();
+            };
+            var timeout = setTimeout(f, 100);
+            if (this.teamOneTime < 0 || this.teamTwoTime < 0) {
+                if (this.currentRound == this.totalRounds) {
+                    this.playingGame = false;
+                    this.gameOver = true;
+                    this.gameView.renderGameOverTwo(this.teamOneScore, this.teamTwoScore);
+                }
+                else {
+                    this.playingGame = false;
+                    this.inBetweenRounds = true;
+                    this.gameView.renderInBetweenRounds(this.teamOneScore, this.teamTwoScore, this.currentRound, this.totalRounds);
+                }
+                clearTimeout(timeout);
+            }
+            if (this.newItem) {
+                this.playedWords.push(this.currentItem);
+                this.changeWord();
+                this.newItem = false;
+            }
+            if (this.activeTeam == 1) {
+                this.teamOneTime -= .1;
+            }
+            else {
+                this.teamTwoTime -= .1;
+            }
+        };
         return GameTwo;
     })(Game.Model);
     Game.GameTwo = GameTwo;
@@ -176,11 +282,13 @@ var Game;
     var GameView = (function () {
         function GameView(context, width, height, model) {
             this.game_background = new Image();
+            this.game_background2 = new Image();
             this.forehead = new Image();
             this.pass = new Image();
             this.correct = new Image();
             this.endGame_background = new Image();
             this.game_background.src = "InGame.png";
+            this.game_background2.src = "InGame2.png";
             this.forehead.src = "forehead.png";
             this.pass.src = "pass.png";
             this.correct.src = "correct.png";
@@ -211,12 +319,120 @@ var Game;
             this.printWord(currword);
             this.printTime(currTime);
         };
+        GameView.prototype.renderCurrentWordTwo = function (currWord, teamTime, activeTeam) {
+            this.clearCanvas();
+            teamTime = Math.floor(teamTime);
+            this.context.drawImage(this.game_background2, 0, 0, this.width, this.height);
+            this.printWord(currWord);
+            this.printTimeTwo(teamTime, activeTeam);
+        };
+        GameView.prototype.renderInBetweenRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
+            this.clearCanvas();
+            this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+            this.context.font = "50px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            this.context.fillText("ROUND " + currentRound + "/" + totalRounds, this.width / 2, this.height / 4);
+            this.context.fillText("Team 1", this.width / 4, this.height / 2);
+            this.context.fillText("Team 2", 3 * this.width / 4, this.height / 2);
+            this.context.fillText(teamOneScore, this.width / 4, 3 * this.height / 4);
+            this.context.fillText(teamTwoScore, 3 * this.width / 4, 3 * this.height / 4);
+        };
+        GameView.prototype.renderRoundNumber = function (height, rounds, up) {
+            this.bouncingHeight = height;
+            var self = this;
+            if (up) {
+                --height;
+            }
+            else {
+                ++height;
+            }
+            if (height > this.height / 2 + 10) {
+                up = true;
+            }
+            else if (height < this.height / 2 - 20) {
+                up = false;
+            }
+            var f = function () {
+                self.renderRoundNumber(height, rounds, up);
+            };
+            this.bouncingAnimation = setTimeout(f, 20);
+            this.clearCanvas();
+            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            this.context.font = "150px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            this.context.fillText(rounds, this.width / 2, height);
+        };
+        GameView.prototype.slideLeft = function (rounds1, rounds2, width1, width2) {
+            this.clearCanvas();
+            var self = this;
+            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            width1 -= 5;
+            width2 -= 5;
+            clearTimeout(this.bouncingAnimation);
+            var f = function () {
+                self.slideLeft(rounds1, rounds2, width1, width2);
+            };
+            this.slideLeftAnimation = setTimeout(f, .01);
+            if (width2 <= Math.floor(this.width / 2)) {
+                clearTimeout(this.slideLeftAnimation);
+                this.renderRoundNumber(this.bouncingHeight, rounds2, true);
+            }
+            this.context.font = "150px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            this.context.fillText(rounds1, width1, this.bouncingHeight);
+            this.context.fillText(rounds2, width2, this.bouncingHeight);
+        };
+        GameView.prototype.slideRight = function (rounds1, rounds2, width1, width2) {
+            this.clearCanvas();
+            var self = this;
+            self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+            width1 += 5;
+            width2 += 5;
+            clearTimeout(this.bouncingAnimation);
+            var f = function () {
+                self.slideLeft(rounds1, rounds2, width1, width2);
+            };
+            this.slideLeftAnimation = setTimeout(f, .01);
+            if (width2 >= Math.floor(this.width / 2)) {
+                clearTimeout(this.slideLeftAnimation);
+                this.renderRoundNumber(this.bouncingHeight, rounds2, true);
+            }
+            this.context.font = "150px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            this.context.fillText(rounds1, width1, this.bouncingHeight);
+            this.context.fillText(rounds2, width2, this.bouncingHeight);
+        };
+        GameView.prototype.renderSelectedRoundNumber = function () {
+            clearTimeout(this.bouncingAnimation);
+        };
+        GameView.prototype.renderNotEnoughCategories = function () {
+        };
+        GameView.prototype.renderGameOverTwo = function (score1, score2) {
+            this.clearCanvas();
+            this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
+            this.context.font = "50px AG Book Rounded";
+            this.context.textBaseline = 'center';
+            this.context.textAlign = 'center';
+            if (score1 > score2) {
+                this.context.fillText("TEAM 1 WINS!", this.width / 2, this.height / 3);
+            }
+            else if (score1 == score2) {
+                this.context.fillText("IT'S A TIE!", this.width / 2, this.height / 3);
+            }
+            else {
+                this.context.fillText("TEAM 2 WINS!", this.width / 2, this.height / 3);
+            }
+        };
         GameView.prototype.renderGameOver = function (numItems, playedWords, correct) {
             this.clearCanvas();
-            this.context.drawImage(this.endGame_background, 0, 0, w, h);
+            this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
             var numCorrect = 0;
             var shiftUp = 0;
-            for (var i = 0; i < numItems; ++i) {
+            for (var i = 1; i < numItems; ++i) {
                 if (!correct[i]) {
                     this.context.fillStyle = "red";
                 }
@@ -224,18 +440,18 @@ var Game;
                     numCorrect++;
                     this.context.fillStyle = "green";
                 }
-                this.context.font = "bold 20px AG Book Rounded";
+                this.context.font = "20px AG Book Rounded";
                 this.context.fillText(playedWords[i], this.width / 2, this.height * 1 / 4 + i * 23 - shiftUp * 23);
             }
-            this.context.font = "bold 40px AG Book Rounded";
+            this.context.font = "40px AG Book Rounded";
             this.context.fillStyle = "white";
-            this.context.fillText((numCorrect).toString(), w / 2, h * 1 / 8);
+            this.context.fillText((numCorrect).toString(), this.width / 2, this.height * 1 / 8);
         };
         GameView.prototype.clearCanvas = function () {
             this.context.clearRect(0, 0, this.width, this.height);
         };
         GameView.prototype.printWord = function (currword) {
-            this.context.font = "bold 80px AG Book Rounded";
+            this.context.font = "80px AG Book Rounded";
             this.context.textBaseline = 'bottom';
             this.context.textAlign = 'center';
             this.rotateContext();
@@ -280,18 +496,24 @@ var Game;
                 context.fillText(line, x, y);
                 y += lineHeight;
             }
-            //return isMultipleLines;
         };
         GameView.prototype.printTime = function (timeLeft) {
-            this.context.font = "bold 30px Arial";
+            this.context.font = "30px AG Book Rounded";
             this.context.textBaseline = 'bottom';
             this.context.textAlign = 'center';
             this.rotateContext();
             this.context.fillStyle = "white";
-            this.context.fillText('TIME REMAINING: ' + Math.floor(timeLeft), h / 4, w * 15 / 16);
+            this.context.fillText('TIME REMAINING: ' + Math.floor(timeLeft), this.height / 4, this.width * 15 / 16);
             this.context.restore();
         };
-        GameView.prototype.gameTwoRender = function () {
+        GameView.prototype.printTimeTwo = function (timeLeft, teamNumber) {
+            this.context.font = "30px AG Book Rounded";
+            this.context.textBaseline = 'bottom';
+            this.context.textAlign = 'center';
+            this.rotateContext();
+            this.context.fillStyle = "white";
+            this.context.fillText("TEAM " + teamNumber + ' TIME REMAINING: ' + Math.floor(timeLeft), this.height / 4, this.width * 2 / 15 + 5);
+            this.context.restore();
         };
         return GameView;
     })();
@@ -320,6 +542,9 @@ var Game;
         GameOne.prototype.countdown = function () {
             this.gameView.renderCountdown();
         };
+        GameOne.prototype.notEnoughCategories = function () {
+            this.gameView.renderNotEnoughCategories;
+        };
         GameOne.prototype.startGame = function (timeOfRound) {
             this.gameStarted = true;
             this.gameView.renderCurrentWordOne(this.currentItem, timeOfRound);
@@ -336,6 +561,8 @@ var Game;
             if (this.newItem) {
                 this.playedWords.push(this.currentItem);
                 this.correctPlayedWords.push(this.recentPassOrFail);
+                console.log("len" + this.playedWords.length);
+                console.log("cuur" + this.currentItem);
                 this.changeWord();
                 this.newItem = false;
             }
@@ -350,7 +577,6 @@ var Game;
             else {
                 timeOfRound = timeOfRound - 0.1;
             }
-            //TODO figure out how to hold scores.			
         };
         return GameOne;
     })(Game.Model);
@@ -379,13 +605,27 @@ var Game;
             }
         };
         GameController.prototype.gameOneTakeInput = function () {
-            var self = this;
+            if (this.gameCanStart()) {
+                console.log("start");
+                this.startGameOne();
+            }
+            else {
+                console.log("nostart");
+                this.model.notEnoughCategories();
+            }
+        };
+        GameController.prototype.startGameOne = function () {
             this.model.beginGame();
+            var self = this;
             this.mobileClick = this.mobileClick.bind(this);
-            this.canvas.addEventListener("touchstart", this.mobileClick);
+            this.canvas.addEventListener("click", this.mobileClick);
             var mostRecentState = 100;
+            var mostRecentTimeItWasBeingHeldSideways;
             window.ondeviceorientation = function (event) {
                 var gamma = Math.round(event.gamma);
+                if (gamma > 125 || gamma < 55) {
+                    mostRecentTimeItWasBeingHeldSideways = new Date().getTime();
+                }
                 if (gamma > 125 && mostRecentState <= 125) {
                     self.model.setRecentPassOrFail(true); //they got the answer right
                     self.model.heldSideways = true;
@@ -399,18 +639,28 @@ var Game;
                         self.model.countdown();
                         self.model.startGame(5);
                     }
+                    while ((new Date().getTime()) - mostRecentTimeItWasBeingHeldSideways < 2000) {
+                    }
                     self.model.heldSideways = false;
                 }
                 mostRecentState = gamma;
             };
         };
+        GameController.prototype.gameCanStart = function () {
+            for (var i = 0; i != this.model.chosenCategories.length; ++i) {
+                if (this.model.chosenCategories[i] == true) {
+                    console.log(i);
+                    return true;
+                }
+            }
+            return false;
+        };
         GameController.prototype.mobileClick = function (e) {
             if (this.model.gameOver) {
-                var touchobj = e.changedTouches[0]; // reference first touch point (ie: first finger)
-                var mobileClickX = parseInt(touchobj.clientX); // get x position of touch point relative to left edge of browser
-                mobileClickX = mobileClickX - (window.innerWidth - this.gameloop.width) / 2;
-                var mobileClickY = parseInt(touchobj.clientY);
-                mobileClickY = mobileClickY - 25;
+                var mobileClickY = event.y;
+                mobileClickY -= this.canvas.offsetTop;
+                var mobileClickX = event.x;
+                mobileClickX -= this.canvas.offsetLeft;
                 this.click(mobileClickX, mobileClickY);
             }
         };
@@ -422,24 +672,119 @@ var Game;
             }
         };
         GameController.prototype.gameTwoTakeInput = function () {
+            if (this.gameCanStart()) {
+                this.startGameTwo();
+            }
+            else {
+                console.log("nostart");
+                this.model.notEnoughCategories();
+            }
+        };
+        GameController.prototype.startGameTwo = function () {
+            this.mobileClickTwo = this.mobileClickTwo.bind(this);
+            this.canvas.addEventListener("click", this.mobileClickTwo);
+            this.model.beginGame(this.height);
+        };
+        GameController.prototype.mobileClickTwo = function (event) {
+            var mobileClickY = event.y;
+            mobileClickY -= this.canvas.offsetTop;
+            var mobileClickX = event.x;
+            mobileClickX -= this.canvas.offsetLeft;
+            if (this.model.inBetweenRounds) {
+                this.clickNextRoundOption(mobileClickX, mobileClickY);
+            }
+            else if (this.model.playingGame) {
+                this.clickTwo(mobileClickX, mobileClickY);
+            }
+            else if (this.model.gameOver) {
+                this.clickMenuOption(mobileClickX, mobileClickY);
+            }
+            else {
+                this.clickSelectTotalRounds(mobileClickX, mobileClickY);
+            }
+        };
+        GameController.prototype.clickNextRoundOption = function (X, Y) {
+            var menuButton = (550 / 667) * this.height;
+            if (Y > menuButton) {
+                if (X < this.width / 2) {
+                    this.switchToMenuState();
+                }
+                else {
+                    this.model.startGame();
+                }
+            }
+        };
+        GameController.prototype.clickMenuOption = function (X, Y) {
+            var menuButton = (550 / 667) * this.height;
+            if (Y > menuButton) {
+                this.switchToMenuState();
+            }
+        };
+        GameController.prototype.clickSelectTotalRounds = function (X, Y) {
+            var leftArrowStartingX = 260 / 375 * this.width;
+            var leftArrowStartingY = 250 / 667 * this.height;
+            var leftArrowEndingY = 290 / 667 * this.height;
+            if (X > leftArrowStartingX && X < this.width) {
+                if (Y > leftArrowStartingY && Y < leftArrowEndingY) {
+                    this.model.slideLeft(this.width);
+                }
+                else if (Y > 550 / 667 * this.height) {
+                    this.model.setTotalRounds();
+                    this.model.selectedRoundNumber();
+                    this.model.startGame();
+                }
+            }
+        };
+        GameController.prototype.clickTwo = function (X, Y) {
+            var buttonStartingX = 290 / 375 * this.width;
+            var buttonEndingX = 360 / 375 * this.width;
+            var CorrectStartingY = 10 / 667 * this.height;
+            var CorrectEndingY = 330 / 667 * this.height;
+            var PassStartingY = 370 / 667 * this.height;
+            var PassEndingY = 650 / 667 * this.height;
+            if (X > buttonStartingX && X < buttonEndingX) {
+                if (Y > CorrectStartingY && Y < CorrectEndingY) {
+                    this.model.changeActiveTeam();
+                }
+                else if (Y > PassStartingY && Y < PassEndingY) {
+                    this.model.changeItem();
+                }
+            }
         };
         GameController.prototype.switchToMenuState = function () {
             this.switchStates();
             this.gameloop.switchToMenuState();
         };
         GameController.prototype.switchStates = function () {
-            this.canvas.removeEventListener("click", this.mobileClick);
-            this.clearVariables();
+            if (this.model instanceof Game.GameOne) {
+                this.canvas.removeEventListener("click", this.mobileClick);
+                this.clearVariablesOne();
+            }
+            else {
+                this.canvas.removeEventListener("click", this.mobileClickTwo);
+                this.clearVariablesTwo();
+            }
         };
-        GameController.prototype.clearVariables = function () {
+        GameController.prototype.clearVariablesOne = function () {
             this.model.gameOver = false;
             this.model.gameStarted = false;
+            this.model.newItem = false;
             while (this.model.playedWords.length > 0) {
                 this.model.playedWords.pop();
                 this.model.correctPlayedWords.pop();
             }
-            this.model.currentItem = "";
-            this.model.newItem = true;
+        };
+        GameController.prototype.clearVariablesTwo = function () {
+            this.model.gameOver = false;
+            this.model.playingGame = false;
+            this.model.newItem = false;
+            this.model.activeTeam = 1;
+            this.model.currentRound = 0;
+            this.model.teamOneTime = 30;
+            this.model.teamTwoTime = 30;
+            this.model.teamOneScore = 0;
+            this.model.teamTwoScore = 0;
+            this.model.totalRoundsOptionNumber = 0;
         };
         return GameController;
     })();
@@ -455,6 +800,7 @@ var Game;
             this.width = width;
             this.height = height;
             this.startingHeight = 0;
+            this.oldY = 0;
             this.model = model;
             this.categoriesView = categoriesView;
             this.categoriesView.setCategories(this.model.Categories, this.model.chosenCategories);
@@ -474,7 +820,6 @@ var Game;
             var maxHeight = screenHeight * numCatPages; //fix this once there is new categories
             var canvas_x = event.targetTouches[0].pageX;
             var canvas_y = event.targetTouches[0].pageY;
-            var startingHeight;
             if (this.fingerLifted) {
                 this.startX = canvas_x;
                 this.startY = canvas_y;
@@ -491,6 +836,7 @@ var Game;
                 else {
                     this.startingHeight = newStartingHeight;
                 }
+                console.log("hi" + canvas_y);
                 this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
             }
             this.oldY = canvas_y;
@@ -503,7 +849,7 @@ var Game;
         };
         CategoriesController.prototype.updateGame = function (event) {
             var canvas_y = event.y;
-            canvas_y -= c.offsetLeft;
+            canvas_y -= this.canvas.offsetTop;
             var screenHeight = this.height - (this.height / 4);
             var buttonHeight = screenHeight / 7;
             var gap = 10;
@@ -516,7 +862,7 @@ var Game;
                 this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
             }
             if (canvas_y > menuButton) {
-                console.log("menu");
+                this.switchToMenuState();
             }
         };
         CategoriesController.prototype.switchStates = function () {
@@ -524,13 +870,9 @@ var Game;
             this.canvas.removeEventListener("touchend", this.endScrolling);
             this.canvas.removeEventListener("click", this.updateGame);
         };
-        CategoriesController.prototype.switchToGameState = function () {
+        CategoriesController.prototype.switchToMenuState = function () {
             this.switchStates();
-            this.gameloop.switchToGameState();
-        };
-        CategoriesController.prototype.switchToCategoriesState = function () {
-            this.switchStates();
-            this.gameloop.switchToCategoriesState();
+            this.gameloop.switchToMenuState();
         };
         return CategoriesController;
     })();
@@ -564,9 +906,9 @@ var Game;
             this.context.quadraticCurveTo(x + w, y, x + w, y + r);
             this.context.lineTo(x + w, y + h - r);
             this.context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-            this.context.lineTo(x + r, y + h);
+            this.context.lineTo(x, y + h);
             //this.context.quadraticCurveTo(x, y+h, x, y+h-r);
-            this.context.lineTo(x, y + r);
+            this.context.lineTo(x, y);
             //this.context.quadraticCurveTo(x, y, x+r, y);
             this.context.closePath();
             this.context.strokeStyle = "black";
@@ -577,7 +919,7 @@ var Game;
         CategoriesView.prototype.drawText = function (rectX, rectY, width, height, i) {
             var fontSize = 30;
             var fontSizeString = fontSize.toString();
-            var font = "pt Calibri";
+            var font = "pt AG Book Rounded";
             this.context.font = fontSizeString + font;
             this.context.textAlign = "center";
             this.context.textBaseline = "middle";
@@ -643,19 +985,19 @@ var Game;
             this.height = height;
             this.model = new Game.GameOne();
             this.controller = new Game.MenuController(this, canvas, width, height); //add model
-            this.view = new Game.MenuView(context, width, height); //add model		
+            this.view = new Game.MenuView(context, width, height, 1); //add model		
         }
         GameLoop.prototype.runGame = function () {
             this.controller.takeInput();
-            this.view.render();
-            console.log("imadeit");
         };
         GameLoop.prototype.switchGameModes = function () {
             if (this.model instanceof Game.GameOne) {
                 this.model = new Game.GameTwo();
+                this.view.render(2);
             }
             else if (this.model instanceof Game.GameTwo) {
                 this.model = new Game.GameOne();
+                this.view.render(1);
             }
         };
         GameLoop.prototype.switchToGameState = function () {
@@ -675,9 +1017,15 @@ var Game;
             this.view.render();
         };
         GameLoop.prototype.switchToMenuState = function () {
-            var newView = new Game.MenuView(this.context, this.width, this.height); //add model
+            var gm;
+            if (this.model instanceof Game.GameOne) {
+                gm = 1;
+            }
+            else if (this.model instanceof Game.GameTwo) {
+                gm = 2;
+            }
+            var newView = new Game.MenuView(this.context, this.width, this.height, gm); //add model
             this.view = newView;
-            this.view.render();
             var newController = new Game.MenuController(this, this.canvas, this.width, this.height); //add model
             this.controller = newController;
             this.controller.takeInput();

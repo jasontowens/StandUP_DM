@@ -4,11 +4,12 @@ module Game{
 		chosenCategories:boolean[];
 		Categories:string[][];//decide which ones are which
 		currentItem:string;
-		size:number;
 		
 		playedWords:string[];
 		correctPlayedWords:boolean[];
 		gameOver:boolean;
+		newItem:boolean;
+		gameStarted:boolean;
 		
 		currentWordCategory:number;
 		
@@ -46,8 +47,6 @@ module Game{
 			for(var i=0; i!= this.Categories.length; ++i){
 				this.chosenCategories[i] = true;
 			}
-			//this.Items = ["hidjnfoda fnoiqwebfo sada" ,"bye", "yo"];
-			this.size = this.Categories.length;
 		}
 		changeWord(){
 			var currentCategory = this.randomUsableCategory();
@@ -86,13 +85,15 @@ module Game{
 				return categoryToUse; //is an int
 			}
 		 }
+		
 		 changeChosenCat(i:number){
-		 	if(this.chosenCategories[i]){
-		 		this.chosenCategories[i] = false;
-		 	}else{
-		 		this.chosenCategories[i] = true;
-		 	}
-		 
+			 if(i < this.chosenCategories.length){
+				if(this.chosenCategories[i]){
+					this.chosenCategories[i] = false;
+				}else{
+					this.chosenCategories[i] = true;
+				}
+			 }
 		 }
 		 randomWordInCategory(currentCategory){	//returns a random word in give category (parameter is int)
 			var sizeOfCategory = this.Categories[currentCategory].length;

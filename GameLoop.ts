@@ -28,20 +28,21 @@ module Game{
 			this.height = height;
 			this.model = new GameOne();
 			this.controller = new Game.MenuController(this,canvas,width,height);//add model
-			this.view = new MenuView(context,width,height);//add model		
+			this.view = new MenuView(context,width,height,1);//add model		
 		}
 		runGame(){
 			this.controller.takeInput();
-			this.view.render();
-			console.log("imadeit");
 		}
 		
 		switchGameModes(){
 			if(this.model instanceof GameOne){
 				this.model = new GameTwo();
+				this.view.render(2);
 			}else if(this.model instanceof GameTwo){
 				this.model = new GameOne();
+				this.view.render(1);
 			}
+
 		}
 		
 		switchToGameState(){
@@ -70,10 +71,14 @@ module Game{
 		}
 		
 		switchToMenuState(){
-		
-			var newView = new MenuView(this.context,this.width,this.height);//add model
+			var gm;
+			if(this.model instanceof GameOne){
+				gm = 1;
+			}else if(this.model instanceof GameTwo){
+				gm = 2
+			}
+			var newView = new MenuView(this.context,this.width,this.height,gm);//add model
 			this.view = newView;
-			this.view.render();
 			
 			var newController = new MenuController(this,this.canvas,this.width,this.height);//add model
 			this.controller = newController;

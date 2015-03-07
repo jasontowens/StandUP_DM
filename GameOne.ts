@@ -4,14 +4,7 @@ module Game{
 	
 		recentPassOrFail:boolean;
 		heldSideways:boolean;
-		newItem:boolean;
-		gameStarted:boolean;
 		gameView;
-		
-	
-		
-		
-		
 		
 		
 		constructor(){
@@ -32,6 +25,9 @@ module Game{
 		countdown(){
 			this.gameView.renderCountdown();
 		}
+		 notEnoughCategories(){
+		 	this.gameView.renderNotEnoughCategories
+		 }
 		startGame(timeOfRound:number){
 			this.gameStarted = true;
 			this.gameView.renderCurrentWordOne(this.currentItem,timeOfRound);
@@ -46,6 +42,8 @@ module Game{
 			if(this.newItem){
 				this.playedWords.push(this.currentItem);
 				this.correctPlayedWords.push(this.recentPassOrFail);
+				console.log("len" + this.playedWords.length);
+				console.log("cuur" + this.currentItem);
 				this.changeWord();
 				this.newItem = false;
 				
@@ -58,9 +56,7 @@ module Game{
 				}
 			}else{
 				timeOfRound = timeOfRound - 0.1;
-			}
-			
-//TODO figure out how to hold scores.			
+			}		
 		}
 	}
 }

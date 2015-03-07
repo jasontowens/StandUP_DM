@@ -22,6 +22,7 @@ module Game{
 			this.width = width;
 			this.height = height;
 			this.startingHeight = 0;
+			this.oldY = 0;
 			this.model = model;
 			this.categoriesView = categoriesView;
 			this.categoriesView.setCategories(this.model.Categories,this.model.chosenCategories);
@@ -41,7 +42,6 @@ module Game{
 			var maxHeight = screenHeight * numCatPages;//fix this once there is new categories
 			var canvas_x = event.targetTouches[0].pageX;
 			var canvas_y = event.targetTouches[0].pageY;
-			var startingHeight;
 			if(this.fingerLifted){
 				this.startX = canvas_x;
 				this.startY = canvas_y;
@@ -58,6 +58,7 @@ module Game{
 				else{
 					this.startingHeight = newStartingHeight;
 				}
+				console.log("hi" + canvas_y);
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories);
 				
 			}
@@ -76,7 +77,7 @@ module Game{
 		 
 		 updateGame(event){
 		 	var canvas_y = event.y;
-			canvas_y -= c.offsetLeft;
+			canvas_y -= this.canvas.offsetTop;
 			var screenHeight = this.height - (this.height/4);
 			var buttonHeight = screenHeight/7;
 			var gap = 10;
@@ -89,7 +90,7 @@ module Game{
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)
 			}
 			if(canvas_y > menuButton){	
-				console.log("menu");
+				this.switchToMenuState();
 			}
 		}
 		 
@@ -100,15 +101,9 @@ module Game{
 			this.canvas.removeEventListener("click",this.updateGame); 
 		}
 	
-		switchToGameState(){
+		switchToMenuState(){
 			this.switchStates();
-			this.gameloop.switchToGameState();
+			this.gameloop.switchToMenuState();
 		}
-		switchToCategoriesState(){
-			this.switchStates();
-			this.gameloop.switchToCategoriesState();
-		}
-		
-	
 	}
 }

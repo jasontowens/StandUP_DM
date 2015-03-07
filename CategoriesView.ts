@@ -34,9 +34,9 @@ module Game{
 			this.context.quadraticCurveTo(x+w, y, x+w, y+r);
 			this.context.lineTo(x+w, y+h-r);
 			this.context.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-			this.context.lineTo(x+r, y+h);
+			this.context.lineTo(x, y+h);
 			//this.context.quadraticCurveTo(x, y+h, x, y+h-r);
-			this.context.lineTo(x, y+r);
+			this.context.lineTo(x, y);
 			//this.context.quadraticCurveTo(x, y, x+r, y);
 			this.context.closePath();
 			this.context.strokeStyle = "black";
@@ -47,7 +47,7 @@ module Game{
     	drawText(rectX,rectY,width,height,i){
     		var fontSize = 30;
     		var fontSizeString = fontSize.toString();
-    		var font = "pt Calibri"
+    		var font = "pt AG Book Rounded"
     		this.context.font = fontSizeString + font;
       		this.context.textAlign="center"; 
 			this.context.textBaseline = "middle";

@@ -5,6 +5,7 @@ module Game{
 	export class GameView{
 	
 		game_background = new Image();
+		game_background2 = new Image();
 		forehead = new Image();
 		pass = new Image();
 		correct = new Image();
@@ -13,10 +14,15 @@ module Game{
 		width;
 		height;
 		model;
-		timeout;
+		bouncingAnimation;
+		slideRightAnimation;
+		slideLeftAnimation;
+		bouncingHeight;
 	
 		constructor(context,width,height,model){
 			this.game_background.src = "InGame.png";
+			this.game_background2.src = "InGame2.png";
+
 			this.forehead.src = "forehead.png";
 			this.pass.src = "pass.png";
 			this.correct.src = "correct.png";
@@ -51,14 +57,119 @@ module Game{
 			this.printTime(currTime);
 		
 		}
+		
+		renderCurrentWordTwo(currWord:string, teamTime:number,activeTeam:number){
+			this.clearCanvas();
+			teamTime = Math.floor(teamTime);
+			this.context.drawImage(this.game_background2, 0, 0, this.width, this.height);
+			this.printWord(currWord);
+			this.printTimeTwo(teamTime,activeTeam);
+		
+		}
+		renderInBetweenRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
+			this.clearCanvas();
+			this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+			this.context.font = "50px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			this.context.fillText("ROUND " + currentRound+ "/" + totalRounds, this.width/2, this.height/4);
+			this.context.fillText("Team 1", this.width/4, this.height/2);
+			this.context.fillText("Team 2", 3*this.width/4, this.height/2);
+			this.context.fillText(teamOneScore, this.width/4, 3*this.height/4);
+			this.context.fillText(teamTwoScore, 3*this.width/4, 3*this.height/4);
+		
+		}
+		renderRoundNumber(height,rounds,up){
+			this.bouncingHeight = height;
+			var self = this;
+			if(up){	
+				--height;
+			}else{
+				++height;
+			}
+			if(height > this.height/2 + 10){
+				up = true;
+			}else if(height < this.height/2 - 20){
+				up = false;
+			}
+			var f = function(){self.renderRoundNumber(height,rounds,up)};
+			this.bouncingAnimation = setTimeout(f, 20);
+			this.clearCanvas();
+			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			this.context.font = "150px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			this.context.fillText(rounds, this.width/2, height);	
+		}
+		slideLeft(rounds1,rounds2,width1,width2){
+			this.clearCanvas();
+			var self = this;
+			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			width1-=5;
+			width2-=5;
+			clearTimeout(this.bouncingAnimation);
+			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
+			this.slideLeftAnimation = setTimeout(f, .01);
+			if(width2 <= Math.floor(this.width/2)){
+				clearTimeout(this.slideLeftAnimation);
+				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
+			}
+			this.context.font = "150px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			this.context.fillText(rounds1, width1, this.bouncingHeight);
+			this.context.fillText(rounds2, width2, this.bouncingHeight);
+			
+			
+		}
+		slideRight(rounds1,rounds2,width1,width2){
+			this.clearCanvas();
+			var self = this;
+			self.context.drawImage(self.game_background, 0, 0, self.width, self.height);
+			width1+=5;
+			width2+=5;
+			clearTimeout(this.bouncingAnimation);
+			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
+			this.slideLeftAnimation = setTimeout(f, .01);
+			if(width2 >= Math.floor(this.width/2)){
+				clearTimeout(this.slideLeftAnimation);
+				this.renderRoundNumber(this.bouncingHeight,rounds2,true);
+			}
+			this.context.font = "150px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			this.context.fillText(rounds1, width1, this.bouncingHeight);
+			this.context.fillText(rounds2, width2, this.bouncingHeight);
+		}
+		renderSelectedRoundNumber(){
+			clearTimeout(this.bouncingAnimation);
+		}
+		renderNotEnoughCategories(){
+		
+		}
+		renderGameOverTwo(score1,score2){
+			this.clearCanvas();
+			this.context.drawImage(this.endGame_background, 0,0,this.width,this.height);
+			this.context.font = "50px AG Book Rounded";
+			this.context.textBaseline = 'center';
+			this.context.textAlign = 'center';
+			if(score1>score2){
+				this.context.fillText("TEAM 1 WINS!", this.width/2, this.height/3);
+			}else if(score1==score2){
+				this.context.fillText("IT'S A TIE!", this.width/2, this.height/3);
+			}else{
+				this.context.fillText("TEAM 2 WINS!", this.width/2, this.height/3);
+			}
+			
+		}
 		renderGameOver(numItems:number,playedWords:string[],correct:boolean){
 			this.clearCanvas();
-			this.context.drawImage(this.endGame_background, 0,0,w,h);
+			this.context.drawImage(this.endGame_background, 0,0,this.width,this.height);
 			var numCorrect = 0;
 			var shiftUp = 0;
 
 				
-			for(var i = 0; i < numItems; ++i){ 	
+			for(var i = 1; i < numItems; ++i){ 	
 				if(!correct[i]){	//if word was passed
 					this.context.fillStyle = "red";		
 				}
@@ -66,12 +177,12 @@ module Game{
 					numCorrect++;
 					this.context.fillStyle = "green";
 				}
-				this.context.font = "bold 20px AG Book Rounded";
+				this.context.font = "20px AG Book Rounded";
 				this.context.fillText(playedWords[i], this.width/2, this.height*1/4+i*23 - shiftUp *23);
 			}
-			this.context.font = "bold 40px AG Book Rounded";
+			this.context.font = "40px AG Book Rounded";
 			this.context.fillStyle = "white";
-			this.context.fillText((numCorrect).toString(), w/2, h*1/8);		
+			this.context.fillText((numCorrect).toString(), this.width/2, this.height*1/8);		
 		}
 		
 		
@@ -80,7 +191,7 @@ module Game{
 		}
 		
 		 printWord(currword:string){
-			this.context.font = "bold 80px AG Book Rounded";
+			this.context.font = "80px AG Book Rounded";
 			this.context.textBaseline = 'bottom';
 			this.context.textAlign = 'center';
 		    this.rotateContext(); 
@@ -130,30 +241,29 @@ module Game{
 					context.fillText(line, x, y);
 					y += lineHeight;
 			}
-			//return isMultipleLines;
-	}
- 	printTime(timeLeft){
-		  this.context.font = "bold 30px Arial";
-		  this.context.textBaseline = 'bottom';
-		  this.context.textAlign = 'center';
-		  this.rotateContext();
-		  this.context.fillStyle = "white";
-		  this.context.fillText( 'TIME REMAINING: ' + Math.floor(timeLeft), h/4, w*15/16); 
-		  this.context.restore();
- 	}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		gameTwoRender(){
-		
 		}
+		printTime(timeLeft){
+			  this.context.font = "30px AG Book Rounded";
+			  this.context.textBaseline = 'bottom';
+			  this.context.textAlign = 'center';
+			  this.rotateContext();
+			  this.context.fillStyle = "white";
+			  this.context.fillText( 'TIME REMAINING: ' + Math.floor(timeLeft), this.height/4, this.width*15/16); 
+			  this.context.restore();
+		}
+		printTimeTwo(timeLeft,teamNumber){
+			  this.context.font = "30px AG Book Rounded";
+			  this.context.textBaseline = 'bottom';
+			  this.context.textAlign = 'center';
+			  this.rotateContext();
+			  this.context.fillStyle = "white";
+			  this.context.fillText( "TEAM " + teamNumber + ' TIME REMAINING: ' + Math.floor(timeLeft), this.height/4, this.width*2/15 +5); 
+			  this.context.restore();
+		}
+
+		
+		
+
 		
 		
 	}
