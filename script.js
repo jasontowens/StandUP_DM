@@ -2,10 +2,12 @@
 var Game;
 (function (Game) {
     var MenuController = (function () {
-        function MenuController(gameloop, canvas, width, height, model) {
+        function MenuController(gameloop, canvas, width, height, model, menuView) {
             this.gameloop = gameloop;
             this.canvas = canvas;
             this.model = model;
+            this.menuView = menuView;
+            this.notEnoughCat = false;
         }
         MenuController.prototype.takeInput = function () {
             this.mobileClick = this.mobileClick.bind(this);
@@ -16,7 +18,16 @@ var Game;
             mobileClickY -= this.canvas.offsetTop;
             var mobileClickX = event.x;
             mobileClickX -= this.canvas.offsetLeft;
-            this.click(mobileClickX, mobileClickY);
+            if (this.notEnoughCat) {
+                this.catClick(mobileClickX, mobileClickY);
+            }
+            else {
+                this.click(mobileClickX, mobileClickY);
+            }
+        };
+        MenuController.prototype.catClick = function (X, Y) {
+            this.notEnoughCat = false;
+            this.menuView.render(this.gameloop.currentGame);
         };
         MenuController.prototype.click = function (X, Y) {
             if (Y > (210 / 667 * h) && Y < (505 / 667 * h)) {
@@ -40,8 +51,14 @@ var Game;
             console.log("switching states");
         };
         MenuController.prototype.switchToGameState = function () {
-            this.switchStates();
-            this.gameloop.switchToGameState();
+            if (this.model.gameCanStart()) {
+                this.switchStates();
+                this.gameloop.switchToGameState();
+            }
+            else {
+                this.notEnoughCat = true;
+                this.menuView.renderNotEnoughCategories(-10, 1, 0);
+            }
         };
         MenuController.prototype.switchToCategoriesState = function () {
             this.switchStates();
@@ -53,20 +70,90 @@ var Game;
 })(Game || (Game = {}));
 var Game;
 (function (Game) {
-    var MenuView = (function () {
-        function MenuView(context, width, height, gameMode, model) {
+    var Resources = (function () {
+        function Resources() {
             this.menu_background1 = new Image();
             this.menu_background2 = new Image();
+            this.game_background = new Image();
+            this.game_background2 = new Image();
+            this.forehead = new Image();
+            this.pass = new Image();
+            this.roundPicking = new Image();
+            this.correct = new Image();
+            this.endGame_background = new Image();
+            this.rightArrow = new Image();
+            this.leftArrow = new Image();
+            this.rightArrowPressed = new Image();
+            this.leftArrowPressed = new Image();
+            this.category_background = new Image();
+            this.category_background1 = new Image();
+            this.noCatSel = new Image();
+            this.balloon = new Image();
             this.menu_background1.src = "Menu.png";
             this.menu_background2.src = "Menu2.png";
+            this.game_background.src = "InGame.png";
+            this.game_background2.src = "InGame2.png";
+            this.roundPicking.src = "RoundPickingBackground.png";
+            this.forehead.src = "forehead.png";
+            this.pass.src = "pass.png";
+            this.correct.src = "correct.png";
+            this.endGame_background.src = "endGame.png";
+            this.rightArrow.src = "rightArrow.png";
+            this.leftArrow.src = "leftArrow.png";
+            this.rightArrowPressed.src = "rightArrowClicked.png";
+            this.leftArrowPressed.src = "leftArrowClicked.png";
+            this.category_background.src = "categories_foreground.png";
+            this.category_background1.src = "categories_foreground_menuselected.png";
+            this.noCatSel.src = "noCategorySelected.png";
+            this.balloon.src = "balloon.png";
+        }
+        Resources.prototype.hasLoaded = function () {
+            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete);
+        };
+        return Resources;
+    })();
+    Game.Resources = Resources;
+})(Game || (Game = {}));
+/// <reference path="Resources.ts" />
+var Game;
+(function (Game) {
+    var MenuView = (function () {
+        function MenuView(resources, context, width, height, gameMode) {
+            this.resources = resources;
+            this.menu_background1 = this.resources.menu_background1;
+            this.menu_background2 = this.resources.menu_background2;
+            this.noCatSel = this.resources.noCatSel;
             this.context = context;
             this.width = width;
             var self = this;
             this.height = height;
-            this.model = model;
+            this.gameMode = gameMode;
         }
-        MenuView.prototype.checkIfImageLoaded = function () {
-            return this.menu_background1.complete;
+        MenuView.prototype.renderNotEnoughCategories = function (height, velocity, friction) {
+            if (friction == 3) {
+            }
+            else {
+                var gravity = 0.2;
+                var bounceFactor = 0.5;
+                this.clearCanvas();
+                this.render(this.gameMode);
+                this.context.drawImage(this.noCatSel, this.width / 5, height, this.width / 1.5, this.height / 3);
+                height += velocity;
+                velocity += gravity;
+                if (height + this.height / 6 > this.height / 2) {
+                    height = this.height / 2 - this.height / 6;
+                    velocity *= -bounceFactor;
+                    ++friction;
+                }
+                var self = this;
+                var f = function () {
+                    self.renderNotEnoughCategories(height, velocity, friction);
+                };
+                setTimeout(f, 1000 / 60);
+            }
+        };
+        MenuView.prototype.clearCanvas = function () {
+            this.context.clearRect(0, 0, this.width, this.height);
         };
         MenuView.prototype.render = function (gameMode) {
             var self = this;
@@ -152,6 +239,15 @@ var Game;
                 return categoryToUse; //is an int
             }
         };
+        Model.prototype.gameCanStart = function () {
+            for (var i = 0; i != this.chosenCategories.length; ++i) {
+                if (this.chosenCategories[i] == true) {
+                    console.log(i);
+                    return true;
+                }
+            }
+            return false;
+        };
         Model.prototype.changeChosenCat = function (i) {
             if (i < this.chosenCategories.length) {
                 if (this.chosenCategories[i]) {
@@ -192,6 +288,7 @@ var Game;
             this.teamOneScore = 0;
             this.teamTwoScore = 0;
             this.currentRound = 0;
+            this.inBetweenRounds = false;
             this.totalRoundsOption = [1, 3, 7, 9, 11];
             this.totalRoundsOptionNumber = 0;
             this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
@@ -201,13 +298,17 @@ var Game;
             this.playingGame = false;
             this.activeTeam = 1;
             this.currentRound = 0;
+            this.inBetweenRounds = false;
             this.teamOneTimeLeft = 30;
             this.teamTwoTimeLeft = 30;
+            this.teamOneTotalTime = 0;
+            this.teamTwoTotalTime = 0;
             this.teamOneScore = 0;
             this.teamTwoScore = 0;
             this.totalRoundsOptionNumber = 0;
             this.teamOneTotalTime = 0;
             this.teamTwoTotalTime = 0;
+            this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
         };
         GameTwo.prototype.setGameView = function (gv) {
             this.gameView = gv;
@@ -279,6 +380,7 @@ var Game;
             };
             var timeout = setTimeout(f, 100);
             if (this.teamOneTimeLeft < 0 || this.teamTwoTimeLeft < 0) {
+                this.gameView.canDrawBalloons = true;
                 if (this.currentRound == this.totalRounds) {
                     if (this.teamOneTotalTime > this.teamTwoTotalTime) {
                         ++this.teamTwoScore;
@@ -329,39 +431,27 @@ var Game;
 var Game;
 (function (Game) {
     var GameView = (function () {
-        function GameView(context, width, height, model) {
-            this.game_background = new Image();
-            this.game_background2 = new Image();
-            this.forehead = new Image();
-            this.pass = new Image();
-            this.roundPicking = new Image();
-            this.correct = new Image();
-            this.endGame_background = new Image();
-            this.rightArrow = new Image();
-            this.leftArrow = new Image();
-            this.rightArrowPressed = new Image();
-            this.leftArrowPressed = new Image();
-            this.game_background.src = "InGame.png";
-            this.game_background2.src = "InGame2.png";
-            this.roundPicking.src = "RoundPickingBackground.png";
-            this.forehead.src = "forehead.png";
-            this.pass.src = "pass.png";
-            this.correct.src = "correct.png";
-            this.endGame_background.src = "endGame.png";
-            this.rightArrow.src = "rightArrow.png";
-            this.leftArrow.src = "leftArrow.png";
-            this.rightArrowPressed.src = "rightArrowClicked.png";
-            this.leftArrowPressed.src = "leftArrowClicked.png";
+        function GameView(resources, context, width, height, model) {
+            this.resources = resources;
+            this.game_background = this.resources.game_background;
+            this.game_background2 = this.resources.game_background2;
+            this.forehead = this.resources.forehead;
+            this.pass = this.resources.pass;
+            this.roundPicking = this.resources.roundPicking;
+            this.correct = this.resources.correct;
+            this.endGame_background = this.resources.endGame_background;
+            this.rightArrow = this.resources.rightArrow;
+            this.leftArrow = this.resources.leftArrow;
+            this.rightArrowPressed = this.resources.rightArrowPressed;
+            this.leftArrowPressed = this.resources.leftArrowPressed;
+            this.balloon = this.resources.balloon;
             this.context = context;
             this.width = width;
             this.height = height;
             this.model = model;
         }
         GameView.prototype.renderForehead = function () {
-            var self = this;
-            this.forehead.onload = function () {
-                self.context.drawImage(self.forehead, 0, 0, self.width, self.height);
-            };
+            this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
         };
         GameView.prototype.renderCountdown = function (timeLeft) {
             this.clearCanvas();
@@ -409,24 +499,103 @@ var Game;
             this.printWord(currWord);
             this.printTimeTwo(teamTime, activeTeam);
         };
+        GameView.prototype.balloonAnimation = function (print, h1, h2, h3, s1, s2, s3, count) {
+            var balloon_height = 100 / 667 * this.height;
+            var balloon_width = 95 / 375 * this.width;
+            var w1 = 30 / 375 * this.width;
+            var w2 = 160 / 375 * this.width;
+            var w3 = 300 / 375 * this.width;
+            var t;
+            if (this.balloonsInvisible(h1, h2, h3) || count == 0) {
+                if (this.whichOneInvisible(h1, h2, h3) == 1) {
+                    h1 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s1 = Math.floor((Math.random() * 9) + 4);
+                }
+                if (this.whichOneInvisible(h1, h2, h3) == 2) {
+                    h2 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s2 = Math.floor((Math.random() * 9) + 4);
+                }
+                if (this.whichOneInvisible(h1, h2, h3) == 3) {
+                    h3 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s3 = Math.floor((Math.random() * 9) + 4);
+                }
+                else if (count == 0) {
+                    h1 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s1 = Math.floor((Math.random() * 9) + 4);
+                    h2 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s2 = Math.floor((Math.random() * 9) + 4);
+                    h3 = Math.floor((Math.random() * this.height + balloon_height + 50) + this.height);
+                    s3 = Math.floor((Math.random() * 9) + 4);
+                }
+            }
+            if (this.canIDrawBalloons()) {
+                this.clearCanvas();
+                this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+                this.context.drawImage(this.balloon, w1, h1, balloon_width, balloon_height);
+                this.context.drawImage(this.balloon, w2, h2, balloon_width, balloon_height);
+                this.context.drawImage(this.balloon, w3, h3, balloon_width, balloon_height);
+                print();
+                h1 -= s1;
+                h2 -= s2;
+                h3 -= s3;
+                var self = this;
+                var hm = function () {
+                    self.balloonAnimation(print, h1, h2, h3, s1, s2, s3, ++count);
+                };
+                t = setTimeout(hm, 1000 / 60);
+            }
+            else {
+                clearTimeout(t);
+            }
+        };
+        GameView.prototype.canIDrawBalloons = function () {
+            if (this.model instanceof Game.GameOne) {
+                return false;
+            }
+            else {
+                console.log(this.model.gameOver || this.model.inBetweenRounds);
+                return (this.model.gameOver || this.model.inBetweenRounds);
+            }
+        };
+        GameView.prototype.whichOneInvisible = function (h1, h2, h3) {
+            var balloon_height = 100 / 667 * this.height;
+            if (h1 < -balloon_height) {
+                return 1;
+            }
+            if (h2 < -balloon_height) {
+                return 2;
+            }
+            if (h3 < -balloon_height) {
+                return 3;
+            }
+        };
+        GameView.prototype.balloonsInvisible = function (h1, h2, h3) {
+            var balloon_height = 100 / 667 * this.height;
+            return (h1 < -balloon_height || h2 < -balloon_height || h3 < -balloon_height);
+        };
         GameView.prototype.renderInBetweenRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
             this.clearCanvas();
-            this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+            var self = this;
+            var f = function () {
+                self.printRounds(teamOneScore, teamTwoScore, currentRound, totalRounds);
+            };
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0);
+        };
+        GameView.prototype.printRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
             this.context.font = "50px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
+            this.context.fillStyle = "blue";
             this.context.fillText("ROUND " + currentRound + "/" + totalRounds, this.width / 2, this.height / 4);
+            this.context.font = "40px AG Book Rounded";
             this.context.fillText("Team 1", this.width / 4, this.height / 2);
             this.context.fillText("Team 2", 3 * this.width / 4, this.height / 2);
-            this.context.fillText(teamOneScore, this.width / 4, 3 * this.height / 4);
-            this.context.fillText(teamTwoScore, 3 * this.width / 4, 3 * this.height / 4);
+            this.context.fillText(teamOneScore, this.width / 4, this.height / 1.8);
+            this.context.fillText(teamTwoScore, 3 * this.width / 4, this.height / 1.8);
         };
         GameView.prototype.renderRoundNumber = function (height, rounds, up) {
-            var self = this;
-            this.roundPicking.onload = function () {
-                self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
-                self.renderRoundNumber1(height, rounds, up);
-            };
+            this.context.drawImage(this.roundPicking, 0, 0, this.width, this.height);
+            this.renderRoundNumber1(height, rounds, up);
         };
         GameView.prototype.renderRoundNumber1 = function (height, rounds, up) {
             var self = this;
@@ -460,8 +629,6 @@ var Game;
         GameView.prototype.clickLeftArrow = function (currTime) {
         };
         GameView.prototype.clickRightArrow = function () {
-            //this.context.drawImage(this.rightArrowPressed, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
-            //this.context.drawImage(this.rightArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
         };
         GameView.prototype.slideLeft = function (rounds1, rounds2, width1, width2) {
             this.clearCanvas();
@@ -483,8 +650,8 @@ var Game;
             this.context.textAlign = 'center';
             this.context.fillText(rounds1, width1, this.bouncingHeight);
             this.context.fillText(rounds2, width2, this.bouncingHeight);
-            self.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
-            self.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
+            this.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
+            this.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
         };
         GameView.prototype.slideRight = function (rounds1, rounds2, width1, width2) {
             this.clearCanvas();
@@ -506,8 +673,8 @@ var Game;
             this.context.textAlign = 'center';
             this.context.fillText(rounds1, width1, this.bouncingHeight);
             this.context.fillText(rounds2, width2, this.bouncingHeight);
-            self.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
-            self.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
+            this.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
+            this.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
         };
         GameView.prototype.renderSelectedRoundNumber = function () {
             clearTimeout(this.bouncingAnimation);
@@ -516,8 +683,15 @@ var Game;
         };
         GameView.prototype.renderGameOverTwo = function (score1, score2) {
             this.clearCanvas();
+            var self = this;
+            var f = function () {
+                self.printGameOverTwo(score1, score2);
+            };
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0);
+        };
+        GameView.prototype.printGameOverTwo = function (score1, score2) {
             this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
-            this.context.font = "50px AG Book Rounded";
+            this.context.font = "40px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
             if (score1 > score2) {
@@ -596,7 +770,7 @@ var Game;
                         line = testLine;
                     }
                 }
-                context.fillText(line, x, y);
+                context.fillText(line, x, y - 5);
                 y += lineHeight;
             }
         };
@@ -720,12 +894,7 @@ var Game;
             }
         };
         GameController.prototype.gameOneTakeInput = function () {
-            if (this.gameCanStart()) {
-                this.startGameOne();
-            }
-            else {
-                this.model.notEnoughCategories();
-            }
+            this.startGameOne();
         };
         GameController.prototype.startGameOne = function () {
             this.model.beginGame();
@@ -758,7 +927,6 @@ var Game;
             this.startDaGame();
         };
         GameController.prototype.startDaGame = function () {
-            this.model.newItem = false;
             var self = this;
             var t;
             if (!this.model.gameStarted && this.gameShallStart) {
@@ -775,6 +943,7 @@ var Game;
         };
         GameController.prototype.startAnothaGame = function () {
             if (this.model.canChange) {
+                this.model.newItem = false;
                 this.model.startGame(5);
             }
             else {
@@ -786,13 +955,7 @@ var Game;
             }
         };
         GameController.prototype.gameCanStart = function () {
-            for (var i = 0; i != this.model.chosenCategories.length; ++i) {
-                if (this.model.chosenCategories[i] == true) {
-                    console.log(i);
-                    return true;
-                }
-            }
-            return false;
+            return this.model.gameCanStart;
         };
         GameController.prototype.mobileClick = function (e) {
             if (this.model.gameOver) {
@@ -811,13 +974,7 @@ var Game;
             }
         };
         GameController.prototype.gameTwoTakeInput = function () {
-            if (this.gameCanStart()) {
-                this.startGameTwo();
-            }
-            else {
-                console.log("nostart");
-                this.model.notEnoughCategories();
-            }
+            this.startGameTwo();
         };
         GameController.prototype.startGameTwo = function () {
             this.mobileClickTwo = this.mobileClickTwo.bind(this);
@@ -846,6 +1003,7 @@ var Game;
             var menuButton = (550 / 667) * this.height;
             if (Y > menuButton) {
                 if (X < this.width / 2) {
+                    this.model.gameOver = true;
                     this.switchToMenuState();
                 }
                 else {
@@ -904,6 +1062,7 @@ var Game;
             this.gameloop.switchToMenuState();
         };
         GameController.prototype.switchStates = function () {
+            this.model.clearVariables();
             if (this.model instanceof Game.GameOne) {
                 this.canvas.removeEventListener("click", this.mobileClick);
             }
@@ -929,15 +1088,23 @@ var Game;
             this.model = model;
             this.categoriesView = categoriesView;
             this.categoriesView.setCategories(this.model.Categories, this.model.chosenCategories);
-            //this.categoriesView.renderCategories(Math.round(1),this.model.chosenCategories)
         }
         CategoriesController.prototype.takeInput = function () {
             this.Scrolling = this.Scrolling.bind(this);
             this.endScrolling = this.endScrolling.bind(this);
-            this.updateGame = this.updateGame.bind(this);
+            this.startClick = this.startClick.bind(this);
+            this.canvas.addEventListener("touchstart", this.startClick);
             this.canvas.addEventListener("touchmove", this.Scrolling);
             this.canvas.addEventListener("touchend", this.endScrolling);
-            this.canvas.addEventListener("click", this.updateGame);
+        };
+        CategoriesController.prototype.startClick = function (event) {
+            event.preventDefault();
+            var canvas_x = event.targetTouches[0].pageX;
+            var canvas_y = event.targetTouches[0].pageY;
+            this.startX = canvas_x;
+            this.startY = canvas_y;
+            this.endY = canvas_y;
+            this.endX = canvas_x;
         };
         CategoriesController.prototype.Scrolling = function (event) {
             event.preventDefault();
@@ -962,7 +1129,6 @@ var Game;
                 else {
                     this.startingHeight = newStartingHeight;
                 }
-                console.log("hi" + canvas_y);
                 this.categoriesView.renderCategories(Math.round(this.startingHeight), this.model.chosenCategories);
             }
             this.oldY = canvas_y;
@@ -972,15 +1138,21 @@ var Game;
         };
         CategoriesController.prototype.endScrolling = function (event) {
             this.fingerLifted = true;
+            console.log(this.startX + " " + this.endX);
+            if (Math.abs(this.startX - this.endX) < 5) {
+                if (Math.abs(this.startY - this.endY) < 5) {
+                    this.updateGame(this.endY);
+                }
+            }
         };
-        CategoriesController.prototype.updateGame = function (event) {
-            var canvas_y = event.y;
-            canvas_y -= this.canvas.offsetTop;
+        CategoriesController.prototype.updateGame = function (canvas_y) {
+            //var canvas_y = event.y;
+            //canvas_y -= this.canvas.offsetTop;
             var screenHeight = this.height - (this.height / 4);
             var buttonHeight = screenHeight / 7;
             var gap = 10;
             var startingGap = this.height / 9 + 10;
-            var menuButton = (550 / 667) * this.height;
+            var menuButton = (540 / 667) * this.height;
             var click = this.startingHeight + canvas_y;
             if (click > startingGap && canvas_y <= menuButton) {
                 var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
@@ -988,17 +1160,31 @@ var Game;
                 this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
             }
             if (canvas_y > menuButton) {
-                this.switchToMenuState();
+                var time = new Date().getTime();
+                this.switchToMenuState(time, 1);
             }
         };
         CategoriesController.prototype.switchStates = function () {
             this.canvas.removeEventListener("touchmove", this.Scrolling);
             this.canvas.removeEventListener("touchend", this.endScrolling);
-            this.canvas.removeEventListener("click", this.updateGame);
+            this.canvas.removeEventListener("touchstart", this.startClick);
         };
-        CategoriesController.prototype.switchToMenuState = function () {
-            this.switchStates();
-            this.gameloop.switchToMenuState();
+        CategoriesController.prototype.switchToMenuState = function (time, count) {
+            if (count == 1) {
+                console.log("ello");
+                this.categoriesView.changeBackground(this.startingHeight);
+            }
+            if ((new Date().getTime()) - time > 1000) {
+                this.switchStates();
+                this.gameloop.switchToMenuState();
+            }
+            else {
+                var self = this;
+                var f = function () {
+                    self.switchToMenuState(time, ++count);
+                };
+                setTimeout(f, 1000);
+            }
         };
         return CategoriesController;
     })();
@@ -1007,9 +1193,10 @@ var Game;
 var Game;
 (function (Game) {
     var CategoriesView = (function () {
-        function CategoriesView(context, width, height) {
-            this.category_background = new Image();
-            this.category_background.src = "categories_foreground.png";
+        function CategoriesView(resources, context, width, height) {
+            this.resources = resources;
+            this.category_background = this.resources.category_background;
+            this.category_background1 = this.resources.category_background1;
             this.context = context;
             this.width = width;
             this.height = height;
@@ -1020,10 +1207,7 @@ var Game;
             this.boolCategories = boolcat;
         };
         CategoriesView.prototype.render = function () {
-            var self = this;
-            this.category_background.onload = function () {
-                self.renderCategories(0, self.boolCategories);
-            };
+            this.renderCategories(0, this.boolCategories);
         };
         CategoriesView.prototype.fillRoundedRect = function (x, y, w, h) {
             var r = 20;
@@ -1083,18 +1267,36 @@ var Game;
                 this.drawText(rectX, rectY, width, height, i);
                 tempStartingHeight -= (h + gap);
             }
-            this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+            this.context.drawImage(this.category_background1, 0, 0, this.width, this.height);
         };
-        CategoriesView.prototype.fontLoaded = function () {
-            var what = "kajdshfluakhfasn";
-            var metrics = this.context.measureText(what);
-            var metricsWidth = metrics.width;
-            if (Math.floor(metricsWidth) == 304) {
-                return true;
+        CategoriesView.prototype.renderCategoriesNoImage = function (startingHeight, boolCategories) {
+            var self = this;
+            this.clearCanvas();
+            var screenHeight = this.height - (this.height / 4);
+            var tempStartingHeight = startingHeight;
+            var h = screenHeight / 7;
+            var gap = 10;
+            var startingGap = this.height / 9 + 10;
+            for (var i = 0; i != this.categories.length; ++i) {
+                var width = this.width / 1.2;
+                var height = h;
+                var rectX = this.width / 20;
+                var rectY = startingGap - tempStartingHeight;
+                if (boolCategories[i]) {
+                    this.context.fillStyle = "#00FF00";
+                }
+                else {
+                    this.context.fillStyle = "#FF3300";
+                }
+                this.fillRoundedRect(rectX, rectY, width, height);
+                this.drawText(rectX, rectY, width, height, i);
+                tempStartingHeight -= (h + gap);
             }
-            else {
-                return false;
-            }
+        };
+        CategoriesView.prototype.changeBackground = function (startingHeight) {
+            this.clearCanvas();
+            this.renderCategoriesNoImage(startingHeight, this.boolCategories);
+            this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
         };
         CategoriesView.prototype.clearCanvas = function () {
             this.context.clearRect(0, 0, this.width, this.height);
@@ -1112,23 +1314,25 @@ var Game;
 /// <reference path="Model.ts" />
 /// <reference path="GameOne.ts" />
 /// <reference path="GameTwo.ts" />
+/// <reference path="Resources.ts" />
 var Game;
 (function (Game) {
     var GameLoop = (function () {
         function GameLoop(canvas, context, width, height) {
+            this.resources = new Game.Resources();
             this.canvas = canvas;
             this.context = this.canvas.getContext('2d');
             this.width = width;
             this.height = height;
             this.model = new Game.GameOne();
-            this.controller = new Game.MenuController(this, canvas, width, height, this.model);
-            this.view = new Game.MenuView(context, width, height, 1, this.model);
+            this.view = new Game.MenuView(this.resources, context, width, height, 1);
+            this.controller = new Game.MenuController(this, canvas, width, height, this.model, this.view);
             this.gameOne = new Game.GameOne();
             this.gameTwo = new Game.GameTwo();
             this.currentGame = 1;
         }
         GameLoop.prototype.runGame = function () {
-            if (this.view.checkIfImageLoaded()) {
+            if (this.resources.hasLoaded()) {
                 this.controller.takeInput();
                 this.view.render(this.currentGame);
             }
@@ -1143,18 +1347,20 @@ var Game;
         GameLoop.prototype.switchGameModes = function () {
             if (this.model instanceof Game.GameOne) {
                 this.model = this.gameTwo;
+                this.view.gameMode = 2;
                 this.currentGame = 2;
                 this.view.render(2);
             }
             else if (this.model instanceof Game.GameTwo) {
                 this.model = this.gameOne;
+                this.view.gameMode = 1;
                 this.currentGame = 1;
                 this.view.render(1);
             }
         };
         GameLoop.prototype.switchToGameState = function () {
             this.model.clearVariables();
-            var newView = new Game.GameView(this.context, this.width, this.height, this.model);
+            var newView = new Game.GameView(this.resources, this.context, this.width, this.height, this.model);
             this.view = newView;
             this.model.setGameView(newView);
             var newController = new Game.GameController(this, this.canvas, this.width, this.height, this.model);
@@ -1162,18 +1368,18 @@ var Game;
             this.controller.takeInput();
         };
         GameLoop.prototype.switchToCategoriesState = function () {
-            var newView = new Game.CategoriesView(this.context, this.width, this.height); //add model
+            var newView = new Game.CategoriesView(this.resources, this.context, this.width, this.height); //add model
             this.view = newView;
             var newController = new Game.CategoriesController(this, this.canvas, this.width, this.height, this.model, newView);
             this.controller = newController;
-            this.controller.takeInput();
             this.view.render();
+            this.controller.takeInput();
         };
         GameLoop.prototype.switchToMenuState = function () {
-            var newView = new Game.MenuView(this.context, this.width, this.height, this.currentGame, this.model);
+            var newView = new Game.MenuView(this.resources, this.context, this.width, this.height, this.currentGame);
             this.view = newView;
             this.view.render(this.currentGame);
-            var newController = new Game.MenuController(this, this.canvas, this.width, this.height, this.model);
+            var newController = new Game.MenuController(this, this.canvas, this.width, this.height, this.model, newView);
             this.controller = newController;
             this.controller.takeInput();
         };

@@ -1,7 +1,6 @@
 module Game{
 	export class CategoriesView{
 	
-		category_background = new Image();
 		context;
 		width;
 		height;
@@ -9,9 +8,14 @@ module Game{
 		categories;
 		boolCategories:boolean[];
 		font;
+		category_background;
+		category_background1;
+		resources;
 	
-		constructor(context,width,height){
-			this.category_background.src = "categories_foreground.png";
+		constructor(resources,context,width,height){
+			this.resources = resources;
+			this.category_background = this.resources.category_background;
+			this.category_background1 = this.resources.category_background1;
 			this.context = context;
 			this.width = width;
 			this.height = height;
@@ -23,10 +27,7 @@ module Game{
 		}
 		
 		render(){
-			var self = this;
-			this.category_background.onload = function(){ 
-				self.renderCategories(0,self.boolCategories);
-			}
+			this.renderCategories(0,this.boolCategories);
 		}
 		fillRoundedRect(x, y,w,h){
 			var r = 20;
@@ -91,17 +92,36 @@ module Game{
 				this.drawText(rectX,rectY,width,height,i);   
 				tempStartingHeight -= (h+gap);
 			}
-			this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+			this.context.drawImage(this.category_background1, 0, 0, this.width, this.height);
     	}
-    	fontLoaded():boolean{
-    		var what = "kajdshfluakhfasn";
-    		var metrics = this.context.measureText(what);
-      		var metricsWidth = metrics.width;
-      		if(Math.floor(metricsWidth) == 304){
-      			return true;
-      		}else{
-      			return false;
-      		}
+    	renderCategoriesNoImage(startingHeight,boolCategories){
+    		var self = this;
+    		this.clearCanvas()
+    		var screenHeight = this.height - (this.height/4);
+    		var tempStartingHeight = startingHeight;
+    		var h = screenHeight/7;
+    		var gap = 10;
+    		var startingGap = this.height/9 + 10;
+			for(var i = 0; i != this.categories.length;++i){
+				var width = this.width/1.2;
+				var height = h;
+				var rectX = this.width / 20;
+				var rectY = startingGap-tempStartingHeight;
+				if(boolCategories[i]){
+					this.context.fillStyle = "#00FF00";
+				}else{
+					this.context.fillStyle = "#FF3300";
+				}
+				this.fillRoundedRect(rectX,rectY,width,height);
+				this.drawText(rectX,rectY,width,height,i);   
+				tempStartingHeight -= (h+gap);
+			}
+    	
+    	}
+    	changeBackground(startingHeight){	
+    		this.clearCanvas();
+    		this.renderCategoriesNoImage(startingHeight,this.boolCategories)
+    		this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
     	}
     	clearCanvas(){
 			this.context.clearRect(0, 0, this.width, this.height);

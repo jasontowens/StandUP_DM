@@ -3,18 +3,7 @@
 /// <reference path="GameTwo.ts" />
 module Game{
 	export class GameView{
-	
-		game_background = new Image();
-		game_background2 = new Image();
-		forehead = new Image();
-		pass = new Image();
-		roundPicking = new Image();
-		correct = new Image();
-		endGame_background = new Image();
-		rightArrow = new Image();
-		leftArrow = new Image();
-		rightArrowPressed = new Image();
-		leftArrowPressed = new Image();
+		resources;
 		context;
 		width;
 		height;
@@ -23,29 +12,42 @@ module Game{
 		slideRightAnimation;
 		slideLeftAnimation;
 		bouncingHeight;
+		
+		game_background;
+		game_background2;
+		forehead;
+		pass;
+		roundPicking;
+		correct;
+		endGame_background;
+		rightArrow;
+		leftArrow;
+		rightArrowPressed;
+		leftArrowPressed;
+		balloon;
 	
-		constructor(context,width,height,model){
-			this.game_background.src = "InGame.png";
-			this.game_background2.src = "InGame2.png";
-			this.roundPicking.src = "RoundPickingBackground.png";
-			this.forehead.src = "forehead.png";
-			this.pass.src = "pass.png";
-			this.correct.src = "correct.png";
-			this.endGame_background.src = "endGame.png";
-			this.rightArrow.src ="rightArrow.png";
-			this.leftArrow.src = "leftArrow.png";
-			this.rightArrowPressed.src = "rightArrowClicked.png";
-			this.leftArrowPressed.src = "leftArrowClicked.png";
+		constructor(resources,context,width,height,model){
+			this.resources = resources;
+			this.game_background = this.resources.game_background;
+			this.game_background2 = this.resources.game_background2;
+			this.forehead = this.resources.forehead;
+			this.pass = this.resources.pass;
+			this.roundPicking = this.resources.roundPicking;
+			this.correct = this.resources.correct;
+			this.endGame_background = this.resources.endGame_background;
+			this.rightArrow = this.resources.rightArrow;
+			this.leftArrow = this.resources.leftArrow;
+			this.rightArrowPressed = this.resources.rightArrowPressed;
+			this.leftArrowPressed = this.resources.leftArrowPressed;
+			this.balloon = this.resources.balloon;
 			this.context = context;
 			this.width = width;
 			this.height = height;
 			this.model = model;
+			
 		}
 		renderForehead(){
-			var self = this;
-			this.forehead.onload = function(){
-					self.context.drawImage(self.forehead, 0, 0, self.width, self.height);
-			}
+			this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
 		}
 		renderCountdown(timeLeft){
 			this.clearCanvas();
@@ -95,26 +97,104 @@ module Game{
 			this.printTimeTwo(teamTime,activeTeam);
 		
 		}
+		
+		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count){
+			var balloon_height = 100/667*this.height;
+			var balloon_width = 95/375 * this.width;
+			var w1 = 30/375 * this.width;
+			var w2 = 160/375 * this.width;
+			var w3 = 300/375 * this.width;
+			var t;
+			if(this.balloonsInvisible(h1,h2,h3) || count == 0){//generate random starting heights
+				if(this.whichOneInvisible(h1,h2,h3) == 1){
+					h1 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s1 = Math.floor((Math.random() * 9)+4);
+				}
+				if(this.whichOneInvisible(h1,h2,h3) == 2){
+					h2 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s2 = Math.floor((Math.random() * 9)+4);
+				}
+				if(this.whichOneInvisible(h1,h2,h3) == 3){
+					h3 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s3 = Math.floor((Math.random() * 9)+4);
+				}else if (count == 0){
+					h1 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s1 = Math.floor((Math.random() * 9)+4);
+					h2 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s2 = Math.floor((Math.random() * 9)+4);
+					h3 = Math.floor((Math.random() * this.height + balloon_height + 50)+this.height );
+					s3 = Math.floor((Math.random() * 9)+4);
+				}
+			}
+			if(this.canIDrawBalloons()){
+				this.clearCanvas();
+				this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+				this.context.drawImage(this.balloon,w1,h1,balloon_width,balloon_height);
+				this.context.drawImage(this.balloon,w2,h2,balloon_width,balloon_height);
+				this.context.drawImage(this.balloon,w3,h3,balloon_width,balloon_height);
+				print();
+				h1-=s1;
+				h2-=s2;
+				h3-=s3;
+				var self = this;
+				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count)};
+				t = setTimeout(hm,1000/60);
+			}else{
+				clearTimeout(t);
+			}
+		
+		}
+		canIDrawBalloons():boolean{
+			if(this.model instanceof GameOne){
+				return false;
+			
+			}else{
+			    console.log(this.model.gameOver || this.model.inBetweenRounds);
+				return (this.model.gameOver || this.model.inBetweenRounds);
+			}
+		}
+		whichOneInvisible(h1,h2,h3):number{
+			var balloon_height = 100/667*this.height;
+			if(h1 < - balloon_height){
+				return 1;
+			}
+			if(h2 < - balloon_height){
+				return 2;
+			}
+			if(h3 < - balloon_height){
+				return 3;
+			}
+		
+		}
+		balloonsInvisible(h1,h2,h3):boolean{
+			var balloon_height = 100/667*this.height;
+			return (h1 < -balloon_height || h2 < -balloon_height || h3 < -balloon_height);
+			
+		}
 		renderInBetweenRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
 			this.clearCanvas();
-			this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+			var self = this;
+			var f = function(){self.printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds)};
+			this.balloonAnimation(f,0,0,0,0,0,0,0)
+		}
+		
+		printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
 			this.context.font = "50px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
+			this.context.fillStyle = "blue";
 			this.context.fillText("ROUND " + currentRound+ "/" + totalRounds, this.width/2, this.height/4);
+			this.context.font = "40px AG Book Rounded";
 			this.context.fillText("Team 1", this.width/4, this.height/2);
 			this.context.fillText("Team 2", 3*this.width/4, this.height/2);
-			this.context.fillText(teamOneScore, this.width/4, 3*this.height/4);
-			this.context.fillText(teamTwoScore, 3*this.width/4, 3*this.height/4);
-		
+			this.context.fillText(teamOneScore, this.width/4, this.height/1.8);
+			this.context.fillText(teamTwoScore, 3*this.width/4, this.height/1.8);
 		}
 		renderRoundNumber(height,rounds,up){
-		var self = this;
-			this.roundPicking.onload = function(){
-					self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
-					self.renderRoundNumber1(height,rounds,up);
-			}
+			this.context.drawImage(this.roundPicking, 0, 0, this.width, this.height);
+			this.renderRoundNumber1(height,rounds,up);	
 		}
+		
 		renderRoundNumber1(height,rounds,up){
 			var self = this;
 			
@@ -145,8 +225,7 @@ module Game{
 		
 		}
 		clickRightArrow(){
-			//this.context.drawImage(this.rightArrowPressed, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
-			//this.context.drawImage(this.rightArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			
 		}
 		slideLeft(rounds1,rounds2,width1,width2){
 			this.clearCanvas();
@@ -166,8 +245,8 @@ module Game{
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
-			self.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
-			self.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			
 			
 		}
@@ -189,8 +268,8 @@ module Game{
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
-			self.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
-			self.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 		}
 		renderSelectedRoundNumber(){
 			clearTimeout(this.bouncingAnimation);
@@ -200,8 +279,14 @@ module Game{
 		}
 		renderGameOverTwo(score1,score2){
 			this.clearCanvas();
+			var self = this;
+			var f = function(){self.printGameOverTwo(score1,score2)};
+			this.balloonAnimation(f,0,0,0,0,0,0,0); 	
+			
+		}
+		printGameOverTwo(score1,score2){
 			this.context.drawImage(this.endGame_background, 0,0,this.width,this.height);
-			this.context.font = "50px AG Book Rounded";
+			this.context.font = "40px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
 			if(score1>score2){
@@ -211,7 +296,6 @@ module Game{
 			}else{
 				this.context.fillText("TEAM 2 WINS!", this.width/2, this.height/3);
 			}
-			
 		}
 		renderGameOver(numItems:number,playedWords:string[],correct:boolean){
 			this.clearCanvas();
@@ -289,7 +373,7 @@ module Game{
 						line = testLine;
 					}
 				}
-					context.fillText(line, x, y);
+					context.fillText(line, x, y-5);
 					y += lineHeight;
 			}
 		}
@@ -312,10 +396,5 @@ module Game{
 			  this.context.restore();
 		}
 
-		
-		
-
-		
-		
 	}
 }

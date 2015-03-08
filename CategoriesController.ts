@@ -26,15 +26,23 @@ module Game{
 			this.model = model;
 			this.categoriesView = categoriesView;
 			this.categoriesView.setCategories(this.model.Categories,this.model.chosenCategories);
-			//this.categoriesView.renderCategories(Math.round(1),this.model.chosenCategories)
 		}
 		takeInput(){
 			this.Scrolling = <any>this.Scrolling.bind(this);
 			this.endScrolling = <any>this.endScrolling.bind(this);
-			this.updateGame = <any>this.updateGame.bind(this);
+			this.startClick = <any>this.startClick.bind(this);
+			this.canvas.addEventListener("touchstart",this.startClick);
 			this.canvas.addEventListener("touchmove",this.Scrolling);
 			this.canvas.addEventListener("touchend",this.endScrolling);
-			this.canvas.addEventListener("click",this.updateGame); 
+		}
+		startClick(event){
+			event.preventDefault();
+			var canvas_x = event.targetTouches[0].pageX;
+			var canvas_y = event.targetTouches[0].pageY;
+			this.startX = canvas_x;
+			this.startY = canvas_y;
+			this.endY = canvas_y;
+			this.endX = canvas_x;
 		}
 		Scrolling(event){
 			event.preventDefault();
@@ -59,7 +67,6 @@ module Game{
 				else{
 					this.startingHeight = newStartingHeight;
 				}
-				console.log("hi" + canvas_y);
 				this.categoriesView.renderCategories(Math.round(this.startingHeight),this.model.chosenCategories);
 				
 			}
@@ -74,16 +81,22 @@ module Game{
 		
 		endScrolling(event){
 			this.fingerLifted = true;
+			console.log(this.startX + " " + this.endX);
+			if(Math.abs(this.startX - this.endX)< 5){
+				if(Math.abs(this.startY - this.endY) < 5){
+					this.updateGame(this.endY)
+				}
+			}
 		}
 		 
-		 updateGame(event){
-		 	var canvas_y = event.y;
-			canvas_y -= this.canvas.offsetTop;
+		 updateGame(canvas_y){
+		 	//var canvas_y = event.y;
+			//canvas_y -= this.canvas.offsetTop;
 			var screenHeight = this.height - (this.height/4);
 			var buttonHeight = screenHeight/7;
 			var gap = 10;
     		var startingGap = this.height/9 + 10;
-    		var menuButton = (550/667)*this.height;
+    		var menuButton = (540/667)*this.height;
     		var click = this.startingHeight + canvas_y;
     		if(click > startingGap && canvas_y <= menuButton){
 				var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
@@ -91,7 +104,8 @@ module Game{
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)
 			}
 			if(canvas_y > menuButton){	
-				this.switchToMenuState();
+				var time = new Date().getTime();
+				this.switchToMenuState(time,1);
 			}
 		}
 		 
@@ -99,12 +113,24 @@ module Game{
 		switchStates(){
 			this.canvas.removeEventListener("touchmove",this.Scrolling);
 			this.canvas.removeEventListener("touchend",this.endScrolling);
-			this.canvas.removeEventListener("click",this.updateGame); 
+			this.canvas.removeEventListener("touchstart",this.startClick);
 		}
 	
-		switchToMenuState(){
-			this.switchStates();
-			this.gameloop.switchToMenuState();
+		switchToMenuState(time,count){
+			if(count == 1){
+			console.log("ello");
+				this.categoriesView.changeBackground(this.startingHeight);
+			}
+			if((new Date().getTime()) - time > 1000){
+					this.switchStates();
+					this.gameloop.switchToMenuState();
+				
+			}else{
+				var self = this; 
+				var f = function(){self.switchToMenuState(time,++count)};
+				setTimeout(f,1000);
+			}
+			
 		}
 	}
 }

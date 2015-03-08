@@ -95,7 +95,15 @@ module Game{
 				return categoryToUse; //is an int
 			}
 		 }
-		
+		gameCanStart():boolean{
+			for(var i = 0; i != this.chosenCategories.length; ++i){
+				if(this.chosenCategories[i] == true){
+					console.log(i);
+					return true;
+				}
+			}
+			return false;
+		}
 		 changeChosenCat(i:number){
 			 if(i < this.chosenCategories.length){
 				if(this.chosenCategories[i]){

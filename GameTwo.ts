@@ -23,13 +23,17 @@ module Game{
 			this.playingGame = false;
 			this.activeTeam = 1;
 			this.currentRound = 0;
+			this.inBetweenRounds = false;
 			this.teamOneTimeLeft = 30;
 			this.teamTwoTimeLeft = 30;
+			this.teamOneTotalTime = 0;
+			this.teamTwoTotalTime = 0;
 			this.teamOneScore = 0;
 			this.teamTwoScore = 0;
 			this.totalRoundsOptionNumber = 0;
 			this.teamOneTotalTime = 0;
 			this.teamTwoTotalTime = 0;
+			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
 		}
 		
 		
@@ -44,7 +48,7 @@ module Game{
 			this.teamOneScore = 0;
 			this.teamTwoScore = 0;
 			this.currentRound = 0;
-		
+			this.inBetweenRounds = false;
 			this.totalRoundsOption = [1,3,7,9,11];
 			this.totalRoundsOptionNumber = 0;
 			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber];
@@ -117,6 +121,7 @@ module Game{
 			var f = function(){self.startGameForEachRound()};
 			var timeout = setTimeout(f, 100);
 			if(this.teamOneTimeLeft < 0 || this.teamTwoTimeLeft < 0){
+				this.gameView.canDrawBalloons = true;
 				if(this.currentRound == this.totalRounds){
 					if(this.teamOneTotalTime>this.teamTwoTotalTime){
 						++this.teamTwoScore;
@@ -139,8 +144,7 @@ module Game{
 					this.inBetweenRounds = true;
 					this.gameView.renderInBetweenRounds(this.teamOneScore,this.teamTwoScore,this.currentRound,this.totalRounds);
 				}
-				clearTimeout(timeout);
-				
+				clearTimeout(timeout);	
 			}
 			if(this.newItem){
 				this.playedWords.push(this.currentItem);
