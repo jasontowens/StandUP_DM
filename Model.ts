@@ -87,11 +87,16 @@ module Game{
 			if(usableCategories > 0){	//need at least one category
 				var returnCategory =0;
 				var categoryToUse = Math.floor((Math.random() * usableCategories)); //note: this is OF the usable categories, still need to skip unusable categories
-				for( var i=0; i != categoryToUse; ++i){
+				console.log("category#: "+categoryToUse);
+				var i =0;
+				do{
 					if(this.chosenCategories[i] == false){
 						++categoryToUse; // increments forloop check as it encounters an unused category
 					}
+					++i;
 				}
+				while( i <= categoryToUse);
+				
 				return categoryToUse; //is an int
 			}
 		 }
