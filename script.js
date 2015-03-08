@@ -6,6 +6,8 @@ var Game;
             this.gameloop = gameloop;
             this.canvas = canvas;
             this.model = model;
+            this.height = height;
+            this.width = width;
             this.menuView = menuView;
             this.notEnoughCat = false;
         }
@@ -30,6 +32,7 @@ var Game;
             this.menuView.render(this.gameloop.currentGame);
         };
         MenuController.prototype.click = function (X, Y) {
+<<<<<<< Updated upstream
             if (Y > (210 / 667 * h) && Y < (505 / 667 * h)) {
                 if (X < 275 / 320 * w) {
                     if (Y < 285 / 560 * h && Y > 200 / 667 * h) {
@@ -41,6 +44,19 @@ var Game;
                     } else if (Y < 505 / 560 * h) {
                         //how to play
                     }
+=======
+            if (X < 2 * this.width / 3) {
+                if (Y < 2 * this.height / 7 && Y > this.height / 7) {
+                    this.switchToGameState();
+                }
+                else if (Y < 3 * this.height / 7 && Y > 2 * this.height / 7) {
+                    this.switchToCategoriesState();
+                }
+                else if (Y < 4 * this.height / 7 && Y > 3 * this.height / 7) {
+                    this.gameloop.switchGameModes();
+                }
+                else if (Y < 5 * this.height / 7 && Y > 4 * this.height / 7) {
+>>>>>>> Stashed changes
                 }
             }
         };
@@ -88,6 +104,7 @@ var Game;
             this.category_background1 = new Image();
             this.noCatSel = new Image();
             this.balloon = new Image();
+            this.kids = new Image();
             this.menu_background1.src = "Menu.png";
             this.menu_background2.src = "Menu2.png";
             this.game_background.src = "InGame.png";
@@ -101,13 +118,14 @@ var Game;
             this.leftArrow.src = "leftArrow.png";
             this.rightArrowPressed.src = "rightArrowClicked.png";
             this.leftArrowPressed.src = "leftArrowClicked.png";
-            this.category_background.src = "categories_foreground.png";
+            this.category_background.src = "money.png";
             this.category_background1.src = "categories_foreground_menuselected.png";
             this.noCatSel.src = "noCategorySelected.png";
             this.balloon.src = "balloon.png";
+            this.kids.src = "kids.png";
         }
         Resources.prototype.hasLoaded = function () {
-            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete);
+            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete && this.kids.complete);
         };
         return Resources;
     })();
@@ -120,6 +138,7 @@ var Game;
         function MenuView(resources, context, width, height, gameMode) {
             this.resources = resources;
             this.menu_background1 = this.resources.menu_background1;
+            this.kids = this.resources.kids;
             this.menu_background2 = this.resources.menu_background2;
             this.noCatSel = this.resources.noCatSel;
             this.context = context;
@@ -127,6 +146,7 @@ var Game;
             var self = this;
             this.height = height;
             this.gameMode = gameMode;
+            this.menuOptions = ["Play Game", "Categories", "Game Mode", "Help"];
         }
         MenuView.prototype.renderNotEnoughCategories = function (height, velocity, friction) {
             if (friction == 3) {
@@ -156,10 +176,58 @@ var Game;
         MenuView.prototype.render = function (gameMode) {
             var self = this;
             if (gameMode == 1) {
+<<<<<<< Updated upstream
                 self.context.drawImage(self.menu_background1, 0, 0, self.width, self.height);
             } else {
                 self.context.drawImage(self.menu_background2, 0, 0, self.width, self.height);
+=======
+                this.renderOne();
             }
+            else {
+>>>>>>> Stashed changes
+            }
+        };
+        MenuView.prototype.renderOne = function () {
+            this.context.drawImage(this.kids, 0, 0, this.width, this.height);
+            this.context.globalAlpha = .2;
+            this.context.fillStyle = "black";
+            this.context.fillRect(0, 0, this.width, this.height);
+            this.context.fillStyle = "#1F1F99";
+            this.context.globalAlpha = .7;
+            this.context.fillRect(0, 0, 2 * this.width / 3, this.height);
+            for (var i = 1; i != 6; ++i) {
+                this.context.moveTo(0, i * this.height / 7);
+                this.context.lineTo(2 * this.width / 3, i * this.height / 7);
+                this.context.strokeStyle = "##5C5C5D";
+                this.context.lineWidth = 3;
+                this.context.stroke();
+                if (i == 1) {
+                }
+                else {
+                    var width = 2 * this.width / 3;
+                    this.drawText(0, (i - 1) * this.height / 7, width, this.height / 7, this.menuOptions[i - 2], "white");
+                }
+            }
+            this.context.globalAlpha = 1;
+        };
+        MenuView.prototype.drawText = function (rectX, rectY, width, height, text, color) {
+            var fontSize = 30;
+            var fontSizeString = fontSize.toString();
+            var font = "pt AG Book Rounded";
+            this.context.font = fontSizeString + font;
+            //this.context.textAlign="center"; 
+            this.context.textBaseline = "middle";
+            this.context.fillStyle = color;
+            var metrics = this.context.measureText(text);
+            var metricsWidth = metrics.width;
+            while (metricsWidth >= width) {
+                --fontSize;
+                var fontSizeString = fontSize.toString();
+                this.context.font = fontSizeString + font;
+                metrics = this.context.measureText(text);
+                metricsWidth = metrics.width;
+            }
+            this.context.fillText(text, this.width / 20, rectY + (height / 2));
         };
         return MenuView;
     })();
@@ -456,21 +524,35 @@ var Game;
         GameView.prototype.renderForehead = function () {
             this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
         };
-        GameView.prototype.renderCountdown = function (timeLeft) {
+        GameView.prototype.renderCountdown = function (timeLeft, height, counter) {
             this.clearCanvas();
             this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
             this.drawNumber(timeLeft);
             var self = this;
             var timeout;
+            this.drawCurveyBalloon(height, counter);
             if (timeLeft <= 0) {
                 clearTimeout(timeout);
                 this.model.canChange = true;
+<<<<<<< Updated upstream
             } else {
-                var f = function () {
-                    self.renderCountdown(timeLeft - 1);
-                };
-                timeout = setTimeout(f, 1000);
+=======
             }
+            else {
+                height -= 3;
+                counter += 1;
+>>>>>>> Stashed changes
+                var f = function () {
+                    self.renderCountdown(timeLeft - .01, height, counter);
+                };
+                timeout = setTimeout(f, 10);
+            }
+        };
+        GameView.prototype.drawCurveyBalloon = function (height, counter) {
+            var balloonHeight = 200 * this.height / 667;
+            var balloonWidth = 190 * this.width / 375;
+            var w = 50 * (Math.sin(counter * .02)) + 10;
+            this.context.drawImage(this.balloon, w, height, balloonWidth, balloonHeight);
         };
         GameView.prototype.drawNumber = function (timeLeft) {
             this.rotateContext();
@@ -478,7 +560,11 @@ var Game;
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
             this.context.fillStyle = 'white';
-            this.context.fillText(timeLeft, this.width / 2, this.height / 2);
+            timeLeft = Math.floor(timeLeft);
+            if (timeLeft == -1) {
+                timeLeft = 0;
+            }
+            this.context.fillText(timeLeft, this.width / 2, this.height / 2.4);
             this.context.restore();
         };
         GameView.prototype.renderPass = function () {
@@ -491,7 +577,7 @@ var Game;
 
         GameView.prototype.renderCurrentWordOne = function (currword, currTime) {
             this.clearCanvas();
-            currTime = Math.floor(currTime);
+            currTime = Math.round(currTime);
             this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
             this.printWord(currword);
             this.printTime(currTime);
@@ -504,8 +590,12 @@ var Game;
             this.printWord(currWord);
             this.printTimeTwo(teamTime, activeTeam);
         };
+<<<<<<< Updated upstream
 
         GameView.prototype.balloonAnimation = function (print, h1, h2, h3, s1, s2, s3, count) {
+=======
+        GameView.prototype.balloonAnimation = function (print, h1, h2, h3, s1, s2, s3, count, image) {
+>>>>>>> Stashed changes
             var balloon_height = 100 / 667 * this.height;
             var balloon_width = 95 / 375 * this.width;
             var w1 = 30 / 375 * this.width;
@@ -535,7 +625,7 @@ var Game;
             }
             if (this.canIDrawBalloons()) {
                 this.clearCanvas();
-                this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+                this.context.drawImage(image, 0, 0, this.width, this.height);
                 this.context.drawImage(this.balloon, w1, h1, balloon_width, balloon_height);
                 this.context.drawImage(this.balloon, w2, h2, balloon_width, balloon_height);
                 this.context.drawImage(this.balloon, w3, h3, balloon_width, balloon_height);
@@ -545,7 +635,7 @@ var Game;
                 h3 -= s3;
                 var self = this;
                 var hm = function () {
-                    self.balloonAnimation(print, h1, h2, h3, s1, s2, s3, ++count);
+                    self.balloonAnimation(print, h1, h2, h3, s1, s2, s3, ++count, image);
                 };
                 t = setTimeout(hm, 1000 / 60);
             } else {
@@ -554,9 +644,15 @@ var Game;
         };
         GameView.prototype.canIDrawBalloons = function () {
             if (this.model instanceof Game.GameOne) {
+<<<<<<< Updated upstream
                 return false;
             } else {
                 console.log(this.model.gameOver || this.model.inBetweenRounds);
+=======
+                return (this.model.gameOver);
+            }
+            else {
+>>>>>>> Stashed changes
                 return (this.model.gameOver || this.model.inBetweenRounds);
             }
         };
@@ -582,7 +678,7 @@ var Game;
             var f = function () {
                 self.printRounds(teamOneScore, teamTwoScore, currentRound, totalRounds);
             };
-            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0);
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.game_background);
         };
 
         GameView.prototype.printRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
@@ -628,6 +724,7 @@ var Game;
             this.context.font = "150px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
+            this.context.fillStyle = "blue";
             this.context.fillText(rounds, this.width / 2, height);
         };
         GameView.prototype.clickLeftArrow = function (currTime) {
@@ -683,18 +780,15 @@ var Game;
         GameView.prototype.renderSelectedRoundNumber = function () {
             clearTimeout(this.bouncingAnimation);
         };
-        GameView.prototype.renderNotEnoughCategories = function () {
-        };
         GameView.prototype.renderGameOverTwo = function (score1, score2) {
             this.clearCanvas();
             var self = this;
             var f = function () {
                 self.printGameOverTwo(score1, score2);
             };
-            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0);
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background);
         };
         GameView.prototype.printGameOverTwo = function (score1, score2) {
-            this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
             this.context.font = "40px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
@@ -708,7 +802,13 @@ var Game;
         };
         GameView.prototype.renderGameOver = function (numItems, playedWords, correct) {
             this.clearCanvas();
-            this.context.drawImage(this.endGame_background, 0, 0, this.width, this.height);
+            var self = this;
+            var f = function () {
+                self.printGameOver(numItems, playedWords, correct);
+            };
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background);
+        };
+        GameView.prototype.printGameOver = function (numItems, playedWords, correct) {
             var numCorrect = 0;
             var shiftUp = 0;
 
@@ -724,7 +824,7 @@ var Game;
             }
             this.context.font = "40px AG Book Rounded";
             this.context.fillStyle = "white";
-            this.context.fillText((numCorrect).toString(), this.width / 2, this.height * 1 / 8);
+            this.context.fillText("Score " + (numCorrect) + "/" + numItems, this.width / 2, this.height * 1 / 8);
         };
 
         GameView.prototype.clearCanvas = function () {
@@ -749,6 +849,7 @@ var Game;
         };
 
         GameView.prototype.wrapText = function (context, text, x, y, maxWidth, lineHeight, font) {
+            y -= 10;
             var cars = text.split("\n");
             var lengthgr = false;
             if (text.length > 19) {
@@ -833,7 +934,7 @@ var Game;
         };
         GameOne.prototype.countdown = function () {
             if (this.gameCount == 0) {
-                this.gameView.renderCountdown(3);
+                this.gameView.renderCountdown(3.2, this.gameView.height, 0);
             }
             ++this.gameCount;
         };
@@ -1114,10 +1215,16 @@ var Game;
         CategoriesController.prototype.Scrolling = function (event) {
             event.preventDefault();
             var screenHeight = this.height - (this.height / 4);
+<<<<<<< Updated upstream
             var numCatPages = Math.ceil(this.model.Categories.length / 6);
             var maxHeight = screenHeight * numCatPages;
+=======
+            var buttonHeight = screenHeight / 7;
+            var maxHeight = buttonHeight * this.model.Categories.length;
+>>>>>>> Stashed changes
             var canvas_x = event.targetTouches[0].pageX;
             var canvas_y = event.targetTouches[0].pageY;
+            console.log(this.startingHeight + "sh");
             if (this.fingerLifted) {
                 this.startX = canvas_x;
                 this.startY = canvas_y;
@@ -1127,7 +1234,12 @@ var Game;
                 var newStartingHeight = this.startingHeight + difference;
                 if (newStartingHeight < 0) {
                     this.startingHeight = 0;
+<<<<<<< Updated upstream
                 } else if (newStartingHeight + this.height > (maxHeight)) {
+=======
+                }
+                else if (newStartingHeight + buttonHeight * 4 + -5 > (maxHeight)) {
+>>>>>>> Stashed changes
                     this.startingHeight = this.startingHeight;
                 } else {
                     this.startingHeight = newStartingHeight;
@@ -1157,12 +1269,17 @@ var Game;
             //canvas_y -= this.canvas.offsetTop;
             var screenHeight = this.height - (this.height / 4);
             var buttonHeight = screenHeight / 7;
-            var gap = 10;
-            var startingGap = this.height / 9 + 10;
-            var menuButton = (540 / 667) * this.height;
+            var gap = 0;
+            var startingGap = this.height / 2.8;
+            var menuButton = (560 / 667) * this.height;
             var click = this.startingHeight + canvas_y;
+<<<<<<< Updated upstream
             if (click > startingGap && canvas_y <= menuButton) {
                 var i = Math.floor((click - startingGap) / (buttonHeight + gap));
+=======
+            if (canvas_y > startingGap && canvas_y <= menuButton) {
+                var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
+>>>>>>> Stashed changes
                 this.model.changeChosenCat(i);
                 this.categoriesView.renderCategories(this.startingHeight, this.model.chosenCategories);
             }
@@ -1179,6 +1296,7 @@ var Game;
         };
 
         CategoriesController.prototype.switchToMenuState = function (time, count) {
+<<<<<<< Updated upstream
             if (count == 1) {
                 console.log("ello");
                 this.categoriesView.changeBackground(this.startingHeight);
@@ -1193,6 +1311,10 @@ var Game;
                 };
                 setTimeout(f, 1000);
             }
+=======
+            this.switchStates();
+            this.gameloop.switchToMenuState();
+>>>>>>> Stashed changes
         };
         return CategoriesController;
     })();
@@ -1234,25 +1356,29 @@ var Game;
             this.context.fill();
             this.context.stroke();
         };
-        CategoriesView.prototype.drawText = function (rectX, rectY, width, height, i) {
+        CategoriesView.prototype.drawText = function (rectX, rectY, width, height, text, color) {
             var fontSize = 30;
             var fontSizeString = fontSize.toString();
             this.context.font = fontSizeString + this.font;
             this.context.textAlign = "center";
             this.context.textBaseline = "middle";
-            this.context.fillStyle = "black";
-            var metrics = this.context.measureText(this.categories[i][0]);
+            this.context.fillStyle = color;
+            var metrics = this.context.measureText(text);
             var metricsWidth = metrics.width;
             while (metricsWidth >= width) {
                 --fontSize;
                 var fontSizeString = fontSize.toString();
                 this.context.font = fontSizeString + this.font;
-                metrics = this.context.measureText(this.categories[i][0]);
+                metrics = this.context.measureText(text);
                 metricsWidth = metrics.width;
             }
+<<<<<<< Updated upstream
 
             this.context.fillText(this.categories[i][0], rectX + (width / 2), rectY + (height / 2));
             this.context.fillText(this.categories[i][0], rectX + (width / 2), rectY + (height / 2));
+=======
+            this.context.fillText(text, rectX + (width / 2), rectY + (height / 2));
+>>>>>>> Stashed changes
         };
         CategoriesView.prototype.renderCategories = function (startingHeight, boolCategories) {
             var self = this;
@@ -1261,6 +1387,7 @@ var Game;
             var screenHeight = this.height - (this.height / 4);
             var tempStartingHeight = startingHeight;
             var h = screenHeight / 7;
+<<<<<<< Updated upstream
             var gap = 10;
             var startingGap = this.height / 9 + 10;
 
@@ -1288,25 +1415,40 @@ var Game;
             var h = screenHeight / 7;
             var gap = 10;
             var startingGap = this.height / 9 + 10;
+=======
+            var gap = 0;
+            var startingGap = this.height / 2.8;
+>>>>>>> Stashed changes
             for (var i = 0; i != this.categories.length; ++i) {
-                var width = this.width / 1.2;
+                var width = this.width;
                 var height = h;
-                var rectX = this.width / 20;
+                var rectX = 0;
                 var rectY = startingGap - tempStartingHeight;
                 if (boolCategories[i]) {
                     this.context.fillStyle = "#00FF00";
                 } else {
                     this.context.fillStyle = "#FF3300";
                 }
-                this.fillRoundedRect(rectX, rectY, width, height);
-                this.drawText(rectX, rectY, width, height, i);
+                this.context.globalAlpha = .5;
+                this.context.fillRect(rectX, rectY, width, height);
+                this.context.globalAlpha = 1;
+                this.drawText(rectX, rectY, width, height, this.categories[i][0], "black");
                 tempStartingHeight -= (h + gap);
             }
+            this.drawCategoriesOverLay();
         };
-        CategoriesView.prototype.changeBackground = function (startingHeight) {
-            this.clearCanvas();
-            this.renderCategoriesNoImage(startingHeight, this.boolCategories);
-            this.context.drawImage(this.category_background, 0, 0, this.width, this.height);
+        CategoriesView.prototype.drawCategoriesOverLay = function () {
+            this.context.drawImage(this.category_background, 0, 0, this.width, this.height / 2.8);
+            this.context.globalAlpha = 0.6;
+            this.context.fillStyle = "black";
+            this.context.fillRect(0, 0, this.width, this.height / 2.8);
+            this.context.globalAlpha = 1;
+            this.context.fillRect(0, this.height - (150 * this.height / 667), this.width, 150 * this.height / 667);
+            this.context.globalAlpha = .9;
+            this.drawText(0, this.height - 150 * this.height / 667, this.width, 150 * this.height / 667, "Menu", "white");
+            this.drawText(0, 20, this.width, this.height / 2.8, "Categories", "white");
+            this.context.globalAlpha = 1;
+            this.context.globalAlpha = 1;
         };
         CategoriesView.prototype.clearCanvas = function () {
             this.context.clearRect(0, 0, this.width, this.height);

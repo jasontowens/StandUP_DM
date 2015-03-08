@@ -49,19 +49,29 @@ module Game{
 		renderForehead(){
 			this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
 		}
-		renderCountdown(timeLeft){
+		renderCountdown(timeLeft,height,counter){
 			this.clearCanvas();
 			this.context.drawImage(this.game_background, 0,0,this.width,this.height);
 			this.drawNumber(timeLeft);
 			var self = this;
 			var timeout;
+			this.drawCurveyBalloon(height,counter);
 			if(timeLeft <= 0){
 				clearTimeout(timeout);
 				this.model.canChange = true;
 			}else{
-				var f = function(){self.renderCountdown(timeLeft-1)};
-				timeout = setTimeout(f, 1000);
+				height-=3;
+				counter+=1;
+				var f = function(){self.renderCountdown(timeLeft-.01,height,counter)};
+				timeout = setTimeout(f, 10);
 			}
+		}
+		drawCurveyBalloon(height,counter){
+			var balloonHeight = 200*this.height/667;
+			var balloonWidth = 190*this.width/375;
+			var w = 50*(Math.sin(counter*.02)) + 10;
+			this.context.drawImage(this.balloon,w,height,balloonWidth,balloonHeight);
+
 		}
 		drawNumber(timeLeft){
 			this.rotateContext();
@@ -69,7 +79,11 @@ module Game{
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
 			this.context.fillStyle = 'white';
-			this.context.fillText(timeLeft, this.width/2, this.height/2);
+			timeLeft = Math.floor(timeLeft);
+			if(timeLeft == -1){
+				timeLeft = 0;
+			}
+			this.context.fillText(timeLeft, this.width/2, this.height/2.4);
 			this.context.restore();
 		}
 		renderPass(){
@@ -82,7 +96,7 @@ module Game{
 		
 		renderCurrentWordOne(currword:string,currTime:number){
 			this.clearCanvas();
-			currTime = Math.floor(currTime);
+			currTime = Math.round(currTime);
 			this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
 			this.printWord(currword);
 			this.printTime(currTime);
@@ -98,7 +112,7 @@ module Game{
 		
 		}
 		
-		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count){
+		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count,image){
 			var balloon_height = 100/667*this.height;
 			var balloon_width = 95/375 * this.width;
 			var w1 = 30/375 * this.width;
@@ -128,7 +142,7 @@ module Game{
 			}
 			if(this.canIDrawBalloons()){
 				this.clearCanvas();
-				this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+				this.context.drawImage(image, 0, 0, this.width, this.height);
 				this.context.drawImage(this.balloon,w1,h1,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w2,h2,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w3,h3,balloon_width,balloon_height);
@@ -137,7 +151,7 @@ module Game{
 				h2-=s2;
 				h3-=s3;
 				var self = this;
-				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count)};
+				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count,image)};
 				t = setTimeout(hm,1000/60);
 			}else{
 				clearTimeout(t);
@@ -146,10 +160,9 @@ module Game{
 		}
 		canIDrawBalloons():boolean{
 			if(this.model instanceof GameOne){
-				return false;
+				return (this.model.gameOver);
 			
 			}else{
-			    console.log(this.model.gameOver || this.model.inBetweenRounds);
 				return (this.model.gameOver || this.model.inBetweenRounds);
 			}
 		}
@@ -175,7 +188,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0)
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background)
 		}
 		
 		printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
@@ -219,6 +232,7 @@ module Game{
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
+			this.context.fillStyle = "blue";
 			this.context.fillText(rounds, this.width/2, height);	
 		}
 		clickLeftArrow(currTime){
@@ -274,18 +288,14 @@ module Game{
 		renderSelectedRoundNumber(){
 			clearTimeout(this.bouncingAnimation);
 		}
-		renderNotEnoughCategories(){
-		
-		}
 		renderGameOverTwo(score1,score2){
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printGameOverTwo(score1,score2)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0); 	
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background);	
 			
 		}
 		printGameOverTwo(score1,score2){
-			this.context.drawImage(this.endGame_background, 0,0,this.width,this.height);
 			this.context.font = "40px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
@@ -299,27 +309,29 @@ module Game{
 		}
 		renderGameOver(numItems:number,playedWords:string[],correct:boolean){
 			this.clearCanvas();
-			this.context.drawImage(this.endGame_background, 0,0,this.width,this.height);
+			var self = this;
+			var f = function(){self.printGameOver(numItems,playedWords,correct)};
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background);	
+					
+		}
+		printGameOver(numItems:number,playedWords:string[],correct:boolean){
 			var numCorrect = 0;
 			var shiftUp = 0;
-
-				
 			for(var i = 0; i < numItems; ++i){ 	
-				if(!correct[i]){	//if word was passed
-					this.context.fillStyle = "red";		
-				}
-				else{
-					numCorrect++;
-					this.context.fillStyle = "green";
-				}
-				this.context.font = "20px AG Book Rounded";
-				this.context.fillText(playedWords[i], this.width/2, this.height*1/4+i*23 - shiftUp *23);
+			if(!correct[i]){	//if word was passed
+				this.context.fillStyle = "red";		
+			}
+			else{
+				numCorrect++;
+				this.context.fillStyle = "green";
+			}
+			this.context.font = "20px AG Book Rounded";
+			this.context.fillText(playedWords[i], this.width/2, this.height*1/4+i*23 - shiftUp *23);
 			}
 			this.context.font = "40px AG Book Rounded";
 			this.context.fillStyle = "white";
-			this.context.fillText((numCorrect).toString(), this.width/2, this.height*1/8);		
+			this.context.fillText("Score " + (numCorrect) + "/" + numItems , this.width/2, this.height*1/8);
 		}
-		
 		
 		clearCanvas(){
 			this.context.clearRect(0, 0, this.width, this.height);
@@ -343,6 +355,7 @@ module Game{
 		 }
 		 
 		wrapText(context, text, x, y, maxWidth, lineHeight, font) {
+			y-=10;
 			var cars = text.split("\n");
 			var lengthgr = false;
 			if(text.length > 19 ){

@@ -47,10 +47,11 @@ module Game{
 		Scrolling(event){
 			event.preventDefault();
 			var screenHeight = this.height - (this.height/4);
-			var numCatPages = Math.ceil(this.model.Categories.length / 6);
-			var maxHeight = screenHeight * numCatPages;//fix this once there is new categories
+			var buttonHeight = screenHeight/7;
+			var maxHeight = buttonHeight * this.model.Categories.length;
 			var canvas_x = event.targetTouches[0].pageX;
 			var canvas_y = event.targetTouches[0].pageY;
+			console.log(this.startingHeight + "sh");
 			if(this.fingerLifted){
 				this.startX = canvas_x;
 				this.startY = canvas_y;
@@ -58,10 +59,11 @@ module Game{
 			if(!this.fingerLifted){
 				var difference = this.oldY - canvas_y;
 				var newStartingHeight = this.startingHeight+difference;
+				
 				if(newStartingHeight < 0){
 					this.startingHeight = 0;
 				}
-				else if(newStartingHeight + this.height > (maxHeight)){
+				else if(newStartingHeight + buttonHeight*4 + -5 > (maxHeight)){
 					this.startingHeight = this.startingHeight;
 				}
 				else{
@@ -94,11 +96,11 @@ module Game{
 			//canvas_y -= this.canvas.offsetTop;
 			var screenHeight = this.height - (this.height/4);
 			var buttonHeight = screenHeight/7;
-			var gap = 10;
-    		var startingGap = this.height/9 + 10;
-    		var menuButton = (540/667)*this.height;
+			var gap = 0;
+    		var startingGap = this.height/2.8;
+    		var menuButton = (560/667)*this.height;
     		var click = this.startingHeight + canvas_y;
-    		if(click > startingGap && canvas_y <= menuButton){
+    		if(canvas_y > startingGap && canvas_y <= menuButton){
 				var i = Math.floor((click - startingGap) / (buttonHeight + gap)); // i
 				this.model.changeChosenCat(i);
 				this.categoriesView.renderCategories(this.startingHeight,this.model.chosenCategories)
@@ -117,20 +119,10 @@ module Game{
 		}
 	
 		switchToMenuState(time,count){
-			if(count == 1){
-			console.log("ello");
-				this.categoriesView.changeBackground(this.startingHeight);
-			}
-			if((new Date().getTime()) - time > 1000){
-					this.switchStates();
-					this.gameloop.switchToMenuState();
-				
-			}else{
-				var self = this; 
-				var f = function(){self.switchToMenuState(time,++count)};
-				setTimeout(f,1000);
-			}
-			
+			this.switchStates();
+			this.gameloop.switchToMenuState();
 		}
+			
+		
 	}
 }

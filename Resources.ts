@@ -18,6 +18,7 @@ module Game{
 		category_background1 = new Image();
 		noCatSel = new Image();
 		balloon = new Image();
+		kids = new Image();
 		
 		constructor(){
 			this.menu_background1.src = "Menu.png";
@@ -33,10 +34,11 @@ module Game{
 			this.leftArrow.src = "leftArrow.png";
 			this.rightArrowPressed.src = "rightArrowClicked.png";
 			this.leftArrowPressed.src = "leftArrowClicked.png";
-			this.category_background.src = "categories_foreground.png";
+			this.category_background.src = "money.png";
 			this.category_background1.src = "categories_foreground_menuselected.png";
 			this.noCatSel.src = "noCategorySelected.png";
 			this.balloon.src = "balloon.png";
+			this.kids.src = "kids.png";
 		
 		}
 		hasLoaded():boolean{
@@ -55,7 +57,8 @@ module Game{
 			this.category_background.complete &&
 			this.category_background1.complete &&
 			this.noCatSel.complete &&
-			this.balloon.complete)
+			this.balloon.complete &&
+			this.kids.complete)
 		}
 		
 	}

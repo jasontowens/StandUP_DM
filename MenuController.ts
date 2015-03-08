@@ -14,6 +14,8 @@ module Game{
 			this.gameloop = gameloop;
 			this.canvas = canvas;
 			this.model = model
+			this.height = height;
+			this.width = width;
 			this.menuView = menuView;
 			this.notEnoughCat = false;
 		}
@@ -38,22 +40,22 @@ module Game{
 			this.menuView.render(this.gameloop.currentGame);
 		}
 		click(X,Y){
-			if(Y>(210/667*h) && Y<(505/667*h)){	
-				if(X<275/320*w){
-					if(Y<285/560*h && Y>200/667*h){	
-						this.switchToGameState();		
-					}
-					else if(Y<350/560*h){
-						this.switchToCategoriesState();	
-					}
-					else if(Y<435/560*h){
-						this.gameloop.switchGameModes();
-					}
-					else if(Y<505/560*h){
-						//how to play
-					}
+			
+			if(X<2*this.width/3){
+				if(Y<2*this.height/7 && Y>this.height/7){
+					this.switchToGameState();		
+				}
+				else if(Y<3*this.height/7 && Y>2*this.height/7){
+					this.switchToCategoriesState();	
+				}
+				else if(Y<4*this.height/7 && Y>3*this.height/7){
+					this.gameloop.switchGameModes();
+				}
+				else if(Y<5*this.height/7 && Y>4*this.height/7){
+					//how to play
 				}
 			}
+			
 		 }
 		 
 		 

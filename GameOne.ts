@@ -32,7 +32,7 @@ module Game{
 		}
 		countdown(){
 			if(this.gameCount == 0){
-				this.gameView.renderCountdown(3);
+				this.gameView.renderCountdown(3.2,this.gameView.height,0);
 			}
 			++this.gameCount;
 		}
