@@ -23,6 +23,7 @@ module Game{
 		animationTwo:boolean;
 		animationThree:boolean;
 		buttons;
+		buttons2;
 		
 		balloonHeight;
 		
@@ -50,6 +51,7 @@ module Game{
 			this.animationThree = false;
 			this.youCanClick = false;
 			this.balloonHeight = this.height*200/667;
+			this.buttons2 = this.resources.buttons2;
 		}
 		renderNotEnoughCategories(height,velocity,friction){
 			clearTimeout(this.balloonAnimation);
@@ -78,13 +80,17 @@ module Game{
 			this.context.clearRect(0, 0, this.width, this.height);
 		}
 		drawBackGround(){
+			this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);	
+		}
+		drawButtons(){
 			if(this.gameMode == 1){
-				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
-			
+				this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				
 			}else{
-				this.context.drawImage(this.menu_background2, 0, 0, this.width, this.height);
+				this.context.drawImage(this.buttons2,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
 			}
 		}
+		
 		render(gameMode){
 			if(this.balloonAnimation){
 				clearTimeout(this.balloonAnimation);
@@ -129,7 +135,7 @@ module Game{
 				this.clearCanvas();
 				this.drawBackGround();
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
-			this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				this.drawButtons();
 				height-=.1;
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
@@ -138,7 +144,7 @@ module Game{
 				this.clearCanvas();
 				this.drawBackGround();
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
-				this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				this.drawButtons();
 				height+=.1;
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};

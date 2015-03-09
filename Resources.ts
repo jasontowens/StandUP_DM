@@ -4,6 +4,7 @@ module Game{
 		menu_background1 = new Image();
 		menu_background2 = new Image();
 		buttons = new Image();
+		buttons2 = new Image();
 		game_background = new Image();
 		game_background2 = new Image();
 		forehead = new Image();
@@ -49,6 +50,7 @@ module Game{
 			this.slime.src = "slime.png";
 			this.blueBackground.src = "blueBackground.png";
 			this.buttons.src = "buttons.png";
+			this.buttons2.src = "buttons2.png";
 			
 		
 		}
@@ -74,7 +76,8 @@ module Game{
 			this.blueBackground.complete &&
 			this.slime.complete &&
 			this.kids.complete &&
-			this.buttons.complete);
+			this.buttons.complete&&
+			this.buttons2.complete);
 		}
 		
 	}

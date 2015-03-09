@@ -78,6 +78,7 @@ var Game;
             this.menu_background1 = new Image();
             this.menu_background2 = new Image();
             this.buttons = new Image();
+            this.buttons2 = new Image();
             this.game_background = new Image();
             this.game_background2 = new Image();
             this.forehead = new Image();
@@ -121,9 +122,10 @@ var Game;
             this.slime.src = "slime.png";
             this.blueBackground.src = "blueBackground.png";
             this.buttons.src = "buttons.png";
+            this.buttons2.src = "buttons2.png";
         }
         Resources.prototype.hasLoaded = function () {
-            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete && this.orangeBackground.complete && this.stand.complete && this.blueBackground.complete && this.slime.complete && this.kids.complete && this.buttons.complete);
+            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete && this.orangeBackground.complete && this.stand.complete && this.blueBackground.complete && this.slime.complete && this.kids.complete && this.buttons.complete && this.buttons2.complete);
         };
         return Resources;
     })();
@@ -156,6 +158,7 @@ var Game;
             this.animationThree = false;
             this.youCanClick = false;
             this.balloonHeight = this.height * 200 / 667;
+            this.buttons2 = this.resources.buttons2;
         }
         MenuView.prototype.renderNotEnoughCategories = function (height, velocity, friction) {
             clearTimeout(this.balloonAnimation);
@@ -186,11 +189,14 @@ var Game;
             this.context.clearRect(0, 0, this.width, this.height);
         };
         MenuView.prototype.drawBackGround = function () {
+            this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
+        };
+        MenuView.prototype.drawButtons = function () {
             if (this.gameMode == 1) {
-                this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
+                this.context.drawImage(this.buttons, this.width / 4, this.height / 2.5, this.width / 2, this.height / 2.4);
             }
             else {
-                this.context.drawImage(this.menu_background2, 0, 0, this.width, this.height);
+                this.context.drawImage(this.buttons2, this.width / 4, this.height / 2.5, this.width / 2, this.height / 2.4);
             }
         };
         MenuView.prototype.render = function (gameMode) {
@@ -235,7 +241,7 @@ var Game;
                 this.clearCanvas();
                 this.drawBackGround();
                 this.context.drawImage(this.balloon, this.width - this.width * 230 / 375, height, this.width * 280 / 375, this.height * 320 / 667);
-                this.context.drawImage(this.buttons, this.width / 4, this.height / 2.5, this.width / 2, this.height / 2.4);
+                this.drawButtons();
                 height -= .1;
                 var self = this;
                 var f = function () {
@@ -247,7 +253,7 @@ var Game;
                 this.clearCanvas();
                 this.drawBackGround();
                 this.context.drawImage(this.balloon, this.width - this.width * 230 / 375, height, this.width * 280 / 375, this.height * 320 / 667);
-                this.context.drawImage(this.buttons, this.width / 4, this.height / 2.5, this.width / 2, this.height / 2.4);
+                this.drawButtons();
                 height += .1;
                 var self = this;
                 var f = function () {
