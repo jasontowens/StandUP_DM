@@ -120,7 +120,7 @@ module Game{
 		 }
 		 randomWordInCategory(currentCategory){	//returns a random word in give category (parameter is int)
 			var sizeOfCategory = this.Categories[currentCategory].length;
-			var currentItemNumber = Math.floor((Math.random() * sizeOfCategory-1))+1;//location in select category of used word, should not be 0 because of category name
+			var currentItemNumber = Math.floor((Math.random() * (sizeOfCategory-1)))+1;//location in select category of used word, should not be 0 because of category name
 			
 			return this.Categories[currentCategory][currentItemNumber];
 		 }

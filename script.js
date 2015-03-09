@@ -474,7 +474,7 @@ var Game;
         };
         Model.prototype.randomWordInCategory = function (currentCategory) {
             var sizeOfCategory = this.Categories[currentCategory].length;
-            var currentItemNumber = Math.floor((Math.random() * sizeOfCategory - 1)) + 1;
+            var currentItemNumber = Math.floor((Math.random() * (sizeOfCategory - 1))) + 1;
 
             return this.Categories[currentCategory][currentItemNumber];
         };
