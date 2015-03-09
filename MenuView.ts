@@ -37,7 +37,7 @@ module Game{
 			this.slime = this.resources.slime;
 			this.menu_background1 = this.resources.menu_background1;
 			this.kids = this.resources.kids;
-			this.menu_background2 = this.resources.menu_background2;
+			//this.menu_background2 = this.resources.menu_background2;
 			this.arrow = this.resources.leftArrowPressed;
 			this.noCatSel = this.resources.noCatSel;
 			this.context = context;
@@ -82,7 +82,7 @@ module Game{
 				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
 			
 			}else{
-				this.context.drawImage(this.menu_background2, 0, 0, this.width, this.height);
+				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
 			}
 		}
 		render(gameMode){
@@ -93,7 +93,7 @@ module Game{
 				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
 			
 			}else{
-				this.context.drawImage(this.menu_background2, 0, 0, this.width, this.height);
+				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
 			}
 			
 			var targetHeightTop = this.height*180/667;
@@ -129,7 +129,7 @@ module Game{
 				this.clearCanvas();
 				this.drawBackGround();
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
-			this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+			this.context.drawImage(this.buttons,0/*was this.width*/,this.height/3,this.width/2,this.height/2.4);
 				height-=.1;
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
@@ -138,7 +138,7 @@ module Game{
 				this.clearCanvas();
 				this.drawBackGround();
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
-				this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				this.context.drawImage(this.buttons,0,this.height/3,this.width/2,this.height/2.4);
 				height+=.1;
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
