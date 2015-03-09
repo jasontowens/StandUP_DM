@@ -94,7 +94,15 @@ module Game{
 			console.log(startingHeight);
 			//jason help
 			this.context.globalAlpha = .7;
-			this.context.fillRect(this.width - 10*this.width/375,startingGap + (startingHeight)*(.5),10*this.width/375,h);
+			var sizeOfAllCategoryBoxes = h * self.categories.length;
+			var bottomStartingHeight = sizeOfAllCategoryBoxes - 4*h;
+			//bottom y value of scroll bar is startingGap + 3*h
+			//startingHeight = 0 to bottomStartingHeight
+			var scrollBarY = startingHeight/bottomStartingHeight*3*h + startingGap; //was startingGap + (startingHeight)*(.5)
+			if(scrollBarY > startingGap + 3*h){
+				scrollBarY = startingGap + 3*h;
+			}
+			this.context.fillRect(this.width - 10*this.width/375, scrollBarY,10*this.width/375,h);
 			this.context.globalAlpha = 1;
 			this.drawCategoriesOverLay();
     	}
