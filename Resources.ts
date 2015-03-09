@@ -19,10 +19,14 @@ module Game{
 		noCatSel = new Image();
 		balloon = new Image();
 		kids = new Image();
+		orangeBackground = new Image();
+		stand = new Image();
+		slime = new Image();
+		blueBackground = new Image();
 		
 		constructor(){
-			this.menu_background1.src = "Menu.png";
-			this.menu_background2.src = "Menu2.png";
+			this.menu_background1.src = "thenewMenu.png";
+			this.menu_background2.src = "thenewMenu2.png";
 			this.game_background.src = "InGame.png";
 			this.game_background2.src = "InGame2.png";
 			this.roundPicking.src = "RoundPickingBackground.png";
@@ -39,6 +43,11 @@ module Game{
 			this.noCatSel.src = "noCategorySelected.png";
 			this.balloon.src = "balloon.png";
 			this.kids.src = "kids.png";
+			this.orangeBackground.src = "orangeBack.png";
+			this.stand.src = "stand.png";
+			this.slime.src = "slime.png";
+			this.blueBackground.src = "blueBackground.png";
+			
 		
 		}
 		hasLoaded():boolean{
@@ -58,6 +67,10 @@ module Game{
 			this.category_background1.complete &&
 			this.noCatSel.complete &&
 			this.balloon.complete &&
+			this.orangeBackground.complete &&
+			this.stand.complete &&
+			this.blueBackground.complete &&
+			this.slime.complete &&
 			this.kids.complete)
 		}
 		

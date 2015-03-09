@@ -29,21 +29,21 @@ module Game{
 		render(){
 			this.renderCategories(0,this.boolCategories);
 		}
-		fillRoundedRect(x, y,w,h){
-			var r = 20;
+		fillRoundedRect(x, y,width,height){
+			var radius = 20;
 			this.context.beginPath();
-			this.context.moveTo(x+r, y);
-			this.context.lineTo(x+w-r, y);
-			this.context.quadraticCurveTo(x+w, y, x+w, y+r);
-			this.context.lineTo(x+w, y+h-r);
-			this.context.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-			this.context.lineTo(x, y+h);
-			this.context.lineTo(x, y);
-			this.context.closePath();
-			this.context.strokeStyle = "black";
-    		this.context.lineWidth   = 5;
-			this.context.fill();
-			this.context.stroke();     
+  			this.context.moveTo(x + radius, y);
+  			this.context.lineTo(x + width - radius, y);
+  			this.context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  			this.context.lineTo(x + width, y + height - radius);
+  			this.context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  			this.context.lineTo(x + radius, y + height);
+			this.context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  			this.context.lineTo(x, y + radius);
+  			this.context.quadraticCurveTo(x, y, x + radius, y);
+  			this.context.closePath();
+  			this.context.fillStyle = "black";
+  			this.context.fill();
     	}
     	drawText(rectX,rectY,width,height,text,color){
     		var fontSize = 30;
@@ -69,6 +69,8 @@ module Game{
 			var self = this;
     		this.clearCanvas()
     		var screenHeight = this.height - (this.height/4);
+    		var buttonHeight = screenHeight/7;
+    		var totalScreenHeight = buttonHeight/4;
     		var tempStartingHeight = startingHeight;
     		var h = screenHeight/7;
     		var gap = 0;
@@ -89,6 +91,11 @@ module Game{
 				this.drawText(rectX,rectY,width,height,this.categories[i][0],"black");   
 				tempStartingHeight -= (h+gap);
 			}
+			console.log(startingHeight);
+			//jason help
+			this.context.globalAlpha = .7;
+			this.context.fillRect(this.width - 10*this.width/375,startingGap + (startingHeight)*(.5),10*this.width/375,h);
+			this.context.globalAlpha = 1;
 			this.drawCategoriesOverLay();
     	}
     
