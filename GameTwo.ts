@@ -79,7 +79,7 @@ module Game{
 			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber%5];
 		}
 		beginGame(height){
-			this.gameView.renderRoundNumber(height/1.7,(height/1.7)-(20*height/667) ,(height/1.7)+(25*height/667),this.totalRounds,true);
+			this.gameView.renderRoundNumber(height/1.7,(height/1.7)-(20*height/667) ,(height/1.7)+(25*height/667),this.totalRounds,true,false);
 		}
 		slideLeft(width,height){
 			if(this.totalRoundsOptionNumber+1 <=4 ){
