@@ -22,6 +22,7 @@ module Game{
 		animationOne;
 		animationTwo:boolean;
 		animationThree:boolean;
+		balloonDirection;
 		buttons;
 		buttons2;
 		
@@ -52,6 +53,7 @@ module Game{
 			this.youCanClick = false;
 			this.balloonHeight = this.height*200/667;
 			this.buttons2 = this.resources.buttons2;
+			this.balloonDirection = false;
 		}
 		renderNotEnoughCategories(height,velocity,friction){
 			clearTimeout(this.balloonAnimation);
@@ -63,6 +65,8 @@ module Game{
 				var bounceFactor = 0.5;
 				this.clearCanvas();
 				this.drawBackGround();
+				this.context.drawImage(this.balloon,this.width - this.width*230/375,this.balloonHeight,this.width*280/375,this.height*320/667);
+				this.drawButtons();
 				this.context.drawImage(this.noCatSel, this.width/5, height, this.width/1.5, this.height/3);
 				height += velocity;
 				velocity += gravity;
@@ -84,10 +88,10 @@ module Game{
 		}
 		drawButtons(){
 			if(this.gameMode == 1){
-				this.context.drawImage(this.buttons,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				this.context.drawImage(this.buttons,0,this.height/2.5,this.width/2,this.height/2.4);
 				
 			}else{
-				this.context.drawImage(this.buttons2,this.width/4,this.height/2.5,this.width/2,this.height/2.4);
+				this.context.drawImage(this.buttons2,0,this.height/2.5,this.width/2,this.height/2.4);
 			}
 		}
 		
@@ -104,7 +108,7 @@ module Game{
 			
 			var targetHeightTop = this.height*180/667;
 			var targetHeightBottom = this.height*250/667;
-			this.balloonAnimation1(this.height*200/667,targetHeightTop, targetHeightBottom,false);
+			this.balloonAnimation1(this.balloonHeight,targetHeightTop, targetHeightBottom,this.balloonDirection);
 			
 			/*
 			//this.beginAnimationOne(-this.height/4,-(this.height/4+this.height-4));
@@ -137,6 +141,8 @@ module Game{
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
 				this.drawButtons();
 				height-=.1;
+				this.balloonHeight = height;
+				this.balloonDirection = direction
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
 				this.balloonAnimation = setTimeout(f, 1000/600);
@@ -146,6 +152,8 @@ module Game{
 				this.context.drawImage(this.balloon,this.width - this.width*230/375,height,this.width*280/375,this.height*320/667);
 				this.drawButtons();
 				height+=.1;
+				this.balloonHeight = height;
+				this.balloonDirection = direction;
 				var self = this
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
 				this.balloonAnimation = setTimeout(f, 1000/600);

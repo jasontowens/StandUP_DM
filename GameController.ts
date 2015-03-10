@@ -83,7 +83,7 @@ module Game{
 		startAnothaGame(){
 			if(this.model.canChange){
 				this.model.newItem = false;
-				this.model.startGame(5);
+				this.model.startGame(30);
 			}else{
 				var self = this;
 				var f = function(){self.startAnothaGame();};
@@ -97,19 +97,29 @@ module Game{
 		}
 		
 		mobileClick(e){
-			if(this.model.gameOver){
+			
 				var mobileClickY = event.y;
  				mobileClickY -= this.canvas.offsetTop;
 				var mobileClickX = event.x;
 				mobileClickX -= this.canvas.offsetLeft;
-				this.click(mobileClickX,mobileClickY);
-			}
+				if(this.model.gameOver){
+					this.gameOverClickOne(mobileClickX,mobileClickY);
+				}else if(this.model.gameStarted){
+					this.BackToMenuClick(mobileClickX,mobileClickY);
+				}
 		}
 		
-		click(X,Y){
-		var menuButton = (550/667)*this.height;
+		gameOverClickOne(X,Y){
+			var menuButton = (550/667)*this.height;
 			if(Y>menuButton){
-				console.log("badddd");
+				this.switchToMenuState()
+			}
+		}
+		BackToMenuClick(X,Y){
+			var menuButtonY = (530/667)*this.height;
+			var menuButtonX = (70/375)*this.width;
+			if(Y>menuButtonY && X<menuButtonX){
+				this.model.endGame();
 				this.switchToMenuState()
 			}
 		}
@@ -144,7 +154,6 @@ module Game{
 			var menuButton = (550/667)*this.height;
 			if(Y>menuButton){
 				if(X< this.width/2){
-					this.model.gameOver = true;
 					this.switchToMenuState();
 				}else{
 					this.model.startGame();
@@ -194,7 +203,7 @@ module Game{
 					this.model.changeItem();
 				}
 			}
-		
+			this.BackToMenuClick(X,Y);
 		}
 		
 		switchToMenuState(){

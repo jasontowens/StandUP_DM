@@ -7,6 +7,7 @@ module Game{
 		gameView;
 		gameCount;
 		canChange;
+		gameLoop;
 		
 		clearVariables(){
 			super.clearVariables();
@@ -43,10 +44,10 @@ module Game{
 			this.gameStarted = true;
 			var self = this;
 			var f = function(){self.startGame(timeOfRound)};
-			var timeout = setTimeout(f, 100);
+			this.gameLoop = setTimeout(f, 100);
 			this.gameView.renderCurrentWordOne(this.currentItem,timeOfRound);
 			if(timeOfRound <= 0){
-				clearTimeout(timeout);
+				clearTimeout(this.gameLoop);
 				this.gameOver = true;
 				this.gameView.renderGameOver(this.playedWords.length,this.playedWords,this.correctPlayedWords);
 			}
@@ -68,7 +69,12 @@ module Game{
 			}else{
 				timeOfRound = timeOfRound - 0.1;
 			}	
-			
+		}
+		endGame(){
+			if(this.gameLoop){
+				clearTimeout(this.gameLoop)
+			}	
+		
 		}
 	}
 }
