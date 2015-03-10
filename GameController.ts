@@ -153,11 +153,11 @@ module Game{
 		clickNextRoundOption(X,Y){
 			var menuButton = (550/667)*this.height;
 			if(Y>menuButton){
-				if(X< this.width/2){
-					this.switchToMenuState();
-				}else{
-					this.model.startGame();
-				}
+				this.model.startGame();
+				
+			}
+			if(X < 150*this.width/375 && Y < 100*this.height/667){
+				this.switchToMenuState();
 			}
 		}
 		clickMenuOption(X,Y){
@@ -170,15 +170,17 @@ module Game{
 			var leftArrowStartingX	= (260/375) * this.width;
 			var leftArrowStartingY =  (250/667) * this.height;
 			var leftArrowEndingY = (340/667)* this.height;
+			if(X < 150*this.width/375 && Y < 100*this.height/667){
+				this.model.stopBouncingAnimations();
+				this.switchToMenuState();
+			}
 			if(X > leftArrowStartingX && X  < this.width ){
 				if(Y > leftArrowStartingY && Y < leftArrowEndingY){
-					this.model.clickRightArrow();
-					this.model.slideLeft(this.width);
+					this.model.clickRightArrow(this.width,this.height);
 				}
 			}else if(X > 0 && X  < (150/375)*this.width ){
 				if(Y > leftArrowStartingY && Y < leftArrowEndingY){
-					this.model.clickLeftArrow();
-					this.model.slideRight(this.width);
+					this.model.clickLeftArrow(this.width,this.height);
 				}
 			}else{
 				if(Y > 550/667 * this.height){

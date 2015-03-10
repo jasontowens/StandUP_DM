@@ -41,32 +41,29 @@ module Game{
 			this.menuView.render(this.gameloop.currentGame);
 		}
 		click(X,Y){
-			
-			if(X<this.width/2){
-			console.log(Y);
-				if(X<183*this.width/375 && X>7*this.width/375){
-					if(Y<342*this.height/667 && Y>291*this.height/667){
-						this.switchToGameState();		
-					}
-					else if(Y<410*this.height/667 && Y>352*this.height/667){
-						this.switchToCategoriesState();	
-					}
-					else if(Y<475*this.height/667 && Y>425*this.height/667){
-						this.gameloop.switchGameModes();
-					}
-					else if(Y<540*this.height/667 && Y>483*this.height/667){
-						//how to play
-					}
+			if(X<183*this.width/375 && X>7*this.width/375){
+				if(Y<342*this.height/667 && Y>291*this.height/667){
+					this.switchToGameState();		
 				}
-			
+				else if(Y<410*this.height/667 && Y>352*this.height/667){
+					this.switchToCategoriesState();	
+				}
+				else if(Y<475*this.height/667 && Y>425*this.height/667){
+					this.gameloop.switchGameModes();
+				}
+				else if(Y<540*this.height/667 && Y>483*this.height/667){
+					//how to play
+				}
 			}
-		}
+		
+			 
+		 }
 		 
 		 
 		switchStates(){
 			clearTimeout(this.menuView.balloonAnimation);
 			this.canvas.removeEventListener('click', this.mobileClick); 
-				console.log("switching states");
+			console.log("switching states");
 		}
 	
 		switchToGameState(){

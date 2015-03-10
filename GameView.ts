@@ -87,8 +87,8 @@ module Game{
 			this.context.font = "30px AG Book Rounded";
 			this.context.textBaseline = 'bottom';
 			this.context.textAlign = 'left';
-			this.context.fillStyle = 'blue';
-			this.context.fillText("< Menu", 30*this.width/375 , 40*this.height/667);
+			this.context.fillStyle = 'black';
+			this.context.fillText("< Menu", 30*this.width/375 , 60*this.height/667);
 		}
 		drawNumber(timeLeft){
 			this.rotateContext();
@@ -225,12 +225,12 @@ module Game{
 			this.context.fillText(teamOneScore, this.width/4, this.height/1.8);
 			this.context.fillText(teamTwoScore, 3*this.width/4, this.height/1.8);
 		}
-		renderRoundNumber(height,rounds,up){
+		renderRoundNumber(height,top,bottom,rounds,up){
 			this.context.drawImage(this.roundPicking, 0, 0, this.width, this.height);
-			this.renderRoundNumber1(height,rounds,up);	
+			this.renderRoundNumber1(height,top,bottom,rounds,up);	
 		}
 		
-		renderRoundNumber1(height,rounds,up){
+		renderRoundNumber1(height,top,bottom,rounds,up){
 			var self = this;
 			
 			this.clearCanvas();
@@ -241,12 +241,12 @@ module Game{
 			}else{
 				++height;
 			}
-			if(height > this.height/2 + 10){
+			if(height > bottom){
 				up = true;
-			}else if(height < this.height/2 - 20){
+			}else if(height < top){
 				up = false;
 			}
-			var f = function(){self.renderRoundNumber1(height,rounds,up)};
+			var f = function(){self.renderRoundNumber1(height,top,bottom,rounds,up)};
 			this.bouncingAnimation = setTimeout(f, 20);
 			this.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
@@ -255,7 +255,7 @@ module Game{
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
-			this.context.fillStyle = "blue";
+			this.context.fillStyle = "black";
 			this.context.fillText(rounds, this.width/2, height);	
 		}
 		clickLeftArrow(currTime){
@@ -264,18 +264,18 @@ module Game{
 		clickRightArrow(){
 			
 		}
-		slideLeft(rounds1,rounds2,width1,width2){
+		slideLeft(rounds1,rounds2,width1,width2,top,bottom){
 			this.clearCanvas();
 			var self = this;
 			this.context.drawImage(self.roundPicking, 0, 0, this.width, this.height);
 			width1-=5;
 			width2-=5;
 			clearTimeout(this.bouncingAnimation);
-			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2)};
+			var f = function(){self.slideLeft(rounds1,rounds2,width1,width2,top,bottom)};
 			this.slideLeftAnimation = setTimeout(f, 5);
 			if(width2 <= Math.round(this.width/2)){
 				clearTimeout(this.slideLeftAnimation);
-				this.renderRoundNumber1(this.bouncingHeight,rounds2,true);
+				this.renderRoundNumber1(this.bouncingHeight,top,bottom,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
@@ -287,18 +287,18 @@ module Game{
 			this.drawMenuTextVertical();
 			
 		}
-		slideRight(rounds1,rounds2,width1,width2){
+		slideRight(rounds1,rounds2,width1,width2,top,bottom){
 			this.clearCanvas();
 			var self = this;
 			self.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			width1+=5;
 			width2+=5;
 			clearTimeout(this.bouncingAnimation);
-			var f = function(){self.slideRight(rounds1,rounds2,width1,width2)};
+			var f = function(){self.slideRight(rounds1,rounds2,width1,width2,top,bottom)};
 			this.slideRightAnimation = setTimeout(f, 5);
 			if(width2 >= Math.round(this.width/2)){
 				clearTimeout(this.slideRightAnimation);
-				this.renderRoundNumber1(this.bouncingHeight,rounds2,true);
+				this.renderRoundNumber1(this.bouncingHeight,top,bottom,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
@@ -429,7 +429,7 @@ module Game{
 			  this.context.textAlign = 'center';
 			  this.rotateContext();
 			  this.context.fillStyle = "white";
-			  this.context.fillText( "TEAM " + teamNumber + ' TIME REMAINING: ' + Math.floor(timeLeft), 250*this.width/375, 65*this.height/667); 
+			  this.context.fillText( "TEAM " + teamNumber + ' TIME: ' + Math.floor(timeLeft), 170*this.width/375, 65*this.height/667); 
 			  this.context.restore();
 		}
 

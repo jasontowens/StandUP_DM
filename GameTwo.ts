@@ -68,24 +68,27 @@ module Game{
 		changeItem(){
 			this.newItem = true;
 		}
-		clickLeftArrow(){
-			this.gameView.clickLeftArrow();
+		clickLeftArrow(w,h){
+			this.slideRight(w,h)
+			
 		}
-		clickRightArrow(){
-			this.gameView.clickRightArrow();
+		clickRightArrow(w,h){
+			this.slideLeft(w,h)
 		}
 		setTotalRounds(){
 			this.totalRounds = this.totalRoundsOption[this.totalRoundsOptionNumber%5];
 		}
 		beginGame(height){
-			this.gameView.renderRoundNumber(height/2,this.totalRounds,true);
+			this.gameView.renderRoundNumber(height/1.7,(height/1.7)-(20*height/667) ,(height/1.7)+(25*height/667),this.totalRounds,true);
 		}
-		slideLeft(width){
-			this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(++this.totalRoundsOptionNumber)%5],width/2,width+70);
+		slideLeft(width,height){
+			if(this.totalRoundsOptionNumber+1 <=4 ){
+				this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(++this.totalRoundsOptionNumber)%5],width/2,width+70,(height/1.5)-40 ,(height/1.5)+50);
+			}
 		}
-		slideRight(width){
+		slideRight(width,height){
 			if(this.totalRoundsOptionNumber-1 >= 0){
-				this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,-70);
+				this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber)%5],this.totalRoundsOption[(--this.totalRoundsOptionNumber)%5],width/2,-70,(height/1.5)-40 ,(height/1.5)+50);
 			}
 		}
 		selectedRoundNumber(){
@@ -98,13 +101,24 @@ module Game{
 		notEnoughCategories(){
 		 	this.gameView.renderNotEnoughCategories
 		}
+		stopBouncingAnimations(){
+			if(this.gameView.bouncingAnimation){
+				clearTimeout(this.gameView.bouncingAnimation);
+			}
+			if(this.gameView.slideRightAnimation){	
+				clearTimeout(this.gameView.bouncingAnimation);
+			}
+			if(this.gameView.slideLeftAnimation){
+				clearTimeout(this.gameView.bouncingAnimation);
+			}
 		
+		}
 		startGame(){
 			this.inBetweenRounds = false;
 			this.playingGame = true;
 			this.gameStarted = true;
-			this.teamOneTimeLeft = 30;
-			this.teamTwoTimeLeft = 30;
+			this.teamOneTimeLeft = 2;
+			this.teamTwoTimeLeft = 2;
 			this.teamOneTotalTime = 0;
 			this.teamTwoTotalTime = 0;
 			this.currentRound++;
@@ -113,9 +127,9 @@ module Game{
 		startGameForEachRound(){
 			var act
 			if(this.activeTeam == 1){
-				act = this.teamOneTimeLeft;
+				act = this.teamOneTotalTime;
 			}else{	
-				act = this.teamTwoTimeLeft;
+				act = this.teamTwoTotalTime;
 			}
 			this.gameView.renderCurrentWordTwo(this.currentItem,act,this.activeTeam);
 			var self = this;

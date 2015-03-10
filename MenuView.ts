@@ -32,6 +32,7 @@ module Game{
 		constructor(resources,context,width,height,gameMode){
 			this.resources = resources;
 			this.buttons = this.resources.buttons;
+			this.buttons2 = this.resources.buttons2;
 			this.orangeBackground = this.resources.orangeBackground;
 			this.balloon = this.resources.balloon;
 			this.stand = this.resources.stand;
@@ -52,7 +53,6 @@ module Game{
 			this.animationThree = false;
 			this.youCanClick = false;
 			this.balloonHeight = this.height*200/667;
-			this.buttons2 = this.resources.buttons2;
 			this.balloonDirection = false;
 		}
 		renderNotEnoughCategories(height,velocity,friction){
@@ -99,41 +99,19 @@ module Game{
 			if(this.balloonAnimation){
 				clearTimeout(this.balloonAnimation);
 			}
-			if(gameMode == 1){
-				this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
-			
-			}else{
-				this.context.drawImage(this.menu_background2, 0, 0, this.width, this.height);
-			}
-			
+		
+			this.context.drawImage(this.menu_background1, 0, 0, this.width, this.height);
+		
 			var targetHeightTop = this.height*180/667;
 			var targetHeightBottom = this.height*250/667;
 			this.balloonAnimation1(this.balloonHeight,targetHeightTop, targetHeightBottom,this.balloonDirection);
-			
-			/*
-			//this.beginAnimationOne(-this.height/4,-(this.height/4+this.height-4));
-			//this.beginAnimationTwo(this.height + this.height*50/667);;
-			
-			this.context.drawImage(this.kids, 0, 0, this.width, this.height);
-			this.context.globalAlpha = .2;
-			this.context.fillStyle = "black";
-			this.context.fillRect(0,0,this.width,this.height);
-			//this.context.fillStyle = "#1F1F99";
-			this.context.fillStyle = "#FFFFFF";
-			this.context.globalAlpha = .9;
-			this.context.fillRect(0,0,3*this.width/4,this.height);
-			
-			
-			}
-			this.context.globalAlpha = 1;
-			*/
+		
 		}
 		balloonAnimation1(height,top,bottom,direction){
 			if(height>=bottom){
 				direction = true;
 			}else if(height <= top){
 				direction = false;
-				
 			}
 			if(direction){
 				this.clearCanvas();
@@ -143,7 +121,7 @@ module Game{
 				height-=.1;
 				this.balloonHeight = height;
 				this.balloonDirection = direction
-				var self = this
+				var self = this;
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
 				this.balloonAnimation = setTimeout(f, 1000/600);
 			}else{
@@ -161,27 +139,6 @@ module Game{
 		
 		}
 		
-		drawText(rectX,rectY,width,height,text,color){
-    		var fontSize = 30;
-    		var fontSizeString = fontSize.toString();
-    		var font = "pt AG Book Rounded";
-    		this.context.font = fontSizeString + font;
-      		//this.context.textAlign="center"; 
-			this.context.textBaseline = "middle";
-      		this.context.fillStyle = color;
-      		var metrics = this.context.measureText(text);
-      		var metricsWidth = metrics.width;
-      		while(metricsWidth >= width){
-      			--fontSize;
-      			var fontSizeString = fontSize.toString();
-      			this.context.font = fontSizeString + font;
-      			metrics = this.context.measureText(text);
-      			metricsWidth = metrics.width;
-      			
-      		}
-      		
-      		this.context.fillText(text,this.width/30,rectY+(height/2));
-    	}
 		
 		
 	}
