@@ -16,6 +16,7 @@ module Game{
 		playingGame;
 		totalRoundsOption:number[];
 		totalRoundsOptionNumber;
+		gameLoop;
 		
 		
 		clearVariables(){
@@ -43,8 +44,8 @@ module Game{
 			this.gameStarted = false;
 			this.changeWord();
 			this.activeTeam = 1;
-			this.teamOneTimeLeft = 2;
-			this.teamTwoTimeLeft = 2;
+			this.teamOneTimeLeft = 30;
+			this.teamTwoTimeLeft = 30;
 			this.teamOneScore = 0;
 			this.teamTwoScore = 0;
 			this.currentRound = 0;
@@ -102,8 +103,8 @@ module Game{
 			this.inBetweenRounds = false;
 			this.playingGame = true;
 			this.gameStarted = true;
-			this.teamOneTimeLeft = 2;
-			this.teamTwoTimeLeft = 2;
+			this.teamOneTimeLeft = 30;
+			this.teamTwoTimeLeft = 30;
 			this.teamOneTotalTime = 0;
 			this.teamTwoTotalTime = 0;
 			this.currentRound++;
@@ -119,7 +120,7 @@ module Game{
 			this.gameView.renderCurrentWordTwo(this.currentItem,act,this.activeTeam);
 			var self = this;
 			var f = function(){self.startGameForEachRound()};
-			var timeout = setTimeout(f, 100);
+			this.gameLoop = setTimeout(f, 100);
 			if(this.teamOneTimeLeft < 0 || this.teamTwoTimeLeft < 0){
 				this.gameView.canDrawBalloons = true;
 				if(this.currentRound == this.totalRounds){
@@ -144,7 +145,7 @@ module Game{
 					this.inBetweenRounds = true;
 					this.gameView.renderInBetweenRounds(this.teamOneScore,this.teamTwoScore,this.currentRound,this.totalRounds);
 				}
-				clearTimeout(timeout);	
+				clearTimeout(this.gameLoop);	
 			}
 			if(this.newItem){
 				this.playedWords.push(this.currentItem);
@@ -160,5 +161,11 @@ module Game{
 				this.teamTwoTimeLeft -= .1;
 			}		
 		}
+		
+		endGame(){
+				if(this.gameLoop){
+					clearTimeout(this.gameLoop);
+				}
+		}	
 	}
 }

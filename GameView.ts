@@ -73,11 +73,28 @@ module Game{
 			this.context.drawImage(this.balloon,w,height,balloonWidth,balloonHeight);
 
 		}
+		drawMenuTextHorizontal(){
+			this.rotateContext();
+			this.context.font = "30px AG Book Rounded";
+			this.context.textBaseline = 'bottom';
+			this.context.textAlign = 'left';
+			this.context.fillStyle = 'blue';
+			this.context.fillText("< Menu", -140*this.width/375, 65*this.height/667);
+			this.context.restore();
+		
+		}
+		drawMenuTextVertical(){
+			this.context.font = "30px AG Book Rounded";
+			this.context.textBaseline = 'bottom';
+			this.context.textAlign = 'left';
+			this.context.fillStyle = 'blue';
+			this.context.fillText("< Menu", 30*this.width/375 , 40*this.height/667);
+		}
 		drawNumber(timeLeft){
 			this.rotateContext();
 			this.context.font = "bold 80px AG Book Rounded";
 			this.context.textBaseline = 'center';
-			this.context.textAlign = 'center';
+			this.context.textAlign = 'left';
 			this.context.fillStyle = 'white';
 			timeLeft = Math.floor(timeLeft);
 			if(timeLeft == -1){
@@ -98,6 +115,7 @@ module Game{
 			this.clearCanvas();
 			currTime = Math.round(currTime);
 			this.context.drawImage(this.game_background, 0, 0, this.width, this.height);
+			this.drawMenuTextHorizontal();
 			this.printWord(currword);
 			this.printTime(currTime);
 		
@@ -107,12 +125,13 @@ module Game{
 			this.clearCanvas();
 			teamTime = Math.floor(teamTime);
 			this.context.drawImage(this.game_background2, 0, 0, this.width, this.height);
+			this.drawMenuTextHorizontal();
 			this.printWord(currWord);
 			this.printTimeTwo(teamTime,activeTeam);
 		
 		}
 		
-		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count,image){
+		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count,image,drawMenu){
 			var balloon_height = 100/667*this.height;
 			var balloon_width = 95/375 * this.width;
 			var w1 = 30/375 * this.width;
@@ -146,12 +165,15 @@ module Game{
 				this.context.drawImage(this.balloon,w1,h1,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w2,h2,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w3,h3,balloon_width,balloon_height);
+				if(drawMenu){
+					this.drawMenuTextVertical();
+				}	
 				print();
 				h1-=s1;
 				h2-=s2;
 				h3-=s3;
 				var self = this;
-				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count,image)};
+				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count,image,drawMenu)};
 				t = setTimeout(hm,1000/60);
 			}else{
 				clearTimeout(t);
@@ -188,7 +210,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background)
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background,true)
 		}
 		
 		printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
@@ -229,6 +251,7 @@ module Game{
 			this.context.drawImage(self.roundPicking, 0, 0, self.width, self.height);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.drawMenuTextVertical();
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
@@ -261,7 +284,7 @@ module Game{
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
-			
+			this.drawMenuTextVertical();
 			
 		}
 		slideRight(rounds1,rounds2,width1,width2){
@@ -284,6 +307,7 @@ module Game{
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
+			this.drawMenuTextVertical();
 		}
 		renderSelectedRoundNumber(){
 			clearTimeout(this.bouncingAnimation);
@@ -292,7 +316,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printGameOverTwo(score1,score2)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background);	
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false);	
 			
 		}
 		printGameOverTwo(score1,score2){
@@ -311,7 +335,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printGameOver(numItems,playedWords,correct)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background);	
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false);	
 					
 		}
 		printGameOver(numItems:number,playedWords:string[],correct:boolean){
@@ -405,7 +429,7 @@ module Game{
 			  this.context.textAlign = 'center';
 			  this.rotateContext();
 			  this.context.fillStyle = "white";
-			  this.context.fillText( "TEAM " + teamNumber + ' TIME REMAINING: ' + Math.floor(timeLeft), this.height/4, this.width*2/15 +5); 
+			  this.context.fillText( "TEAM " + teamNumber + ' TIME REMAINING: ' + Math.floor(timeLeft), 250*this.width/375, 65*this.height/667); 
 			  this.context.restore();
 		}
 

@@ -44,16 +44,17 @@ module Game{
 			
 			if(X<this.width/2){
 			console.log(Y);
-				if(Y<290*this.height/565 && Y>245*this.height/565){
+			if(X<183*this.width/375 && X>7*this.width/375){
+				if(Y<342*this.height/667 && Y>291*this.height/667){
 					this.switchToGameState();		
 				}
-				else if(Y<340*this.height/565 && Y>300*this.height/565){
+				else if(Y<410*this.height/667 && Y>352*this.height/667){
 					this.switchToCategoriesState();	
 				}
-				else if(Y<400*this.height/565 && Y>350*this.height/565){
+				else if(Y<475*this.height/667 && Y>425*this.height/667){
 					this.gameloop.switchGameModes();
 				}
-				else if(Y<450*this.height/565 && Y>410*this.height/565){
+				else if(Y<540*this.height/667 && Y>483*this.height/667){
 					//how to play
 				}
 			}
