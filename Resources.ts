@@ -26,6 +26,8 @@ module Game{
 		slime = new Image();
 		blueBackground = new Image();
 		
+		nextRoundButton = new Image();
+		
 		constructor(){
 			this.menu_background1.src = "thenewMenu.png";
 			this.menu_background2.src = "thenewMenu2.png";
@@ -51,7 +53,7 @@ module Game{
 			this.blueBackground.src = "blueBackground.png";
 			this.buttons.src = "buttons.png";
 			this.buttons2.src = "buttons2.png";
-			
+			this.nextRoundButton.src = "NextRound.png";
 		
 		}
 		hasLoaded():boolean{
@@ -76,8 +78,9 @@ module Game{
 			this.blueBackground.complete &&
 			this.slime.complete &&
 			this.kids.complete &&
-			this.buttons.complete&&
-			this.buttons2.complete);
+			this.buttons.complete &&
+			this.buttons2.complete &&
+			this.nextRoundButton.complete);
 		}
 		
 	}

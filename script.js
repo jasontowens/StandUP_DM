@@ -98,6 +98,7 @@ var Game;
             this.stand = new Image();
             this.slime = new Image();
             this.blueBackground = new Image();
+            this.nextRoundButton = new Image();
             this.menu_background1.src = "thenewMenu.png";
             this.menu_background2.src = "thenewMenu2.png";
             this.game_background.src = "InGame.png";
@@ -122,9 +123,10 @@ var Game;
             this.blueBackground.src = "blueBackground.png";
             this.buttons.src = "buttons.png";
             this.buttons2.src = "buttons2.png";
+            this.nextRoundButton.src = "NextRound.png";
         }
         Resources.prototype.hasLoaded = function () {
-            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete && this.orangeBackground.complete && this.stand.complete && this.blueBackground.complete && this.slime.complete && this.kids.complete && this.buttons.complete && this.buttons2.complete);
+            return (this.menu_background1.complete && this.menu_background2.complete && this.game_background.complete && this.game_background2.complete && this.roundPicking.complete && this.forehead.complete && this.pass.complete && this.correct.complete && this.endGame_background.complete && this.rightArrow.complete && this.rightArrowPressed.complete && this.leftArrowPressed.complete && this.category_background.complete && this.category_background1.complete && this.noCatSel.complete && this.balloon.complete && this.orangeBackground.complete && this.stand.complete && this.blueBackground.complete && this.slime.complete && this.kids.complete && this.buttons.complete && this.buttons2.complete && this.nextRoundButton.complete);
         };
         return Resources;
     })();
@@ -424,12 +426,12 @@ var Game;
         };
         GameTwo.prototype.slideLeft = function (width, height) {
             if (this.totalRoundsOptionNumber + 1 <= 4) {
-                this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 70, (height / 1.5) - 40, (height / 1.5) + 50);
+                this.gameView.slideLeft(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(++this.totalRoundsOptionNumber) % 5], width / 2, width + 70, (height / 1.7) - (20 * height / 667), (height / 1.7) + (25 * height / 667));
             }
         };
         GameTwo.prototype.slideRight = function (width, height) {
             if (this.totalRoundsOptionNumber - 1 >= 0) {
-                this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, -70, (height / 1.5) - 40, (height / 1.5) + 50);
+                this.gameView.slideRight(this.totalRoundsOption[(this.totalRoundsOptionNumber) % 5], this.totalRoundsOption[(--this.totalRoundsOptionNumber) % 5], width / 2, -70, (height / 1.7) - (20 * height / 667), (height / 1.7) + (25 * height / 667));
             }
         };
         GameTwo.prototype.selectedRoundNumber = function () {
@@ -536,6 +538,7 @@ var Game;
     var GameView = (function () {
         function GameView(resources, context, width, height, model) {
             this.resources = resources;
+            this.nextRoundButton = this.resources.nextRoundButton;
             this.game_background = this.resources.game_background;
             this.game_background2 = this.resources.game_background2;
             this.forehead = this.resources.forehead;
@@ -633,7 +636,7 @@ var Game;
             this.printWord(currWord);
             this.printTimeTwo(teamTime, activeTeam);
         };
-        GameView.prototype.balloonAnimation = function (print, h1, h2, h3, s1, s2, s3, count, image, drawMenu) {
+        GameView.prototype.balloonAnimation = function (print, h1, h2, h3, s1, s2, s3, count, image, drawMenu, inBetweenRounds) {
             var balloon_height = 100 / 667 * this.height;
             var balloon_width = 95 / 375 * this.width;
             var w1 = 30 / 375 * this.width;
@@ -665,6 +668,9 @@ var Game;
             if (this.canIDrawBalloons()) {
                 this.clearCanvas();
                 this.context.drawImage(image, 0, 0, this.width, this.height);
+                if (inBetweenRounds) {
+                    this.context.drawImage(this.nextRoundButton, this.width - 330 * this.width / 375, this.height - 100 * this.height / 667, 275 * this.width / 375, 100 * this.height / 667);
+                }
                 this.context.drawImage(this.balloon, w1, h1, balloon_width, balloon_height);
                 this.context.drawImage(this.balloon, w2, h2, balloon_width, balloon_height);
                 this.context.drawImage(this.balloon, w3, h3, balloon_width, balloon_height);
@@ -677,7 +683,7 @@ var Game;
                 h3 -= s3;
                 var self = this;
                 var hm = function () {
-                    self.balloonAnimation(print, h1, h2, h3, s1, s2, s3, ++count, image, drawMenu);
+                    self.balloonAnimation(print, h1, h2, h3, s1, s2, s3, ++count, image, drawMenu, inBetweenRounds);
                 };
                 t = setTimeout(hm, 1000 / 60);
             }
@@ -715,7 +721,7 @@ var Game;
             var f = function () {
                 self.printRounds(teamOneScore, teamTwoScore, currentRound, totalRounds);
             };
-            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.game_background, true);
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.game_background, true, true);
         };
         GameView.prototype.printRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
             this.context.font = "50px AG Book Rounded";
@@ -759,6 +765,9 @@ var Game;
             this.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
             this.drawMenuTextVertical();
             this.context.font = "150px AG Book Rounded";
+            if (rounds == "11") {
+                this.context.font = "130px AG Book Rounded";
+            }
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
             this.context.fillStyle = "black";
@@ -784,9 +793,16 @@ var Game;
                 this.renderRoundNumber1(this.bouncingHeight, top, bottom, rounds2, true);
             }
             this.context.font = "150px AG Book Rounded";
+            if (rounds1 == "11") {
+                this.context.font = "130px AG Book Rounded";
+            }
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
             this.context.fillText(rounds1, width1, this.bouncingHeight);
+            this.context.font = "150px AG Book Rounded";
+            if (rounds2 == "11") {
+                this.context.font = "130px AG Book Rounded";
+            }
             this.context.fillText(rounds2, width2, this.bouncingHeight);
             this.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
             this.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
@@ -810,7 +826,14 @@ var Game;
             this.context.font = "150px AG Book Rounded";
             this.context.textBaseline = 'center';
             this.context.textAlign = 'center';
+            if (rounds1 == "11") {
+                this.context.font = "130px AG Book Rounded";
+            }
             this.context.fillText(rounds1, width1, this.bouncingHeight);
+            this.context.font = "150px AG Book Rounded";
+            if (rounds2 == "11") {
+                this.context.font = "130px AG Book Rounded";
+            }
             this.context.fillText(rounds2, width2, this.bouncingHeight);
             this.context.drawImage(this.rightArrow, 13.5 * this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
             this.context.drawImage(this.leftArrow, this.width / 20, this.height / 2.5, 100 / 375 * this.width, 100 / 667 * this.height);
@@ -825,7 +848,7 @@ var Game;
             var f = function () {
                 self.printGameOverTwo(score1, score2);
             };
-            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background, false);
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background, false, false);
         };
         GameView.prototype.printGameOverTwo = function (score1, score2) {
             this.context.font = "40px AG Book Rounded";
@@ -847,7 +870,7 @@ var Game;
             var f = function () {
                 self.printGameOver(numItems, playedWords, correct);
             };
-            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background, false);
+            this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background, false, false);
         };
         GameView.prototype.printGameOver = function (numItems, playedWords, correct) {
             var numCorrect = 0;

@@ -15,6 +15,7 @@ module Game{
 		
 		game_background;
 		game_background2;
+		nextRoundButton;
 		forehead;
 		pass;
 		roundPicking;
@@ -28,6 +29,7 @@ module Game{
 	
 		constructor(resources,context,width,height,model){
 			this.resources = resources;
+			this.nextRoundButton = this.resources.nextRoundButton;
 			this.game_background = this.resources.game_background;
 			this.game_background2 = this.resources.game_background2;
 			this.forehead = this.resources.forehead;
@@ -131,7 +133,7 @@ module Game{
 		
 		}
 		
-		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count,image,drawMenu){
+		balloonAnimation(print,h1,h2,h3,s1,s2,s3,count,image,drawMenu,inBetweenRounds){
 			var balloon_height = 100/667*this.height;
 			var balloon_width = 95/375 * this.width;
 			var w1 = 30/375 * this.width;
@@ -162,6 +164,9 @@ module Game{
 			if(this.canIDrawBalloons()){
 				this.clearCanvas();
 				this.context.drawImage(image, 0, 0, this.width, this.height);
+				if(inBetweenRounds){
+					this.context.drawImage(this.nextRoundButton,this.width- 330*this.width/375,this.height-100*this.height/667 ,275*this.width/375,100*this.height/667);
+				}
 				this.context.drawImage(this.balloon,w1,h1,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w2,h2,balloon_width,balloon_height);
 				this.context.drawImage(this.balloon,w3,h3,balloon_width,balloon_height);
@@ -173,7 +178,7 @@ module Game{
 				h2-=s2;
 				h3-=s3;
 				var self = this;
-				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count,image,drawMenu)};
+				var hm = function(){self.balloonAnimation(print,h1,h2,h3,s1,s2,s3,++count,image,drawMenu,inBetweenRounds)};
 				t = setTimeout(hm,1000/60);
 			}else{
 				clearTimeout(t);
@@ -210,7 +215,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background,true)
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background,true,true)
 		}
 		
 		printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
@@ -253,6 +258,9 @@ module Game{
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.drawMenuTextVertical();
 			this.context.font = "150px AG Book Rounded";
+			if(rounds == "11"){
+				this.context.font = "130px AG Book Rounded";
+			}
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
 			this.context.fillStyle = "black";
@@ -278,9 +286,16 @@ module Game{
 				this.renderRoundNumber1(this.bouncingHeight,top,bottom,rounds2,true);
 			}
 			this.context.font = "150px AG Book Rounded";
+			if(rounds1 == "11"){
+				this.context.font = "130px AG Book Rounded";
+			}
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
+			this.context.font = "150px AG Book Rounded";
+			if(rounds2 == "11"){
+				this.context.font = "130px AG Book Rounded";
+			}
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
@@ -303,7 +318,14 @@ module Game{
 			this.context.font = "150px AG Book Rounded";
 			this.context.textBaseline = 'center';
 			this.context.textAlign = 'center';
+			if(rounds1 == "11"){
+				this.context.font = "130px AG Book Rounded";
+			}
 			this.context.fillText(rounds1, width1, this.bouncingHeight);
+			this.context.font = "150px AG Book Rounded";
+			if(rounds2 == "11"){
+				this.context.font = "130px AG Book Rounded";
+			}
 			this.context.fillText(rounds2, width2, this.bouncingHeight);
 			this.context.drawImage(this.rightArrow, 13.5* this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
 			this.context.drawImage(this.leftArrow, this.width/20, this.height/2.5, 100/375 * this.width, 100/667*this.height);
@@ -316,7 +338,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printGameOverTwo(score1,score2)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false);	
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false,false);	
 			
 		}
 		printGameOverTwo(score1,score2){
@@ -335,7 +357,7 @@ module Game{
 			this.clearCanvas();
 			var self = this;
 			var f = function(){self.printGameOver(numItems,playedWords,correct)};
-			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false);	
+			this.balloonAnimation(f,0,0,0,0,0,0,0,this.endGame_background,false,false);	
 					
 		}
 		printGameOver(numItems:number,playedWords:string[],correct:boolean){
