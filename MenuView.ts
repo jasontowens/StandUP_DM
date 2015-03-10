@@ -75,7 +75,7 @@ module Game{
 					velocity *= -bounceFactor;
 					++friction;
 				}
-				var self = this
+				var self = this;
 				var f = function(){self.renderNotEnoughCategories(height,velocity, friction)};
 				this.animationOne = setTimeout(f, 1000/60);
 			}
@@ -154,7 +154,7 @@ module Game{
 				height+=.1;
 				this.balloonHeight = height;
 				this.balloonDirection = direction;
-				var self = this
+				var self = this;
 				var f = function(){self.balloonAnimation1(height,top,bottom,direction)};
 				this.balloonAnimation = setTimeout(f, 1000/600);
 			}
