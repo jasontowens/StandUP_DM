@@ -52,8 +52,11 @@ module Game{
 				this.gameView.renderGameOver(this.playedWords.length,this.playedWords,this.correctPlayedWords);
 			}
 			if(this.newItem){
-				this.playedWords.push(this.currentItem);
+				this.playedWords.push(this.currentItem);				
 				this.correctPlayedWords.push(this.recentPassOrFail);
+				
+				this.recentlyUsedWords.push(this.currentItem);
+				
 				console.log("len" + this.playedWords.length);
 				console.log("cuur" + this.currentItem);
 				this.changeWord();

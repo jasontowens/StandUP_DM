@@ -1,10 +1,11 @@
 module Game{
 	export class Model{
 	
-		chosenCategories:boolean[];
+		chosenCategories:boolean[]; 
 		Categories:string[][];//decide which ones are which
 		currentItem:string;
 		
+		recentlyUsedWords:string[];
 		playedWords:string[];
 		correctPlayedWords:boolean[];
 		gameOver:boolean;
@@ -16,6 +17,7 @@ module Game{
 		constructor(){
 			this.chosenCategories = [];
 			this.playedWords = [];
+			this.recentlyUsedWords = [];
 			this.correctPlayedWords = [];
 			this.generateItems();
 			this.gameOver = false;
@@ -32,6 +34,8 @@ module Game{
 			}
 		}
 		generateItems(){
+		
+		
 			//VERY IMPORTANT: FIRST ELEMENT IN EACH CATEGORY IS THE NAME OF THE CATEGORY, DO NOT PRINT IT
 			this.Categories= 
 				[
@@ -58,23 +62,54 @@ module Game{
 				this.chosenCategories[i] = true;
 			}
 		}
+	
+		
 		changeWord(){
 			var currentCategory = this.randomUsableCategory();
 			this.currentWordCategory = currentCategory;
 			this.currentItem = this.randomWordInCategory(currentCategory);//category, phrase in category
 			
-			for(var i=0; i != this.playedWords.length; ++i){
-				if(this.playedWords[i]){
-					if(this.currentItem == this.playedWords[i]){
+			for(var i=0; i < this.recentlyUsedWords.length; ++i){
+				if(this.recentlyUsedWords[i]){
+					if(this.currentItem == this.recentlyUsedWords[i]){
 						this.changeWord();
 						break;
 					}
 				}
 				else{
-					console.log("game.playedWords[i] not found");
+					console.log("game.recentlyUsedWords[i] not found");
 				}
+				
+				if(this.recentlyUsedWords.length >= this.numberOfActivePhrases()){ // if we're almost out of possible words not used this game
+					while(this.recentlyUsedWords.length != 0){
+						this.recentlyUsedWords.pop();
+					}
+				}
+				
+				
 			}
 		 }
+		 
+		 numberOfActiveCategories(){ //returns number of selected categories
+			var count = 0;
+			for(var i = 0; i!= this.chosenCategories.length; ++i){
+				if(this.chosenCategories[i]){
+					++count;
+				}
+			}
+			return count;
+		 }
+		 
+		 numberOfActivePhrases(){ //returns number of possible phrases under selected categories
+			var count = 0;
+			for(var i = 0; i!= this.chosenCategories.length; ++i){
+				if(this.chosenCategories[i]){
+					count += (this.Categories[i].length -1); // -1 is for first element which is name of category 
+				}
+			}
+			return count;
+		 }
+		 
 		 
 		randomUsableCategory(){	//returns an int
 			var usableCategories=0;
