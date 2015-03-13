@@ -33,9 +33,11 @@ module Game{
 			this.width = width;
 			this.height = height;
 			this.model = new GameOne();
+			
 			this.view = new MenuView(this.resources,context,width,height,1);	
 			this.controller = new Game.MenuController(this,canvas,width,height,this.model,this.view);
 			this.gameOne = new GameOne();
+			this.gameOne.gameLoop = this;
 			this.gameTwo = new GameTwo();
 			this.currentGame = 1;
 				

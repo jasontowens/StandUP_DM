@@ -12,6 +12,7 @@ module Game{
 		slideRightAnimation;
 		slideLeftAnimation;
 		bouncingHeight;
+		startingHeight;
 		
 		game_background;
 		game_background2;
@@ -46,7 +47,7 @@ module Game{
 			this.width = width;
 			this.height = height;
 			this.model = model;
-			
+			this.startingHeight=0;
 		}
 		renderForehead(){
 			this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
@@ -217,7 +218,6 @@ module Game{
 			var f = function(){self.printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds)};
 			this.balloonAnimation(f,0,0,0,0,0,0,0,this.game_background,true,true)
 		}
-		
 		printRounds(teamOneScore,teamTwoScore,currentRound,totalRounds){
 			this.context.font = "50px AG Book Rounded";
 			this.context.textBaseline = 'center';
@@ -233,8 +233,7 @@ module Game{
 		renderRoundNumber(height,top,bottom,rounds,up){
 			this.context.drawImage(this.roundPicking, 0, 0, this.width, this.height);
 			this.renderRoundNumber1(height,top,bottom,rounds,up);	
-		}
-		
+		}	
 		renderRoundNumber1(height,top,bottom,rounds,up){
 			var self = this;
 			
@@ -361,18 +360,23 @@ module Game{
 					
 		}
 		printGameOver(numItems:number,playedWords:string[],correct:boolean){
+			console.log("numItems: "+ numItems +" playedWords[0]: "+playedWords[0] + "correctBool: " + correct);
+		
 			var numCorrect = 0;
 			var shiftUp = 0;
 			for(var i = 0; i < numItems; ++i){ 	
-			if(!correct[i]){	//if word was passed
-				this.context.fillStyle = "red";		
-			}
-			else{
-				numCorrect++;
-				this.context.fillStyle = "green";
-			}
-			this.context.font = "20px AG Book Rounded";
-			this.context.fillText(playedWords[i], this.width/2, this.height*1/4+i*23 - shiftUp *23);
+				if(!correct[i]){	//if word was passed
+					this.context.fillStyle = "red";		
+				}
+				else{
+					numCorrect++;
+					this.context.fillStyle = "green";
+				}
+				this.context.font = "20px AG Book Rounded";
+				var printY = this.height*1/4+i*23 - shiftUp *23 - this.startingHeight;
+				if(printY < this.height * 3/4 && printY>this.height*1/8){
+					this.context.fillText(playedWords[i], this.width/2, printY);
+				}
 			}
 			this.context.font = "40px AG Book Rounded";
 			this.context.fillStyle = "white";

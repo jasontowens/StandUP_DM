@@ -13,6 +13,16 @@ module Game{
 		model;
 		gamma;
 		gameShallStart;
+		gameLength;
+		
+		//printing
+		startX;
+		startY;
+		endX;
+		endY;
+		startingHeight;
+		fingerLifted;
+		oldY;
 		
 		constructor(gameloop,canvas,width,height,model){
 			this.gameloop = gameloop;
@@ -22,6 +32,7 @@ module Game{
 			this.model = model;
 			this.gameShallStart = false;
 			this.gamma = 0;
+			this.gameLength=5;
 		}
 		takeInput(){
 			 if(this.model instanceof GameOne){
@@ -35,6 +46,74 @@ module Game{
 		gameOneTakeInput(){
 			 this.startGameOne();
 		}
+		
+		endGameInput(){
+			this.fingerLifted = false;
+			this.startingHeight = 0;
+			this.startingHeight = 0;
+			this.oldY = 0;
+		
+			this.ScrollingEnd = <any>this.ScrollingEnd.bind(this);
+			this.endScrollingEnd = <any>this.endScrollingEnd.bind(this);
+			this.startClickEnd = <any>this.startClickEnd.bind(this);
+			//this.canvas.addEventListener("touchstart",this.startClickEnd);
+			this.canvas.addEventListener("touchmove",this.ScrollingEnd);
+			this.canvas.addEventListener("touchend",this.endScrollingEnd);
+		}
+		
+		startClickEnd(event){
+			event.preventDefault();
+			var canvas_x = event.targetTouches[0].pageX;
+			var canvas_y = event.targetTouches[0].pageY;
+			this.startX = canvas_x;
+			this.startY = canvas_y;
+			this.endY = canvas_y;
+			this.endX = canvas_x;
+		}
+		ScrollingEnd(event){
+			event.preventDefault();
+			var screenHeight = this.height - (this.height/4);
+			//var buttonHeight = screenHeight/7;
+			var maxHeight = 23 * this.model.playedWords.length;
+			var canvas_x = event.targetTouches[0].pageX;
+			var canvas_y = event.targetTouches[0].pageY;
+			console.log(this.startingHeight + "sh");
+			if(this.fingerLifted){
+				this.startX = canvas_x;
+				this.startY = canvas_y;
+			}
+			if(!this.fingerLifted){
+				var difference = this.oldY - canvas_y;
+				var newStartingHeight = this.startingHeight+difference;
+				
+				if(newStartingHeight < 0){
+					this.startingHeight = 0;
+				}
+				else{
+					this.startingHeight = newStartingHeight;
+				}
+				//this.categoriesView.renderCategories(Math.round(this.startingHeight),this.model.chosenCategories);
+				
+			}
+			
+			this.oldY = canvas_y;
+			this.endY = canvas_y;
+			this.endX = canvas_x;
+			this.model.setEndGameStartingHeight(this.startingHeight);
+			this.fingerLifted = false;
+			
+		}
+		endScrollingEnd(event){
+			this.fingerLifted = true;
+			console.log(this.startX + " " + this.endX);
+			if(Math.abs(this.startX - this.endX)< 5){
+				if(Math.abs(this.startY - this.endY) < 5){
+					//this.updateGame(this.endY)
+				}
+			}
+		}
+		 
+		
 		
 		startGameOne(){
 			this.model.beginGame();
@@ -65,6 +144,7 @@ module Game{
 				  }
 				mostRecentState  = self.gamma;
 			}
+			this.waitForGameOver();
 			this.startDaGame();
 		}
 		startDaGame(){
@@ -83,7 +163,7 @@ module Game{
 		startAnothaGame(){
 			if(this.model.canChange){
 				this.model.newItem = false;
-				this.model.startGame(30);
+				this.model.startGame(this.gameLength);
 			}else{
 				var self = this;
 				var f = function(){self.startAnothaGame();};
@@ -103,11 +183,14 @@ module Game{
 				var mobileClickX = event.x;
 				mobileClickX -= this.canvas.offsetLeft;
 				if(this.model.gameOver){
+					//this.endGameInput();
 					this.gameOverClickOne(mobileClickX,mobileClickY);
 				}else if(this.model.gameStarted){
 					this.BackToMenuClick(mobileClickX,mobileClickY);
 				}
 		}
+		
+		
 		
 		gameOverClickOne(X,Y){
 			var menuButton = (550/667)*this.height;
@@ -158,6 +241,17 @@ module Game{
 			}
 			if(X < 150*this.width/375 && Y < 100*this.height/667){
 				this.switchToMenuState();
+			}
+		}
+		waitForGameOver(){
+			if(this.model.gameOver){
+				this.endGameInput();
+			}
+			else{
+				var t;
+				var self = this;
+				var f = function(){self.waitForGameOver();};
+				t = setTimeout(f,50);
 			}
 		}
 		clickMenuOption(X,Y){

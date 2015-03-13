@@ -584,6 +584,7 @@ var Game;
             this.width = width;
             this.height = height;
             this.model = model;
+            this.startingHeight = 0;
         }
         GameView.prototype.renderForehead = function () {
             this.context.drawImage(this.forehead, 0, 0, this.width, this.height);
@@ -752,7 +753,6 @@ var Game;
             };
             this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.game_background, true, true);
         };
-
         GameView.prototype.printRounds = function (teamOneScore, teamTwoScore, currentRound, totalRounds) {
             this.context.font = "50px AG Book Rounded";
             this.context.textBaseline = 'center';
@@ -769,7 +769,6 @@ var Game;
             this.context.drawImage(this.roundPicking, 0, 0, this.width, this.height);
             this.renderRoundNumber1(height, top, bottom, rounds, up);
         };
-
         GameView.prototype.renderRoundNumber1 = function (height, top, bottom, rounds, up) {
             var self = this;
 
@@ -901,6 +900,8 @@ var Game;
             this.balloonAnimation(f, 0, 0, 0, 0, 0, 0, 0, this.endGame_background, false, false);
         };
         GameView.prototype.printGameOver = function (numItems, playedWords, correct) {
+            console.log("numItems: " + numItems + " playedWords[0]: " + playedWords[0] + "correctBool: " + correct);
+
             var numCorrect = 0;
             var shiftUp = 0;
             for (var i = 0; i < numItems; ++i) {
@@ -911,7 +912,10 @@ var Game;
                     this.context.fillStyle = "green";
                 }
                 this.context.font = "20px AG Book Rounded";
-                this.context.fillText(playedWords[i], this.width / 2, this.height * 1 / 4 + i * 23 - shiftUp * 23);
+                var printY = this.height * 1 / 4 + i * 23 - shiftUp * 23 - this.startingHeight;
+                if (printY < this.height * 3 / 4 && printY > this.height * 1 / 8) {
+                    this.context.fillText(playedWords[i], this.width / 2, printY);
+                }
             }
             this.context.font = "40px AG Book Rounded";
             this.context.fillStyle = "white";
@@ -1032,6 +1036,11 @@ var Game;
         GameOne.prototype.notEnoughCategories = function () {
             this.gameView.renderNotEnoughCategories;
         };
+
+        GameOne.prototype.setEndGameStartingHeight = function (startingHeight) {
+            this.gameView.startingHeight = startingHeight;
+        };
+
         GameOne.prototype.startGame = function (timeOfRound) {
             this.gameStarted = true;
             var self = this;
@@ -1041,6 +1050,7 @@ var Game;
             this.gameLoop = setTimeout(f, 100);
             this.gameView.renderCurrentWordOne(this.currentItem, timeOfRound);
             if (timeOfRound <= 0) {
+                //console.log("gameLoop Height! "+this.gameLoop.height);
                 clearTimeout(this.gameLoop);
                 this.gameOver = true;
                 this.gameView.renderGameOver(this.playedWords.length, this.playedWords, this.correctPlayedWords);
@@ -1090,6 +1100,7 @@ var Game;
             this.model = model;
             this.gameShallStart = false;
             this.gamma = 0;
+            this.gameLength = 5;
         }
         GameController.prototype.takeInput = function () {
             if (this.model instanceof Game.GameOne) {
@@ -1102,6 +1113,71 @@ var Game;
 
         GameController.prototype.gameOneTakeInput = function () {
             this.startGameOne();
+        };
+
+        GameController.prototype.endGameInput = function () {
+            this.fingerLifted = false;
+            this.startingHeight = 0;
+            this.startingHeight = 0;
+            this.oldY = 0;
+
+            this.ScrollingEnd = this.ScrollingEnd.bind(this);
+            this.endScrollingEnd = this.endScrollingEnd.bind(this);
+            this.startClickEnd = this.startClickEnd.bind(this);
+
+            //this.canvas.addEventListener("touchstart",this.startClickEnd);
+            this.canvas.addEventListener("touchmove", this.ScrollingEnd);
+            this.canvas.addEventListener("touchend", this.endScrollingEnd);
+        };
+
+        GameController.prototype.startClickEnd = function (event) {
+            event.preventDefault();
+            var canvas_x = event.targetTouches[0].pageX;
+            var canvas_y = event.targetTouches[0].pageY;
+            this.startX = canvas_x;
+            this.startY = canvas_y;
+            this.endY = canvas_y;
+            this.endX = canvas_x;
+        };
+        GameController.prototype.ScrollingEnd = function (event) {
+            event.preventDefault();
+            var screenHeight = this.height - (this.height / 4);
+
+            //var buttonHeight = screenHeight/7;
+            var maxHeight = 23 * this.model.playedWords.length;
+            var canvas_x = event.targetTouches[0].pageX;
+            var canvas_y = event.targetTouches[0].pageY;
+            console.log(this.startingHeight + "sh");
+            if (this.fingerLifted) {
+                this.startX = canvas_x;
+                this.startY = canvas_y;
+            }
+            if (!this.fingerLifted) {
+                var difference = this.oldY - canvas_y;
+                var newStartingHeight = this.startingHeight + difference;
+
+                if (newStartingHeight < 0) {
+                    this.startingHeight = 0;
+                } else {
+                    this.startingHeight = newStartingHeight;
+                }
+                //this.categoriesView.renderCategories(Math.round(this.startingHeight),this.model.chosenCategories);
+            }
+
+            this.oldY = canvas_y;
+            this.endY = canvas_y;
+            this.endX = canvas_x;
+            this.model.setEndGameStartingHeight(this.startingHeight);
+            this.fingerLifted = false;
+        };
+        GameController.prototype.endScrollingEnd = function (event) {
+            this.fingerLifted = true;
+            console.log(this.startX + " " + this.endX);
+            if (Math.abs(this.startX - this.endX) < 5) {
+                if (Math.abs(this.startY - this.endY) < 5) {
+                    //this.updateGame(this.endY)
+                }
+            }
         };
 
         GameController.prototype.startGameOne = function () {
@@ -1131,6 +1207,7 @@ var Game;
                 }
                 mostRecentState = self.gamma;
             };
+            this.waitForGameOver();
             this.startDaGame();
         };
         GameController.prototype.startDaGame = function () {
@@ -1150,7 +1227,7 @@ var Game;
         GameController.prototype.startAnothaGame = function () {
             if (this.model.canChange) {
                 this.model.newItem = false;
-                this.model.startGame(30);
+                this.model.startGame(this.gameLength);
             } else {
                 var self = this;
                 var f = function () {
@@ -1170,6 +1247,7 @@ var Game;
             var mobileClickX = event.x;
             mobileClickX -= this.canvas.offsetLeft;
             if (this.model.gameOver) {
+                //this.endGameInput();
                 this.gameOverClickOne(mobileClickX, mobileClickY);
             } else if (this.model.gameStarted) {
                 this.BackToMenuClick(mobileClickX, mobileClickY);
@@ -1223,6 +1301,18 @@ var Game;
             }
             if (X < 150 * this.width / 375 && Y < 100 * this.height / 667) {
                 this.switchToMenuState();
+            }
+        };
+        GameController.prototype.waitForGameOver = function () {
+            if (this.model.gameOver) {
+                this.endGameInput();
+            } else {
+                var t;
+                var self = this;
+                var f = function () {
+                    self.waitForGameOver();
+                };
+                t = setTimeout(f, 50);
             }
         };
         GameController.prototype.clickMenuOption = function (X, Y) {
@@ -1538,9 +1628,11 @@ var Game;
             this.width = width;
             this.height = height;
             this.model = new Game.GameOne();
+
             this.view = new Game.MenuView(this.resources, context, width, height, 1);
             this.controller = new Game.MenuController(this, canvas, width, height, this.model, this.view);
             this.gameOne = new Game.GameOne();
+            this.gameOne.gameLoop = this;
             this.gameTwo = new Game.GameTwo();
             this.currentGame = 1;
         }

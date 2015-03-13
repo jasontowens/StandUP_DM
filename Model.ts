@@ -111,6 +111,7 @@ module Game{
 		 }
 		 
 		 
+		 
 		randomUsableCategory(){	//returns an int
 			var usableCategories=0;
 			for(var i=0; i!=this.chosenCategories.length; ++i){

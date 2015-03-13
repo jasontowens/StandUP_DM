@@ -40,6 +40,11 @@ module Game{
 		 notEnoughCategories(){
 		 	this.gameView.renderNotEnoughCategories
 		 }
+		 
+		 setEndGameStartingHeight(startingHeight:number){
+			this.gameView.startingHeight = startingHeight;
+		 }
+		 
 		startGame(timeOfRound:number){
 			this.gameStarted = true;
 			var self = this;
@@ -47,6 +52,7 @@ module Game{
 			this.gameLoop = setTimeout(f, 100);
 			this.gameView.renderCurrentWordOne(this.currentItem,timeOfRound);
 			if(timeOfRound <= 0){
+				//console.log("gameLoop Height! "+this.gameLoop.height);
 				clearTimeout(this.gameLoop);
 				this.gameOver = true;
 				this.gameView.renderGameOver(this.playedWords.length,this.playedWords,this.correctPlayedWords);
